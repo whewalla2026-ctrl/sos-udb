@@ -1,0 +1,668 @@
+// ─────────────────────────────────────────────────────────────────────────────
+// Unified Developmental Backbone (UDB) — Prisma Schema
+// Primary Database: PostgreSQL (Cloud SQL / Local Docker)
+// ─────────────────────────────────────────────────────────────────────────────
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─── Enums ───────────────────────────────────────────────────────────────────
+
+enum UserRole {
+  PARENT
+  CHILD
+  ADMIN
+}
+
+enum DoterState {
+  EGG
+  HATCHLING
+  JUVENILE
+  ADOLESCENT
+  ADULT
+  LEGENDARY
+}
+
+enum QuestStatus {
+  PENDING
+  IN_PROGRESS
+  SUBMITTED
+  APPROVED
+  REJECTED
+  EXPIRED
+}
+
+enum QuestPillar {
+  ACADEMIC
+  BIOMETRIC
+  GAMIFICATION
+  ENTREPRENEURSHIP
+  SOCIAL
+  LIFE_SKILLS
+}
+
+enum TransactionType {
+  EARN
+  SPEND
+  REVERSE
+  ESCROW_HOLD
+  ESCROW_RELEASE
+}
+
+enum TransactionSource {
+  QUEST
+  MANUAL_AWARD
+  ESCROW
+  PURCHASE
+  BONUS
+  STREAK_REWARD
+}
+
+enum TransactionStatus {
+  PENDING
+  SETTLED
+  REVERSED
+}
+
+enum GoalStatus {
+  ACTIVE
+  COMPLETED
+  PAUSED
+  ARCHIVED
+}
+
+enum ActivityStatus {
+  SCHEDULED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+enum MessageStatus {
+  SENT
+  DELIVERED
+  READ
+}
+
+enum VentureStatus {
+  DRAFT
+  ACTIVE
+  PAUSED
+  COMPLETED
+}
+
+enum EscrowStatus {
+  HELD
+  PROOF_SUBMITTED
+  RELEASED
+  DISPUTED
+  REFUNDED
+}
+
+enum BiometricSource {
+  APPLE_HEALTH
+  OURA
+  GOOGLE_FIT
+  MANUAL
+  WEARABLE
+}
+
+// ─── Core Models ─────────────────────────────────────────────────────────────
+
+model User {
+  id          String   @id @default(uuid())
+  firebaseUid String   @unique @map("firebase_uid")
+  email       String   @unique
+  displayName String?  @map("display_name")
+  avatarUrl   String?  @map("avatar_url")
+  role        UserRole
+  dateOfBirth DateTime? @map("date_of_birth")
+  timezone    String   @default("UTC")
+
+  // The Unified User Profile (UUP) — JSONB
+  uupData Json @default("{}") @map("uup_data")
+
+  // COPPA / GDPR
+  coppaConsentVerified Boolean   @default(false) @map("coppa_consent_verified")
+  coppaConsentDate     DateTime? @map("coppa_consent_date")
+  gdprDeleteRequested  Boolean   @default(false) @map("gdpr_delete_requested")
+
+  // Accessibility
+  accessibilitySettings Json @default("{}") @map("accessibility_settings")
+
+  // Timestamps
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  lastSeenAt DateTime? @map("last_seen_at")
+
+  // ── Relations ──────────────────────────────────────────────────────────────
+  // Family
+  parentLinks  FamilyLink[] @relation("ParentLinks")
+  childLinks   FamilyLink[] @relation("ChildLinks")
+
+  // Gamification
+  doterProfile DoterProfile?
+  quests       Quest[]
+  pointsLedger PointsLedger[]
+  goals        Goal[]
+  streaks      Streak[]
+
+  // Calendar
+  activities   Activity[]
+
+  // Academic
+  lmsConnections LmsConnection[]
+  skillGaps      SkillGap[]
+  tutoringSessions TutoringSession[]
+
+  // Biometric
+  biometricLogs BiometricLog[]
+
+  // Social
+  sentMessages     Message[] @relation("SentMessages")
+  receivedMessages Message[] @relation("ReceivedMessages")
+  evidenceItems    EvidenceItem[]
+
+  // Entrepreneurship
+  ventures       Venture[]
+  escrows        Escrow[]
+
+  // Safety
+  safetyScores   SafetyScore[]
+
+  // System
+  auditLogs AuditLog[]
+  notifications Notification[]
+
+  @@map("users")
+}
+
+// ─── Family ──────────────────────────────────────────────────────────────────
+
+model FamilyLink {
+  id               String   @id @default(uuid())
+  parentId         String   @map("parent_id")
+  childId          String   @map("child_id")
+  consentVerified  Boolean  @default(false) @map("consent_verified")
+  consentMethod    String?  @map("consent_method") // CREDIT_CARD | ID_CHECK
+  createdAt        DateTime @default(now()) @map("created_at")
+
+  parent User @relation("ParentLinks", fields: [parentId], references: [id], onDelete: Cascade)
+  child  User @relation("ChildLinks", fields: [childId], references: [id], onDelete: Cascade)
+
+  @@unique([parentId, childId])
+  @@map("family_links")
+}
+
+// ─── Doter (Gamified Avatar) ─────────────────────────────────────────────────
+
+model DoterProfile {
+  id          String     @id @default(uuid())
+  userId      String     @unique @map("user_id")
+  state       DoterState @default(EGG)
+  name        String     @default("My Doter")
+  level       Int        @default(1)
+  xp          Int        @default(0)
+  coinBalance Int        @default(0) @map("coin_balance")
+  streakDays  Int        @default(0) @map("streak_days")
+
+  // Current status flags
+  isSluggy    Boolean @default(false) @map("is_sluggy")     // sleep < 6h
+  isEnergetic Boolean @default(false) @map("is_energetic")  // activity complete
+  debuffs     Json    @default("[]")
+  buffs       Json    @default("[]")
+
+  // Visual
+  skinId      String  @default("default") @map("skin_id")
+  accessories Json    @default("[]")
+  evolutionHistory Json @default("[]") @map("evolution_history")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("doter_profiles")
+}
+
+// ─── Quests ──────────────────────────────────────────────────────────────────
+
+model Quest {
+  id          String      @id @default(uuid())
+  userId      String      @map("user_id")
+  title       String
+  description String?
+  pillar      QuestPillar
+  status      QuestStatus @default(PENDING)
+
+  // Rewards
+  xpReward    Int @default(100) @map("xp_reward")
+  coinReward  Int @default(50)  @map("coin_reward")
+
+  // Proof of Work
+  proofUrl      String? @map("proof_url")
+  proofType     String? @map("proof_type") // IMAGE | VIDEO | TEXT | URL
+  aiConfidence  Float?  @map("ai_confidence")
+  aiVerified    Boolean @default(false) @map("ai_verified")
+
+  // Goal mapping
+  goalId        String? @map("goal_id")
+  masteryWeight Float   @default(0) @map("mastery_weight")
+
+  // ADHD — Micro-Quest chunking
+  isChunk       Boolean @default(false) @map("is_chunk")
+  parentQuestId String? @map("parent_quest_id")
+  chunkIndex    Int?    @map("chunk_index")
+
+  // Metadata
+  metadata  Json     @default("{}")
+  dueDate   DateTime? @map("due_date")
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  goal         Goal?         @relation(fields: [goalId], references: [id])
+  parentQuest  Quest?        @relation("QuestChunks", fields: [parentQuestId], references: [id])
+  chunks       Quest[]       @relation("QuestChunks")
+  evidenceItems EvidenceItem[]
+
+  @@map("quests")
+}
+
+// ─── Points Ledger (Immutable) ────────────────────────────────────────────────
+
+model PointsLedger {
+  id              String            @id @default(uuid())
+  userId          String            @map("user_id")
+  transactionType TransactionType   @map("transaction_type")
+  amount          Int
+  balanceAfter    Int               @map("balance_after")
+  source          TransactionSource
+  sourceId        String?           @map("source_id")
+  status          TransactionStatus @default(SETTLED)
+  description     String?
+  metadata        Json              @default("{}")
+  createdAt       DateTime          @default(now()) @map("created_at")
+  // NO updatedAt — immutable by design (FR-38.1)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("points_ledger")
+}
+
+// ─── Goals ───────────────────────────────────────────────────────────────────
+
+model Goal {
+  id            String     @id @default(uuid())
+  userId        String     @map("user_id")
+  title         String
+  description   String?
+  pillar        QuestPillar
+  status        GoalStatus @default(ACTIVE)
+  targetWeight  Float      @default(100) @map("target_weight")
+  currentWeight Float      @default(0)   @map("current_weight")
+  certificateUrl String?   @map("certificate_url")
+  metadata      Json       @default("{}")
+  dueDate       DateTime?  @map("due_date")
+  completedAt   DateTime?  @map("completed_at")
+  createdAt     DateTime   @default(now()) @map("created_at")
+  updatedAt     DateTime   @updatedAt @map("updated_at")
+
+  user   User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  quests Quest[]
+
+  @@map("goals")
+}
+
+// ─── Activity Calendar ────────────────────────────────────────────────────────
+
+model Activity {
+  id          String         @id @default(uuid())
+  userId      String         @map("user_id")
+  title       String
+  description String?
+  pillar      QuestPillar?
+  status      ActivityStatus @default(SCHEDULED)
+
+  // Scheduling
+  startTime   DateTime @map("start_time")
+  endTime     DateTime @map("end_time")
+  rrule       String?          // rrule string for recurring events (FR-22.1)
+  isRecurring Boolean  @default(false) @map("is_recurring")
+
+  // Linking
+  questId     String?  @map("quest_id")
+  goalId      String?  @map("goal_id")
+
+  // Version history (UC-014)
+  version     Int      @default(1)
+  versionHistory Json  @default("[]") @map("version_history")
+
+  // Deep work flag
+  isDeepWork  Boolean @default(false) @map("is_deep_work")
+  metadata    Json    @default("{}")
+
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("activities")
+}
+
+// ─── Streaks ─────────────────────────────────────────────────────────────────
+
+model Streak {
+  id           String   @id @default(uuid())
+  userId       String   @map("user_id")
+  pillar       QuestPillar
+  currentDays  Int      @default(0) @map("current_days")
+  longestDays  Int      @default(0) @map("longest_days")
+  lastActivity DateTime? @map("last_activity")
+  freezeCount  Int      @default(0) @map("freeze_count") // UC-051: Streak Freeze
+
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, pillar])
+  @@map("streaks")
+}
+
+// ─── LMS Integration ─────────────────────────────────────────────────────────
+
+model LmsConnection {
+  id           String   @id @default(uuid())
+  userId       String   @map("user_id")
+  provider     String   // GOOGLE_CLASSROOM | CANVAS | MOODLE
+  accessToken  String   @map("access_token")
+  refreshToken String?  @map("refresh_token")
+  tokenExpiry  DateTime? @map("token_expiry")
+  externalId   String   @map("external_id") // Course/user ID in LMS
+  syncStatus   String   @default("PENDING") @map("sync_status")
+  lastSyncAt   DateTime? @map("last_sync_at")
+  metadata     Json     @default("{}")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lmsAssignments LmsAssignment[]
+
+  @@map("lms_connections")
+}
+
+model LmsAssignment {
+  id            String   @id @default(uuid())
+  connectionId  String   @map("connection_id")
+  externalId    String   @map("external_id")
+  title         String
+  description   String?
+  dueDate       DateTime? @map("due_date")
+  courseId      String   @map("course_id")
+  courseName    String   @map("course_name")
+  points        Float?
+  grade         Float?
+  status        String   @default("PENDING")
+  difficulty    Float?   // AI-predicted workload score 0-1
+  metadata      Json     @default("{}")
+  syncedAt      DateTime @default(now()) @map("synced_at")
+
+  connection LmsConnection @relation(fields: [connectionId], references: [id], onDelete: Cascade)
+
+  @@map("lms_assignments")
+}
+
+// ─── Skill Gaps ───────────────────────────────────────────────────────────────
+
+model SkillGap {
+  id           String   @id @default(uuid())
+  userId       String   @map("user_id")
+  subject      String
+  pillar       QuestPillar
+  gapScore     Float    @map("gap_score")  // 0.0 (critical) - 1.0 (mastered)
+  lastPracticed DateTime? @map("last_practiced")
+  ritScore     Float?   @map("rit_score")  // NWEA RIT score if available
+  metadata     Json     @default("{}")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, subject])
+  @@map("skill_gaps")
+}
+
+// ─── AI Tutoring ─────────────────────────────────────────────────────────────
+
+model TutoringSession {
+  id            String   @id @default(uuid())
+  userId        String   @map("user_id")
+  assignmentId  String?  @map("assignment_id")
+  subject       String
+  sessionLog    Json     @default("[]") @map("session_log") // [{role, content, timestamp}]
+  pathToSolution Json    @default("[]") @map("path_to_solution") // FR-65.2
+  masteryGained Float    @default(0) @map("mastery_gained")
+  duration      Int      @default(0) // seconds
+  createdAt     DateTime @default(now()) @map("created_at")
+  endedAt       DateTime? @map("ended_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("tutoring_sessions")
+}
+
+// ─── Biometric Logs ──────────────────────────────────────────────────────────
+
+model BiometricLog {
+  id          String         @id @default(uuid())
+  userId      String         @map("user_id")
+  loggedAt    DateTime       @default(now()) @map("logged_at")
+  sleepHours  Float?         @map("sleep_hours")
+  hrv         Float?
+  stressLevel Float?         @map("stress_level")
+  focusScore  Float?         @map("focus_score")
+  heartRate   Float?         @map("heart_rate")
+  steps       Int?
+  source      BiometricSource
+  metadata    Json           @default("{}")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, loggedAt])
+  @@map("biometric_logs")
+}
+
+// ─── Messaging (UC-047) ───────────────────────────────────────────────────────
+
+model Message {
+  id          String        @id @default(uuid())
+  senderId    String        @map("sender_id")
+  receiverId  String        @map("receiver_id")
+  content     String
+  status      MessageStatus @default(SENT)
+  isSafe      Boolean       @default(true) @map("is_safe") // AI safety check
+  safetyScore Float?        @map("safety_score")
+  isAiMessage Boolean       @default(false) @map("is_ai_message") // Life Coach messages
+  metadata    Json          @default("{}")
+  createdAt   DateTime      @default(now()) @map("created_at")
+  readAt      DateTime?     @map("read_at")
+
+  sender   User @relation("SentMessages", fields: [senderId], references: [id])
+  receiver User @relation("ReceivedMessages", fields: [receiverId], references: [id])
+
+  @@map("messages")
+}
+
+// ─── Evidence Gallery (UC-019/059) ───────────────────────────────────────────
+
+model EvidenceItem {
+  id           String  @id @default(uuid())
+  userId       String  @map("user_id")
+  questId      String? @map("quest_id")
+  title        String
+  type         String  // IMAGE | VIDEO | TEXT | DOCUMENT
+  url          String
+  thumbnailUrl String? @map("thumbnail_url")
+  aiProTip     String? @map("ai_pro_tip") // AI feedback
+  comments     Json    @default("[]")
+  isPublic     Boolean @default(false) @map("is_public")
+  metadata     Json    @default("{}")
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  user  User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  quest Quest? @relation(fields: [questId], references: [id])
+
+  @@map("evidence_items")
+}
+
+// ─── Kid-Preneur: Ventures ────────────────────────────────────────────────────
+
+model Venture {
+  id              String        @id @default(uuid())
+  userId          String        @map("user_id")
+  name            String
+  description     String?
+  status          VentureStatus @default(DRAFT)
+  businessPlanUrl String?       @map("business_plan_url")
+
+  // AI-generated plan fields
+  problem         String?
+  solution        String?
+  targetMarket    String?
+  pricingModel    String?
+  revenueModel    String?
+  totalRevenue    Float    @default(0) @map("total_revenue")
+
+  // Parent approval
+  parentApproved  Boolean  @default(false) @map("parent_approved")
+  parentApprovedAt DateTime? @map("parent_approved_at")
+
+  metadata        Json     @default("{}")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  escrows Escrow[]
+
+  @@map("ventures")
+}
+
+// ─── Financial Escrow (UC-095) ────────────────────────────────────────────────
+
+model Escrow {
+  id           String       @id @default(uuid())
+  ventureId    String       @map("venture_id")
+  sellerId     String       @map("seller_id")
+  buyerEmail   String       @map("buyer_email")
+  amountUsd    Float        @map("amount_usd")
+  status       EscrowStatus @default(HELD)
+  stripePaymentIntentId String? @map("stripe_payment_intent_id")
+  proofUrl     String?      @map("proof_url")
+  proofNotes   String?      @map("proof_notes")
+  rejectionReason String?   @map("rejection_reason")
+  releasedAt   DateTime?    @map("released_at")
+  metadata     Json         @default("{}")
+  createdAt    DateTime     @default(now()) @map("created_at")
+  updatedAt    DateTime     @updatedAt @map("updated_at")
+
+  venture Venture @relation(fields: [ventureId], references: [id])
+  seller  User    @relation(fields: [sellerId], references: [id])
+
+  @@map("escrows")
+}
+
+// ─── Achievement NFTs / SBTs ──────────────────────────────────────────────────
+
+model Achievement {
+  id            String   @id @default(uuid())
+  userId        String   @map("user_id")
+  title         String
+  description   String
+  pillar        QuestPillar
+  badgeUrl      String   @map("badge_url")
+  sbtTokenId    String?  @map("sbt_token_id") // Blockchain token ID
+  sbtContract   String?  @map("sbt_contract") // Polygon contract address
+  isMinted      Boolean  @default(false) @map("is_minted")
+  metadata      Json     @default("{}")
+  earnedAt      DateTime @default(now()) @map("earned_at")
+
+  @@map("achievements")
+}
+
+// ─── Safety Monitoring ────────────────────────────────────────────────────────
+
+model SafetyScore {
+  id          String   @id @default(uuid())
+  userId      String   @map("user_id")
+  score       Float    // 0-100
+  components  Json     @default("{}") // { messaging: 90, content: 85, social: 92 }
+  alerts      Json     @default("[]") // Active alerts
+  recordedAt  DateTime @default(now()) @map("recorded_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, recordedAt])
+  @@map("safety_scores")
+}
+
+// ─── Weekly Plans ─────────────────────────────────────────────────────────────
+
+model WeeklyPlan {
+  id          String   @id @default(uuid())
+  userId      String   @map("user_id")
+  weekStart   DateTime @map("week_start")
+  weekEnd     DateTime @map("week_end")
+  aiDraft     Json     @default("[]") @map("ai_draft") // AI suggested activities
+  finalPlan   Json     @default("[]") @map("final_plan")
+  focusPillars Json    @default("[]") @map("focus_pillars")
+  isFinalized Boolean  @default(false) @map("is_finalized")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@map("weekly_plans")
+}
+
+// ─── Notifications ────────────────────────────────────────────────────────────
+
+model Notification {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  type      String   // LOW_SLEEP_ALERT | QUEST_COMPLETE | SKILL_GAP | SAFETY_ALERT | etc.
+  title     String
+  body      String
+  data      Json     @default("{}")
+  isRead    Boolean  @default(false) @map("is_read")
+  createdAt DateTime @default(now()) @map("created_at")
+  readAt    DateTime? @map("read_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("notifications")
+}
+
+// ─── Audit Log (WORM — UC-006) ────────────────────────────────────────────────
+
+model AuditLog {
+  id         BigInt   @id @default(autoincrement())
+  actorId    String   @map("actor_id")
+  action     String   // UUP_SYNC | QUEST_APPROVE | FUND_RELEASE | etc.
+  targetType String?  @map("target_type")
+  targetId   String?  @map("target_id")
+  payload    Json     @default("{}")
+  ipAddress  String?  @map("ip_address")
+  userAgent  String?  @map("user_agent")
+  createdAt  DateTime @default(now()) @map("created_at")
+  // NO relations with onDelete — audit must be permanent
+
+  actor User @relation(fields: [actorId], references: [id])
+
+  @@index([actorId, createdAt])
+  @@index([action, createdAt])
+  @@map("audit_logs")
+}

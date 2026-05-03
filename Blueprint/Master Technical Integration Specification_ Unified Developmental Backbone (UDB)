@@ -1,0 +1,87 @@
+# Master Technical Integration Specification: Unified Developmental Backbone (UDB)
+
+**Target Audience:** Replit AI / Lead Full-Stack Engineers
+**Objective:** Complete system architecture and implementation guide for a multi-phase, cross-platform developmental ecosystem.
+
+---
+
+## 1. System Architecture & Tech Stack
+
+### 1.1. High-Level Architecture
+The UDB follows a **Monorepo Architecture** with a centralized API gateway and specialized microservices for AI, Biometrics, and Monitoring.
+
+*   **Frontend:** Next.js 14 (Web Dashboard) + React Native/Expo (Mobile App).
+*   **Backend:** NestJS (Node.js Framework) with PostgreSQL (Primary DB).
+*   **AI Layer:** Python (FastAPI) for LangChain/LangGraph orchestration.
+*   **Infrastructure:** AWS (S3 for media, RDS for DB, Pinecone for Vector Search).
+*   **Real-time:** Redis Pub/Sub for cross-pillar synchronization.
+
+### 1.2. The "Unified User Profile" (UUP) Schema
+The core of the system is a JSONB-driven profile that tracks developmental state across 4 pillars.
+
+```sql
+CREATE TABLE users_master (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    email VARCHAR(255) UNIQUE NOT NULL,
+    uup_data JSONB NOT NULL DEFAULT '{
+        "gamification": {"level": 1, "exp": 0, "doter_state": "egg"},
+        "academic": {"lms_links": [], "skill_gaps": {}},
+        "biometric": {"focus_score": 0, "sleep_logs": []},
+        "entrepreneurship": {"active_ventures": [], "wallet_balance": 0}
+    }',
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+```
+
+---
+
+## 2. Component Breakdown
+
+### 2.1. Core API (NestJS)
+*   **Responsibility:** Auth (Auth0), UUP Sync, Quest Management, and Points Ledger.
+*   **Key Service:** `UUP-Sync-Engine` – Triggers cross-pillar logic (e.g., if sleep < 6h, apply 'Sluggish' debuff to Doter).
+
+### 2.2. AI Mentor Service (Python)
+*   **Responsibility:** Socratic Tutoring, Future Self Simulation, and Business Plan Analysis.
+*   **Tech:** OpenAI GPT-4o, Pinecone (RAG), LangGraph for complex mentoring flows.
+
+### 2.3. Monitoring Agents (Electron / MDM)
+*   **Desktop:** Electron-based agent for macOS/Windows to track app focus and URL usage.
+*   **Mobile:** MDM profiles for iOS/Android for screen time and app usage ingestion.
+
+---
+
+## 3. Implementation Build Order (Phases 1-4)
+
+### Phase 1: Foundation & Habit Layer
+1.  **Monorepo Setup:** `pnpm` workspaces for `apps/web`, `apps/mobile`, and `services/api`.
+2.  **Auth Flow:** Implement Parent/Child linking with COPPA-compliant consent.
+3.  **Doter Engine:** Build the state machine for the gamified avatar.
+
+### Phase 2: Academic & Mentoring
+1.  **LMS Integration:** OAuth2 flows for Google Classroom and Canvas.
+2.  **RAG Pipeline:** Initialize Pinecone and upload academic context for the AI Tutor.
+
+### Phase 3: Social & Global Ecosystem
+1.  **WebXR Integration:** Basic 3D environment for "Joon World" using Three.js.
+2.  **Blockchain Layer:** Minting Achievement NFTs (Soulbound Tokens) for verified skills.
+
+### Phase 4: Entrepreneurship & Governance
+1.  **Stripe Connect:** Implement the escrow-based payment flow for student ventures.
+2.  **Omni-Channel Dashboard:** Real-time data visualization of usage from all agents.
+
+---
+
+## 4. API & Integration Standards
+
+### 4.1. Internal API (GraphQL)
+All frontend-to-backend communication MUST use GraphQL for efficient data fetching of the complex UUP object.
+
+### 4.2. Security (The "Guardian" Protocol)
+*   **Data at Rest:** AES-256-GCM encryption for all child-related PII.
+*   **Data in Transit:** TLS 1.3 for all agent-to-server communication.
+
+---
+
+## 5. Execution for Replit AI
+Replit AI should use the `ultimate_use_case_specification.md` for detailed flow logic and the `100_page_master_blueprint.md` for exhaustive feature descriptions. Start by initializing the monorepo and the `users_master` table.
