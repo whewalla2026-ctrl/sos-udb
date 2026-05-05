@@ -1,16 +1,33 @@
 'use client';
-import { useState } from 'react';
+import { useMutation, gql } from '@apollo/client';
+
+const RUN_SIMULATION = gql`
+  mutation RunFutureSimulation {
+    runFutureSimulation {
+      narrative
+      p50Academic
+      p50Financial
+      p50Wellness
+      avatarAttributes {
+        trait
+        value
+        intensity
+      }
+      pathways {
+        name
+        probability
+        impactScore
+      }
+    }
+  }
+`;
 
 export default function FutureSelfPage() {
-  const [isGenerating, setIsGenerating] = useState(false);
-  const [narrative, setNarrative] = useState('');
+  const [runSimulation, { data, loading }] = useMutation(RUN_SIMULATION);
+  const result = data?.runFutureSimulation;
 
   const generate = () => {
-    setIsGenerating(true);
-    setTimeout(() => {
-      setNarrative("You wake up at 6:30 AM feeling completely rested, a habit you locked in years ago. Checking your portfolio, you see the software agency you started at 19 just cleared its first $100k month — a direct result of those early 'Lemonade Stand' lessons in unit economics. Because you mastered deep work scheduling in high school, you finish your core tasks by noon. You spend the afternoon mentoring young founders, your stress levels practically zero. You built this life one quest at a time.");
-      setIsGenerating(false);
-    }, 2500);
+    runSimulation();
   };
 
   return (
@@ -24,9 +41,9 @@ export default function FutureSelfPage() {
           Our AI analyzes your current habits, skill gaps, and venture progress to generate a highly realistic "Day in the Life" story of you at age 30.
         </p>
 
-        {!narrative ? (
-          <button id="simulate-future-btn" className="btn btn-primary btn-lg" onClick={generate} disabled={isGenerating}>
-            {isGenerating ? (
+        {!result ? (
+          <button id="simulate-future-btn" className="btn btn-primary btn-lg" onClick={generate} disabled={loading}>
+            {loading ? (
               <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                 <span style={{ display: 'inline-block', width: 16, height: 16, border: '2px solid rgba(255,255,255,0.3)', borderTopColor: 'white', borderRadius: '50%', animation: 'spin 1s linear infinite' }} />
                 Simulating Timelines...
@@ -38,11 +55,44 @@ export default function FutureSelfPage() {
             <div style={{ position: 'absolute', top: -15, left: 32, background: 'var(--bg-base)', padding: '0 10px', color: 'var(--color-primary-light)', fontWeight: 600, fontSize: '0.875rem', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
               Your Timeline — Age 30
             </div>
-            <p style={{ fontSize: '1.125rem', lineHeight: 1.8, color: 'var(--text-primary)' }}>
-              {narrative}
+            
+            <p style={{ fontSize: '1.125rem', lineHeight: 1.8, color: 'var(--text-primary)', marginBottom: 24 }}>
+              {result.narrative}
             </p>
+
+            {/* Avatar Evolution Visualizer */}
+            <div style={{ marginBottom: 32, padding: 24, background: 'rgba(255,255,255,0.03)', borderRadius: 'var(--radius-lg)', border: '1px solid var(--bg-glass-border)' }}>
+              <h3 style={{ fontSize: '0.875rem', fontWeight: 700, color: 'var(--color-primary-light)', marginBottom: 16, textAlign: 'center', letterSpacing: '0.1em' }}>AVATAR EVOLUTION</h3>
+              <div style={{ display: 'flex', justifyContent: 'center', gap: 24, flexWrap: 'wrap' }}>
+                {(result.avatarAttributes || []).map((attr: any) => (
+                  <div key={attr.trait} style={{ textAlign: 'center', minWidth: 100 }}>
+                    <div style={{ width: 48, height: 48, borderRadius: '50%', background: 'var(--bg-elevated)', margin: '0 auto 8px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: `2px solid ${attr.value.includes('GOLD') ? 'var(--color-gold)' : 'var(--color-primary)'}`, boxShadow: `0 0 ${attr.intensity * 20}px ${attr.value.includes('GOLD') ? 'rgba(255,215,0,0.2)' : 'rgba(167,139,250,0.2)'}` }}>
+                      {attr.trait === 'AURA' ? '✨' : attr.trait === 'EXPRESSION' ? '😌' : attr.trait === 'POSTURE' ? '🧍' : '👔'}
+                    </div>
+                    <div style={{ fontSize: '0.75rem', fontWeight: 600 }}>{attr.value.replace('_', ' ')}</div>
+                    <div style={{ fontSize: '0.625rem', color: 'var(--text-muted)' }}>{attr.trait}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16, marginBottom: 24 }}>
+              <div style={{ textAlign: 'center', padding: 16, background: 'rgba(255,255,255,0.05)', borderRadius: 'var(--radius-md)' }}>
+                <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: 4 }}>ACADEMIC</div>
+                <div style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--color-primary)' }}>{result.p50Academic.toFixed(0)}%</div>
+              </div>
+              <div style={{ textAlign: 'center', padding: 16, background: 'rgba(255,255,255,0.05)', borderRadius: 'var(--radius-md)' }}>
+                <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: 4 }}>FINANCIAL</div>
+                <div style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--color-gold)' }}>{result.p50Financial.toFixed(0)}%</div>
+              </div>
+              <div style={{ textAlign: 'center', padding: 16, background: 'rgba(255,255,255,0.05)', borderRadius: 'var(--radius-md)' }}>
+                <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: 4 }}>WELLNESS</div>
+                <div style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--color-success)' }}>{result.p50Wellness.toFixed(0)}%</div>
+              </div>
+            </div>
+
             <div style={{ marginTop: 24, borderTop: '1px solid var(--bg-glass-border)', paddingTop: 16, display: 'flex', justifyContent: 'center' }}>
-              <button className="btn btn-secondary" onClick={() => setNarrative('')}>Reset Simulator</button>
+              <button className="btn btn-secondary" onClick={() => window.location.reload()}>Run New Simulation</button>
             </div>
           </div>
         )}

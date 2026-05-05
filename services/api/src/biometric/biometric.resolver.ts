@@ -26,4 +26,16 @@ export class BiometricResolver {
   async focusPeak(@CurrentUser() user: any) {
     return this.bio.analyzeFocusPeak(user.id);
   }
+
+  @Query(() => GraphQLJSON)
+  @UseGuards(GqlAuthGuard)
+  async resilienceMetrics(@CurrentUser() user: any) {
+    return this.bio.calculateResilienceMetrics(user.id);
+  }
+
+  @Query(() => GraphQLJSON)
+  @UseGuards(GqlAuthGuard)
+  async plasticityWindows(@CurrentUser() user: any) {
+    return this.bio.getPeakPlasticityWindows(user.id);
+  }
 }

@@ -1,0 +1,96 @@
+# Master Quality Assurance & Testing Protocol (MQATP): UDB Ecosystem
+
+**Author:** Senior Test Architect & QA Lead
+**Version:** 1.0
+**Scope:** Full-Spectrum Testing (Unit, Integration, E2E, Security, AI, & UAT)
+**Target:** Google Antigravity QA Agent / Manual Testing Team
+
+---
+
+## 1. Testing Strategy Overview
+The UDB uses a **Risk-Based Testing (RBT)** approach, prioritizing the "Guardian Protocol" (Security), "Backbone Sync" (Data Integrity), and "AI Scaffolding" (Educational Validity).
+
+---
+
+## 2. Module 1: Core Auth & Governance (UC-001 - UC-012)
+
+### Test Case TC-1.1: COPPA-Compliant Registration Flow
+*   **Scenario:** Parent registers and adds a child under 13.
+*   **Steps:**
+    1.  Input parent details and child age (e.g., 8).
+    2.  Trigger "Verified Parental Consent" (VPC) flow.
+    3.  Simulate credit card verification success.
+*   **Expected Result:** System generates a `consent_token`; Child profile is activated; Audit log (UC-006) records the VPC event with timestamp.
+*   **Edge Case:** Parent attempts to bypass VPC. Result: System MUST lock the child profile.
+
+### Test Case TC-1.2: Immutable Audit Log Verification
+*   **Scenario:** Attempt to modify a completed activity log.
+*   **Steps:**
+    1.  Create a log entry for a completed quest.
+    2.  Attempt an `UPDATE` or `DELETE` SQL command on the `audit_logs` table.
+*   **Expected Result:** Database trigger or WORM policy blocks the action; System alerts the Security Admin.
+
+---
+
+## 3. Module 2: The Intelligent Planner (UC-013 - UC-030)
+
+### Test Case TC-2.1: Conflict Resolution Logic (UC-022)
+*   **Scenario:** Overlapping "Math Quest" and "Piano Practice."
+*   **Steps:**
+    1.  Schedule Math: 4:00 PM - 5:00 PM.
+    2.  Attempt to schedule Piano: 4:30 PM - 5:30 PM.
+*   **Expected Result:** System flags conflict; AI suggests 5:00 PM - 6:00 PM based on "Low Cognitive Load" window.
+*   **Validation:** Suggestion must appear in < 500ms.
+
+---
+
+## 4. Module 3: AI Mentoring & Socratic Logic (UC-060 - UC-085)
+
+### Test Case TC-3.1: Socratic "No-Direct-Answer" Policy
+*   **Scenario:** Child asks "What is 15 x 12?"
+*   **Steps:**
+    1.  Input query to AI Tutor.
+    2.  AI analyzes intent.
+*   **Expected Result:** AI response MUST NOT contain "180". Response MUST contain a breakdown question (e.g., "What is 15 x 10?").
+*   **Pass/Fail:** Fails if the direct answer is provided in the first three interactions.
+
+---
+
+## 5. Module 4: Omni-Channel Monitoring & Safety (UC-101+)
+
+### Test Case TC-4.1: Cross-Platform Focus Sync
+*   **Scenario:** Switching from VS Code (Productive) to YouTube (Entertainment).
+*   **Steps:**
+    1.  Open VS Code; Wait 2 mins.
+    2.  Open YouTube; Wait 1 min.
+*   **Expected Result:** Parent Dashboard reflects a "Focus Score" drop from 95% to 20% in real-time (< 30s delay).
+
+---
+
+## 6. Module 5: Financial Escrow & Kid-Preneur (UC-086+)
+
+### Test Case TC-5.1: Escrow Release Protocol (UC-095)
+*   **Scenario:** Releasing payment for a "Logo Design" service.
+*   **Steps:**
+    1.  Student uploads logo (Evidence).
+    2.  Parent clicks "Release Funds."
+*   **Expected Result:** Stripe API `transfer` call triggered; Points Ledger (UC-038) reflects credit; Transaction status = "Settled."
+
+---
+
+## 7. Non-Functional Testing Requirements
+
+| Category | Requirement | Test Scenario |
+| :--- | :--- | :--- |
+| **Performance** | < 2s Page Load | Load Parent Dashboard with 100+ historical activities. |
+| **Security** | Zero PII Leak | Run automated pen-test on `uup-sync` endpoint. |
+| **Accessibility** | WCAG 2.1 AA | Run "Lighthouse" audit on Child Dashboard with Dyslexia Mode active. |
+| **Resilience** | Offline Sync | Disconnect Mobile App; Complete Quest; Reconnect. Verify sync. |
+
+---
+
+## 8. Final Acceptance Criteria (The "Go/No-Go" Checklist)
+1.  **Safety:** 100% pass on COPPA/GDPR audit tests.
+2.  **Accuracy:** > 95% accuracy in AI Socratic scaffolding.
+3.  **Sync:** < 5s latency for cross-platform data ingestion.
+4.  **UX:** < 3 clicks for a parent to approve a quest or release funds.

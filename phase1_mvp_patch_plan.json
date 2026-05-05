@@ -1,0 +1,9 @@
+{
+  "phase": 1,
+  "mvp": {
+    "core": ["uup schema", "auth flows", "audit log"],
+    "doter": ["state machine v1"],
+    "planning": ["weekly planning prototype"],
+    "sprints": 5
+  }
+}

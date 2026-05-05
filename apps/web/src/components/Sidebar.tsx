@@ -11,6 +11,7 @@ const NAV_ITEMS = [
   { section: 'GROWTH', items: [
     { href: '/dashboard/quests', icon: '⚔️', label: 'Quests' },
     { href: '/dashboard/goals', icon: '🎯', label: 'Goals' },
+    { href: '/dashboard/m-eq', icon: '🧠', label: 'mEQ Hub' },
     { href: '/dashboard/calendar', icon: '📅', label: 'Calendar' },
     { href: '/dashboard/weekly-plan', icon: '🗓️', label: 'Weekly Plan' },
   ]},
@@ -33,6 +34,8 @@ const NAV_ITEMS = [
   ]},
   { section: 'FUTURE', items: [
     { href: '/dashboard/future-self', icon: '🔮', label: 'Future Self' },
+    { href: '/dashboard/ai-proxy', icon: '🤖', label: 'AI Proxy' },
+    { href: '/dashboard/skill-agents', icon: '⚡', label: 'Skill Agents' },
     { href: '/dashboard/achievements', icon: '🏆', label: 'Achievements' },
     { href: '/dashboard/joon-world', icon: '🌍', label: 'Joon World' },
     { href: '/dashboard/marketplace', icon: '🏪', label: 'Marketplace' },

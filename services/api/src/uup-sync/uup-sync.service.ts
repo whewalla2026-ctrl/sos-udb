@@ -3,7 +3,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { REDIS_CLIENT } from '../redis/redis.module';
 import Redis from 'ioredis';
 
-export type DataSource = 'gamification' | 'academic' | 'biometric' | 'entrepreneurship' | 'metadata';
+export type DataSource = 'gamification' | 'academic' | 'biometric' | 'entrepreneurship' | 'social' | 'metadata';
 
 interface CrossPillarTrigger {
   type: string;
@@ -143,6 +143,30 @@ export class UupSyncService {
           body: `You reached Level ${level}! Your Doter is evolving!`,
         });
         triggers.push({ type: 'LEVEL_UP', severity: 'low', message: `New level: ${level}` });
+      }
+    }
+
+    // ── Entrepreneurship Triggers ─────────────────────────────────────────────
+    if (source === 'entrepreneurship') {
+      const revenue = payload.total_revenue_usd ?? uup.entrepreneurship?.total_revenue_usd ?? 0;
+      if (revenue > 500 && (uup.entrepreneurship?.total_revenue_usd ?? 0) <= 500) {
+        await this.createNotification(userId, 'VENTURE_MILESTONE', {
+          title: '💰 Major Venture Milestone!',
+          body: `Congratulations! Your total revenue has exceeded $500. A special Doter accessory has been unlocked!`,
+        });
+        triggers.push({ type: 'REVENUE_MILESTONE', severity: 'low', message: `Revenue > $500` });
+      }
+    }
+
+    // ── Social Triggers ───────────────────────────────────────────────────────
+    if (source === 'social') {
+      const safetyScore = payload.safety_score ?? 100;
+      if (safetyScore < 70) {
+        await this.createNotification(userId, 'SAFETY_ALERT', {
+          title: '🛡️ Safety Alert',
+          body: `A drop in social safety score has been detected. We recommend reviewing recent interactions.`,
+        });
+        triggers.push({ type: 'SAFETY_RISK', severity: 'critical', message: `Safety score < 70` });
       }
     }
 

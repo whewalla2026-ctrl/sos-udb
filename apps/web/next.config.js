@@ -1,6 +1,4 @@
-/** @type {import('next').NextConfig} */
-const nextConfig = {
-  experimental: { typedRoutes: true },
-  images: { domains: ['api.dicebear.com', 'lh3.googleusercontent.com'] },
+/** Minimal Next.js config placeholder for UDB web app */
+module.exports = {
+  reactStrictMode: true
 };
-module.exports = nextConfig;

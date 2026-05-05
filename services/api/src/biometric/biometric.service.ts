@@ -95,4 +95,45 @@ export class BiometricService {
       reasoning: `Based on 14 days of biometric data, your brain is most focused at ${peakHour}:00 (average score: ${peakScore.toFixed(0)}/100).`,
     };
   }
+
+  // ─── Neuro-Adaptive Refinements (Phase 5) ──────────────────────────────────
+  
+  /**
+   * Calculates the Stress-to-Focus Ratio.
+   * High ratio indicates potential burnout or lack of focus despite high effort.
+   * Low ratio indicates "Flow State" (low stress, high focus).
+   */
+  async calculateResilienceMetrics(userId: string) {
+    const logs = await this.getBiometricHistory(userId, 7);
+    if (logs.length === 0) return { ratio: 0, state: 'INSUFFICIENT_DATA' };
+
+    const avgStress = logs.map(l => l.stressLevel || 0).reduce((a, b) => a + b, 0) / logs.length;
+    const avgFocus = logs.map(l => l.focusScore || 0).reduce((a, b) => a + b, 0) / logs.length;
+
+    const ratio = avgFocus > 0 ? avgStress / avgFocus : 0;
+    
+    let state = 'NORMAL';
+    if (ratio > 0.8) state = 'BURNOUT_RISK';
+    if (ratio < 0.3 && avgFocus > 70) state = 'FLOW_STATE';
+
+    return { ratio, state, avgStress, avgFocus };
+  }
+
+  /**
+   * Identifies "Peak Plasticity" windows using HRV (Heart Rate Variability) as a proxy
+   * for nervous system readiness combined with focus scores.
+   */
+  async getPeakPlasticityWindows(userId: string) {
+    const logs = await this.getBiometricHistory(userId, 7);
+    const windows = logs
+      .filter(l => (l.hrv || 0) > 60 && (l.focusScore || 0) > 75)
+      .map(l => ({
+        startTime: l.loggedAt,
+        score: (l.hrv || 0) * (l.focusScore || 0) / 100,
+      }))
+      .sort((a, b) => b.score - a.score)
+      .slice(0, 3);
+
+    return windows;
+  }
 }

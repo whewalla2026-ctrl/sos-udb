@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { PrismaModule } from '../prisma/prisma.module';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { ConfigService } from '@nestjs/config';
@@ -19,6 +20,7 @@ import { RolesGuard } from './guards/roles.guard';
         signOptions: { expiresIn: config.get('JWT_EXPIRY', '7d') },
       }),
     }),
+    PrismaModule,
   ],
   providers: [AuthService, AuthResolver, FirebaseStrategy, JwtStrategy, GqlAuthGuard, RolesGuard],
   exports: [AuthService, GqlAuthGuard, RolesGuard, JwtModule],

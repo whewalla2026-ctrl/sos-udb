@@ -45,6 +45,7 @@ enum QuestPillar {
   ENTREPRENEURSHIP
   SOCIAL
   LIFE_SKILLS
+  SKILLS
 }
 
 enum TransactionType {
@@ -177,8 +178,11 @@ model User {
   safetyScores   SafetyScore[]
 
   // System
-  auditLogs AuditLog[]
-  notifications Notification[]
+  auditLogs      AuditLog[]
+  simulationRuns SimulationRun[]
+  skillAgents    SkillAgent[]
+  achievements   Achievement[]
+  notifications  Notification[]
 
   @@map("users")
 }
@@ -585,12 +589,15 @@ model Achievement {
   title         String
   description   String
   pillar        QuestPillar
+  points        Int      @default(0)
   badgeUrl      String   @map("badge_url")
   sbtTokenId    String?  @map("sbt_token_id") // Blockchain token ID
   sbtContract   String?  @map("sbt_contract") // Polygon contract address
   isMinted      Boolean  @default(false) @map("is_minted")
   metadata      Json     @default("{}")
   earnedAt      DateTime @default(now()) @map("earned_at")
+
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("achievements")
 }
@@ -665,4 +672,63 @@ model AuditLog {
   @@index([actorId, createdAt])
   @@index([action, createdAt])
   @@map("audit_logs")
+}
+
+// ─── Future-Self Simulation (Phase 4) ────────────────────────────────────────
+
+model SimulationRun {
+  id              String   @id @default(uuid())
+  userId          String   @map("user_id")
+  runDate         DateTime @default(now()) @map("run_date")
+  targetAge       Int      @default(30) @map("target_age")
+  
+  // Aggregate results
+  p50Academic     Float    @map("p50_academic")
+  p50Financial    Float    @map("p50_financial")
+  p50Wellness      Float    @map("p50_wellness")
+  
+  narrative       String?  @db.Text
+  actionableSteps Json     @default("[]") @map("actionable_steps")
+  
+  // Inputs snapshot
+  inputSnapshot   Json     @default("{}") @map("input_snapshot")
+
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  pathways        SimulationPathway[]
+
+  @@index([userId, runDate])
+  @@map("simulation_runs")
+}
+
+model SimulationPathway {
+  id              String   @id @default(uuid())
+  simulationId    String   @map("simulation_id")
+  name            String   // e.g. "Tech Entrepreneur", "Academic Scholar"
+  probability     Float
+  impactScore     Float    @map("impact_score")
+  description     String?
+  
+  simulation      SimulationRun @relation(fields: [simulationId], references: [id], onDelete: Cascade)
+
+  @@map("simulation_pathways")
+}
+
+// ─── Autonomous Skill Agents (Phase 5) ───────────────────────────────────────
+
+model SkillAgent {
+  id          String   @id @default(uuid())
+  userId      String   @map("user_id")
+  skillName   String   @map("skill_name")
+  status      String   @default("IDLE") // IDLE | WORKING | COMPLETED
+  autonomyLevel Float  @default(0.5) @map("autonomy_level") // 0.0 - 1.0
+  
+  learningPath Json    @default("[]") @map("learning_path")
+  lastAction   String? @map("last_action")
+  
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("skill_agents")
 }

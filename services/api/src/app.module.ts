@@ -1,75 +1,28 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
-import { GraphQLModule } from '@nestjs/graphql';
-import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
-import { join } from 'path';
-import { ScheduleModule } from '@nestjs/schedule';
-
-import { PrismaModule } from './prisma/prisma.module';
-import { RedisModule } from './redis/redis.module';
-import { AuthModule } from './auth/auth.module';
-import { UsersModule } from './users/users.module';
-import { FamilyModule } from './family/family.module';
-import { DoterModule } from './doter/doter.module';
-import { QuestsModule } from './quests/quests.module';
-import { PointsModule } from './points/points.module';
-import { GoalsModule } from './goals/goals.module';
-import { ActivitiesModule } from './activities/activities.module';
-import { BiometricModule } from './biometric/biometric.module';
-import { UupSyncModule } from './uup-sync/uup-sync.module';
-import { AcademicModule } from './academic/academic.module';
-import { MessagingModule } from './messaging/messaging.module';
-import { EvidenceModule } from './evidence/evidence.module';
-import { EntrepreneurshipModule } from './entrepreneurship/entrepreneurship.module';
-import { SafetyModule } from './safety/safety.module';
-import { WeeklyPlanModule } from './weekly-plan/weekly-plan.module';
-import { NotificationsModule } from './notifications/notifications.module';
-import { AuditModule } from './audit/audit.module';
-import { AiModule } from './ai/ai.module';
-import { BlockchainModule } from './blockchain/blockchain.module';
-import { MarketplaceModule } from './marketplace/marketplace.module';
+import { UUPModule } from './uup/uup.module';
+import { PlanningModule } from '../../planning/planning.module';
+import { EscrowModule } from '../../services/escrow/escrow.module';
+import { NFTModule } from '../../services/nft/nft.module';
+import { FutureSelfModule } from '../../services/futureself/futureself.module';
+import { MonitoringModule } from '../../services/monitoring/monitoring.module';
+import { AuthModule } from '../../services/auth/auth.module';
+import { GraphQLAppModule } from './graphql.module';
+import { AuditModule } from '../../services/audit/audit.module';
+import { LmsModule } from '../../services/lms/lms.module';
+import { AiMentorModule } from '../../services/aiMentor/aiMentor.module';
+import { JoonWorldModule } from '../../services/joonworld/joonworld.module';
+import { RagModule } from '../../services/rag/rag.module';
+import { ModerationModule } from '../../services/moderation/moderation.module';
+import { KidPreneurModule } from '../../services/kidpreneur/kidpreneur.module';
+import { OmnichannelModule } from '../../services/omnichannel/omnichannel.module';
+import { BiometricsModule } from '../../services/biometrics/biometrics.module';
+import { WalletModule } from '../../services/wallet/wallet.module';
+import { MarketplaceModule } from '../../services/marketplace/marketplace.module';
+import { AiLifeCoachModule } from '../../services/aiLifeCoach/ai_life_coach.module';
+import { GovernanceModule } from '../../services/governance/governance.module';
+import { BiometricFlowModule } from '../../services/biometric/biometric_flow.module';
 
 @Module({
-  imports: [
-    // Config
-    ConfigModule.forRoot({ isGlobal: true }),
-    ScheduleModule.forRoot(),
-
-    // GraphQL
-    GraphQLModule.forRoot<ApolloDriverConfig>({
-      driver: ApolloDriver,
-      autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
-      sortSchema: true,
-      playground: true,
-      context: ({ req }) => ({ req }),
-    }),
-
-    // Infrastructure
-    PrismaModule,
-    RedisModule,
-
-    // Feature Modules
-    AuthModule,
-    UsersModule,
-    FamilyModule,
-    DoterModule,
-    QuestsModule,
-    PointsModule,
-    GoalsModule,
-    ActivitiesModule,
-    BiometricModule,
-    UupSyncModule,
-    AcademicModule,
-    MessagingModule,
-    EvidenceModule,
-    EntrepreneurshipModule,
-    SafetyModule,
-    WeeklyPlanModule,
-    NotificationsModule,
-    AuditModule,
-    AiModule,
-    BlockchainModule,
-    MarketplaceModule,
-  ],
+  imports: [UUPModule, PlanningModule, EscrowModule, NFTModule, FutureSelfModule, MonitoringModule, AuthModule, GraphQLAppModule, AuditModule, LmsModule, AiMentorModule, JoonWorldModule, KidPreneurModule, OmnichannelModule, BiometricsModule, RagModule, ModerationModule, MarketplaceModule, WalletModule, AiLifeCoachModule, GovernanceModule, BiometricFlowModule],
 })
 export class AppModule {}

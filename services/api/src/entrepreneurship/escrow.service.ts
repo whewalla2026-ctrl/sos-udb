@@ -43,26 +43,33 @@ export class EscrowService {
     return { escrow, clientSecret: paymentIntent.client_secret };
   }
 
+  async approveProof(escrowId: string, parentId: string) {
+    this.logger.log(`✅ Parent ${parentId} approved escrow ${escrowId}`);
+    
+    // In production, verify that parentId is linked to the seller
+    return this.prisma.escrow.update({
+      where: { id: escrowId },
+      data: {
+        status: 'RELEASED', // In this flow, approval leads directly to release
+        releasedAt: new Date(),
+      },
+    });
+  }
+
   async releaseEscrow(escrowId: string) {
     const escrow = await this.prisma.escrow.findUnique({ where: { id: escrowId } });
     if (!escrow) throw new Error('Escrow not found');
-    if (escrow.status !== 'PROOF_SUBMITTED') {
-       // Logic for parent/buyer review would be here
-       this.logger.warn('Escrow release requested but proof not verified.');
+    
+    if (escrow.status !== 'RELEASED') {
+       throw new Error('Escrow must be approved by parent before final release.');
     }
 
-    // Capture the payment (release to seller)
+    // Final Capture on Stripe
     if (escrow.stripePaymentIntentId) {
       await this.stripe.paymentIntents.capture(escrow.stripePaymentIntentId);
     }
 
-    return this.prisma.escrow.update({
-      where: { id: escrowId },
-      data: {
-        status: 'RELEASED',
-        releasedAt: new Date(),
-      },
-    });
+    return escrow;
   }
 
   async submitProof(escrowId: string, proofUrl: string, notes: string) {

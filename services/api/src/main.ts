@@ -1,29 +1,21 @@
 import { NestFactory } from '@nestjs/core';
-import { ValidationPipe, Logger } from '@nestjs/common';
 import { AppModule } from './app.module';
+import * as fs from 'fs';
+import * as https from 'https';
 
 async function bootstrap() {
-  const logger = new Logger('UDB-API');
-  const app = await NestFactory.create(AppModule, {
-    logger: ['log', 'error', 'warn', 'debug'],
-  });
-
-  app.enableCors({
-    origin: [process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'],
-    credentials: true,
-  });
-
-  app.useGlobalPipes(
-    new ValidationPipe({
-      whitelist: true,
-      forbidNonWhitelisted: true,
-      transform: true,
-    }),
-  );
-
-  const port = process.env.API_PORT || 4000;
-  await app.listen(port);
-  logger.log(`🚀 UDB API running on http://localhost:${port}/graphql`);
+  const tlsKeyPath = process.env.TLS_KEY;
+  const tlsCertPath = process.env.TLS_CERT;
+  const app = await NestFactory.create(AppModule);
+  if (tlsKeyPath && tlsCertPath && fs.existsSync(tlsKeyPath) && fs.existsSync(tlsCertPath)) {
+    const tlsOptions = {
+      key: fs.readFileSync(tlsKeyPath),
+      cert: fs.readFileSync(tlsCertPath),
+    };
+    const httpsServer = https.createServer(tlsOptions, app.getHttpAdapter().getInstance());
+    await httpsServer.listen(3443);
+  } else {
+    await app.listen(3000);
+  }
 }
-
 bootstrap();

@@ -1,0 +1,201 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type AchievementResponse {
+  id: String!
+  title: String!
+}
+
+type AuthPayload {
+  accessToken: String!
+  email: String!
+  role: UserRole!
+  userId: String!
+}
+
+type AvatarAttribute {
+  intensity: Float!
+  trait: String!
+  value: String!
+}
+
+input BusinessPlanInput {
+  founderAge: Float!
+  pricingModel: String!
+  problem: String!
+  solution: String!
+  targetMarket: String!
+}
+
+type BusinessPlanResponse {
+  executiveSummary: String!
+  isValid: Boolean!
+  validationNotes: String!
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+type DoterProfileType {
+  coinBalance: Float!
+  id: String!
+  isEnergetic: Boolean!
+  isSluggy: Boolean!
+  level: Float!
+  name: String!
+  state: String!
+  streakDays: Float!
+  xp: Float!
+}
+
+type EmotionalStateResponse {
+  emotion: String!
+  focusScore: Float!
+  resilienceLevel: String!
+}
+
+"""
+The `JSON` scalar type represents JSON values as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
+"""
+scalar JSON
+
+type LedgerEntry {
+  amount: Int!
+  balanceAfter: Int!
+  createdAt: DateTime!
+  description: String
+  id: String!
+  source: String!
+  status: String!
+  transactionType: String!
+}
+
+type LedgerPage {
+  entries: [LedgerEntry!]!
+  page: Int!
+  pageSize: Int!
+  total: Int!
+}
+
+type MintResultResponse {
+  success: Boolean!
+  tokenId: String!
+  txHash: String!
+}
+
+type Mutation {
+  addDoterXP(xp: Int!): JSON!
+  addEvidence(questId: String, title: String!, type: String!, url: String!): JSON!
+  analyzeEmotionalState(transcript: String!, videoUrl: String!): EmotionalStateResponse!
+  askTutor(input: String!, sessionId: String!, subject: String!): SocraticResponse!
+  completeSkillMastery(agentId: String!): SkillMasteryResponse!
+  createActivity(endTime: String!, pillar: String, startTime: String!, title: String!): JSON!
+  createGoal(pillar: String!, title: String!): JSON!
+  createVenture(name: String!, pricingModel: String!, problem: String!, solution: String!, targetMarket: String!): JSON!
+  deploySkillAgent(skillName: String!): SkillAgentResponse!
+  generateBusinessPlan(data: BusinessPlanInput!): BusinessPlanResponse!
+  generateWeeklyPlan: JSON!
+  linkChild(childId: String!, consentMethod: String!): JSON!
+  logBiometric(data: String!): JSON!
+  loginWithFirebase(idToken: String!, role: UserRole! = PARENT): AuthPayload!
+  markAllRead: JSON!
+  markNotificationRead(id: String!): JSON!
+  nameMyDoter(name: String!): JSON!
+  onboardPartner(contactEmail: String!, domain: String!, name: String!): JSON!
+  releaseFunds(escrowId: String!): JSON!
+  runFutureSimulation: SimulationResult!
+  sendMessage(content: String!, receiverId: String!): JSON!
+  startTutoringSession(subject: String!): JSON!
+  updateProfile(data: UpdateProfileInput!): UserType!
+  updateSkillGap(gapScore: Float!, subject: String!): JSON!
+}
+
+type Query {
+  auditLog(limit: Int! = 50): JSON!
+  biometricHistory(days: Float! = 30): JSON!
+  coachingInsight: String!
+  conversation(withUserId: String!): JSON!
+  dashboardData: JSON!
+  evidenceGallery: JSON!
+  focusPeak: JSON!
+  futureSelfNarrative: String!
+  getInstitutionalAnalytics(partnerId: String!): JSON!
+  goalProgress(goalId: String!): JSON!
+  inbox: JSON!
+  me: UserType!
+  myBalance: Int!
+  myCalendar(from: String!, to: String!): JSON!
+  myChildren: [UserType!]!
+  myDoter: JSON
+  myFamily: JSON!
+  myGoals: JSON!
+  myLedger(page: Int! = 1, pageSize: Int! = 20): LedgerPage!
+  mySafetyScore: JSON
+  mySkillAgents: [SkillAgentResponse!]!
+  mySkillGaps: JSON!
+  myVentures: JSON!
+  myWeeklyPlan: JSON
+  plasticityWindows: JSON!
+  resilienceMetrics: JSON!
+  unreadNotifications: JSON!
+}
+
+type SimulationPathwayResponse {
+  impactScore: Float!
+  name: String!
+  probability: Float!
+}
+
+type SimulationResult {
+  avatarAttributes: [AvatarAttribute!]!
+  narrative: String!
+  p50Academic: Float!
+  p50Financial: Float!
+  p50Wellness: Float!
+  pathways: [SimulationPathwayResponse!]!
+}
+
+type SkillAgentResponse {
+  autonomyLevel: Float!
+  id: String!
+  lastAction: String
+  skillName: String!
+  status: String!
+}
+
+type SkillMasteryResponse {
+  achievement: AchievementResponse!
+  mintResult: MintResultResponse!
+}
+
+type SocraticResponse {
+  intent: String!
+  response: String!
+}
+
+input UpdateProfileInput {
+  avatarUrl: String
+  displayName: String
+  timezone: String
+}
+
+enum UserRole {
+  ADMIN
+  CHILD
+  PARENT
+}
+
+type UserType {
+  accessibilitySettings: JSON!
+  avatarUrl: String
+  createdAt: DateTime!
+  displayName: String
+  doterProfile: DoterProfileType
+  email: String!
+  id: String!
+  role: String!
+  uupData: JSON
+}

@@ -1,0 +1,21 @@
+name: CI
+on:
+  push:
+    branches: [ main ]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+      - name: Install
+        run: pnpm install
+      - name: Build Web
+        run: npm --prefix apps/web install; npm --prefix apps/web run build
+      - name: Build API
+        run: npm --prefix services/api install; npm --prefix services/api run build
+      - name: Lint (placeholder)
+        run: echo 'Lint step would run here'

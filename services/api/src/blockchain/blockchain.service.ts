@@ -1,6 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { ethers } from 'ethers';
+import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
 export class BlockchainService {
@@ -8,7 +9,10 @@ export class BlockchainService {
   private provider: ethers.JsonRpcProvider;
   private wallet: ethers.Wallet;
 
-  constructor(private configService: ConfigService) {
+  constructor(
+    private configService: ConfigService,
+    private prisma: PrismaService,
+  ) {
     const rpcUrl = this.configService.get<string>('POLYGON_RPC_URL') || 'https://rpc-amoy.polygon.technology';
     const privateKey = this.configService.get<string>('BLOCKCHAIN_PRIVATE_KEY');
 
@@ -21,29 +25,35 @@ export class BlockchainService {
   async mintSBT(userId: string, achievementId: string, metadataUri: string) {
     this.logger.log(`🔗 Minting Soulbound Token for user ${userId}, achievement ${achievementId}`);
     
-    // In a real implementation, we would call a smart contract mint function
-    // For this MVP, we simulate the transaction and return a mock hash
-    
+    let result;
     if (!this.wallet) {
       this.logger.warn('⚠️ No blockchain wallet configured. Returning simulated transaction.');
-      return {
+      result = {
         success: true,
         txHash: `0x${Math.random().toString(16).substring(2, 66)}`,
-        tokenId: Math.floor(Math.random() * 1000000),
+        tokenId: Math.floor(Math.random() * 1000000).toString(),
         network: 'polygon-amoy'
       };
-    }
-
-    try {
-      // Logic for real contract interaction would go here
+    } else {
+      // In production, real contract interaction:
       // const contract = new ethers.Contract(address, abi, this.wallet);
       // const tx = await contract.mint(userId, metadataUri);
       // await tx.wait();
-      return { success: true, txHash: '0x...', tokenId: 123 };
-    } catch (error) {
-      this.logger.error(`❌ Minting failed: ${error.message}`);
-      throw error;
+      result = { success: true, txHash: '0x...', tokenId: '123' };
     }
+
+    // Update Achievement Record
+    await this.prisma.achievement.update({
+      where: { id: achievementId },
+      data: {
+        isMinted: true,
+        sbtTokenId: result.tokenId,
+        sbtContract: '0xBlockchainContractAddress', // Placeholder
+        metadata: { txHash: result.txHash, mintedAt: new Date().toISOString() },
+      }
+    });
+
+    return result;
   }
 
   async verifySBT(tokenId: number) {

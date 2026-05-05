@@ -14,12 +14,19 @@ load_dotenv()
 
 app = FastAPI(title="UDB AI Mentor Service", description="Vertex AI LangGraph Orchestration")
 
+# Pinecone / Vector DB initialization
+from pinecone import Pinecone
+from langchain_pinecone import PineconeVectorStore
+from langchain_google_vertexai import VertexAIEmbeddings
+
 # Define Agent State
 class AgentState(TypedDict):
     messages: Annotated[List[Any], operator.add]
     subject: str
     intent: str
     knowledge_retrieved: str
+    frustration_level: float  # 0.0 to 1.0
+    path_to_solution: List[str] # Key conceptual steps identified
 
 def get_llm():
     try:
@@ -32,37 +39,82 @@ def get_llm():
         print(f"Warning: Failed to init Vertex AI ({e}). Using mock LLM.")
         return None
 
-# ── Node: RAG Retrieval (Vector Search) ──
+# ── Node: Intent & Frustration Analysis ──
+def analyze_student_state(state: AgentState):
+    """Analyzes the student's message for frustration and pedagogical intent."""
+    last_message = state["messages"][-1].content
+    llm = get_llm()
+    
+    if not llm:
+        return {"intent": "question", "frustration_level": 0.1}
+
+    analysis_prompt = f"Analyze the following student message for frustration (0-1) and intent (question, statement, frustration, or giving_up). Message: {last_message}. Return ONLY JSON: {{\"frustration\": float, \"intent\": string}}"
+    response = llm.invoke([HumanMessage(content=analysis_prompt)])
+    
+    # Simple parse for demonstration
+    import json
+    try:
+        # Extract json from markdown block if needed
+        clean_content = response.content.replace('```json', '').replace('```', '').strip()
+        data = json.loads(clean_content)
+        return {"intent": data.get("intent", "question"), "frustration_level": data.get("frustration", 0.0)}
+    except:
+        return {"intent": "question", "frustration_level": 0.2}
+
+# ── Node: RAG Retrieval ──
 def retrieve_knowledge(state: AgentState):
-    """Mocks fetching educational context from Vertex AI Vector Search"""
+    """Fetches educational context from Pinecone Vector Store"""
     subject = state.get("subject", "general")
     query = state["messages"][-1].content
-    # In production, query Vertex AI Vector Search here
-    retrieved_context = f"Educational context for {subject}: Break down the problem into smaller steps."
     
+    try:
+        pc = Pinecone(api_key=os.getenv("PINECONE_API_KEY"))
+        embeddings = VertexAIEmbeddings(model_name="textembedding-gecko@003")
+        vectorstore = PineconeVectorStore(index_name="udb-curriculum", embedding=embeddings)
+        
+        # Filter by subject if possible
+        docs = vectorstore.similarity_search(query, k=2)
+        retrieved_context = "\n".join([d.page_content for d in docs])
+    except Exception as e:
+        print(f"RAG Error: {e}")
+        retrieved_context = f"Educational context for {subject}: Scaffolding needed."
+
     return {"knowledge_retrieved": retrieved_context}
 
 # ── Node: Socratic Generation ──
 def generate_socratic_response(state: AgentState):
     llm = get_llm()
     if not llm:
-        return {"messages": [{"role": "assistant", "content": "Mock Socratic Response: What do you think the first step should be?"}]}
+        return {"messages": [HumanMessage(content="What do you think the first step should be?")]}
     
     context = state.get("knowledge_retrieved", "")
     subject = state.get("subject", "general")
+    frustration = state.get("frustration_level", 0.0)
     
-    sys_msg = SystemMessage(content=f"You are a Socratic tutor for {subject}. Context: {context}. Ask guiding questions, never give direct answers.")
-    messages = [sys_msg] + state["messages"]
+    socratic_system_prompt = f"""
+    You are a world-class Socratic mentor for a student studying {subject}.
+    
+    RULES:
+    1. NEVER give the answer directly.
+    2. Analyze the student's message for their "Point of Confusion".
+    3. Use the provided context to ask a SINGLE, TARGETED question that bridges their current knowledge to the next conceptual step.
+    4. Current frustration level: {frustration:.2f}. If frustration > 0.7, be extra encouraging and offer a smaller hint.
+    5. Subject Context: {context}
+    """
+    
+    messages = [SystemMessage(content=socratic_system_prompt)] + state["messages"]
     
     response = llm.invoke(messages)
     return {"messages": [response]}
 
 # Build the Graph
 workflow = StateGraph(AgentState)
+workflow.add_node("analyze", analyze_student_state)
 workflow.add_node("retrieve", retrieve_knowledge)
 workflow.add_node("generate", generate_socratic_response)
 
-workflow.set_entry_point("retrieve")
+workflow.set_entry_point("analyze")
+workflow.add_edge("analyze", "retrieve")
 workflow.add_edge("retrieve", "generate")
 workflow.add_edge("generate", END)
 
@@ -88,7 +140,9 @@ async def chat_with_mentor(req: ChatRequest):
         "messages": [HumanMessage(content=req.message)],
         "subject": req.subject,
         "intent": "unknown",
-        "knowledge_retrieved": ""
+        "knowledge_retrieved": "",
+        "frustration_level": 0.0,
+        "path_to_solution": []
     }
     
     try:

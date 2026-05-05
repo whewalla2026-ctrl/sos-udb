@@ -211,11 +211,18 @@ Return JSON: { "executiveSummary": "...", "isValid": true/false, "validationNote
   }
 
   // ── Future Self Simulator ────────────────────────────────────────────────────
-  async generateFutureSelfNarrative(userId: string): Promise<string> {
+  async generateFutureSelfNarrative(userId: string, simulationResults?: any): Promise<string> {
     const user = await this.prisma.user.findUnique({ where: { id: userId } });
     const uup = user?.uupData as any;
 
-    const prompt = `You are a narrative AI. Write a vivid, inspiring 200-word "Day in the Life" story for this person at age 30.
+    const p50 = simulationResults?.p50 || {};
+
+    const prompt = `You are a narrative AI. Write a vivid, inspiring 200-word "Day in the Life" story for this person at age 30 based on Monte Carlo simulation outcomes.
+
+Monte Carlo Probabilities (Age 30):
+- Academic Success Probability: ${p50.academic || 'Developing'}%
+- Financial Independence Probability: ${p50.financial || 'Growing'}%
+- Wellness/Balance Score: ${p50.wellness || 70}%
 
 Current stats:
 - Academic level: ${uup?.academic?.math_rit > 220 ? 'Advanced' : 'Developing'}
@@ -223,7 +230,7 @@ Current stats:
 - Health score: ${uup?.biometric?.focus_score || 70}/100
 - XP Level: ${uup?.gamification?.level || 1}
 
-Write in second person ("You wake up..."). Be specific and inspirational. Show the DIRECT connection between their current habits and their future success.`;
+Write in second person ("You wake up..."). Be specific and inspirational. Show the DIRECT connection between their current habits (streaks, skill gap closure) and these simulated future probabilities.`;
 
     return this.callLLM(prompt);
   }
@@ -272,6 +279,43 @@ Return JSON: { "emotion": "...", "focusScore": 0, "resilienceLevel": "..." }`;
     } catch {
       return { emotion: 'Focused', focusScore: 85, resilienceLevel: 'High' };
     }
+  }
+
+  // ─── Avatar Evolution (Phase 5) ──────────────────────────────────────────
+  
+  async calculateAvatarEvolution(userId: string, simulationResults: any) {
+    const user = await this.prisma.user.findUnique({ where: { id: userId } });
+    const uup = (user?.uupData as any) || {};
+    const mEqScore = uup.social?.eq_score || 75;
+    const healthScore = uup.biometric?.avg_sleep_hours > 7 ? 90 : 60;
+
+    const attributes: any[] = [];
+
+    // mEQ Influence: Aura and Expression
+    if (mEqScore > 85) {
+      attributes.push({ trait: 'AURA', value: 'VIBRANT_GOLD', intensity: 0.9 });
+      attributes.push({ trait: 'EXPRESSION', value: 'SERENE_CONFIDENT', intensity: 1.0 });
+    } else if (mEqScore > 70) {
+      attributes.push({ trait: 'AURA', value: 'SOFT_BLUE', intensity: 0.6 });
+      attributes.push({ trait: 'EXPRESSION', value: 'FOCUSED', intensity: 0.8 });
+    } else {
+      attributes.push({ trait: 'AURA', value: 'DIM_GRAY', intensity: 0.4 });
+      attributes.push({ trait: 'EXPRESSION', value: 'NEUTRAL', intensity: 0.5 });
+    }
+
+    // Health Influence: Posture and Vitality
+    if (healthScore > 80) {
+      attributes.push({ trait: 'POSTURE', value: 'UPRIGHT', intensity: 0.9 });
+    } else {
+      attributes.push({ trait: 'POSTURE', value: 'SLIGHT_SLUMP', intensity: 0.6 });
+    }
+
+    // Entrepreneurship Influence: Professional Assets
+    if (simulationResults.p50.financial > 80) {
+      attributes.push({ trait: 'CLOTHING', value: 'ELITE_PROFESSIONAL', intensity: 1.0 });
+    }
+
+    return attributes;
   }
 
   // ── Autonomous Skill Agents (Phase 5) ───────────────────────────────────────

@@ -1,8 +1,5 @@
 node_modules/
 dist/
 .next/
-.turbo/
-*.log
-.env
-.env.local
-coverage/
+prisma/
+dev.db
