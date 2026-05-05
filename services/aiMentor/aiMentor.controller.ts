@@ -14,6 +14,8 @@ export class AiMentorController {
     // naive path to solution and confidence
     const pathToSolution = [`Consider the underlying principles: ${question}`];
     const confidence = Math.min(0.99, 0.5 + Math.random() * 0.5);
+    // Log path to solution for auditing (Phase 2 gating)
+    this.mentor.logPath(userId, question, pathToSolution);
     return { userId, question, hint, pathToSolution, confidence };
   }
 }

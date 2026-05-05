@@ -4,6 +4,8 @@ import { PrismaClient } from '@prisma/client';
 @Injectable()
 export class UUPService {
   private store: any = {};
+  private faultDelayMs: number = parseInt(process.env.FAULT_DB_DELAY_MS || '0');
+  private faultFailRate: number = parseFloat(process.env.FAULT_DB_FAIL_RATE || '0');
   private useDb: boolean;
   private prisma: PrismaClient | null = null;
 
@@ -23,6 +25,16 @@ export class UUPService {
   }
 
   async upsertUser(userId: string, payload: any) {
+    // Simulate failure injection for failure scenarios
+    if (this.faultFailRate > 0) {
+      if (Math.random() < this.faultFailRate) {
+        // simulate a transient DB error
+        throw new Error('Simulated DB write failure (phase2 fault injection)');
+      }
+    }
+    if (this.faultDelayMs > 0) {
+      await new Promise((resolve) => setTimeout(resolve, this.faultDelayMs));
+    }
     // Normalize payload shape
     const incoming = payload?.uup_data ?? {};
     if (this.useDb && this.prisma) {

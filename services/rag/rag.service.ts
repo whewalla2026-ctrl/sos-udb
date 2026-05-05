@@ -2,15 +2,16 @@ import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class RagService {
-  private index: Record<string, string[]> = {};
+  private documents: Array<{ id: string; text: string }> = [];
   indexDocument(id: string, text: string) {
-    // naive indexing by id
-    this.index[id] = [text];
+    this.documents.push({ id, text });
   }
   query(query: string) {
-    // naive respond with the last indexed snippet
-    const keys = Object.keys(this.index);
-    if (!keys.length) return { results: [] };
-    return { results: this.index[keys[0]] || [] };
+    const faultRate = parseFloat(process.env.VECTOR_FAIL_RATE || '0');
+    if (faultRate > 0 && Math.random() < faultRate) {
+      throw new Error('Simulated vector store failure');
+    }
+    const hits = this.documents.filter((d) => d.text.toLowerCase().includes(query.toLowerCase()));
+    return { results: hits };
   }
 }

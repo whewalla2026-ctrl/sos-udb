@@ -12,6 +12,17 @@ What’s Included:
 - ADHD micro-quests and Weekly Planner integration paths (generateWeeklyPlanWithMicroQuests)
 - Phase 2 MQATP mapping (PHASE2_FINAL.md) and Phase 2 demo artifacts
 - Phase 2 end-to-end tests scaffold (phase2_e2e.spec.ts)
+- Lean AI: AiLite hints endpoint via /ai-lite/hint
+- Lean vector store: in-memory vector store fallback
+- Cost guard and Metrics scaffolding for Phase 2 cost control
+- Phase 2 lean module wiring: AiLiteModule, VectorModule, CostModule, MetricsModule
+- LMS Sync endpoints: /lms-sync/ingest, /lms-sync/aggregate/:userId
+- Aggregated LMS context endpoint for gating
+- Socratic Tutor scaffolding (prompt templates, context wiring, path-to-solution logging)
+- Rag pipeline scaffolding (RagModule, RagService, RagController) with a test endpoint
+- ADHD micro-quests and Weekly Planner integration paths (generateWeeklyPlanWithMicroQuests)
+- Phase 2 MQATP mapping (PHASE2_FINAL.md) and Phase 2 demo artifacts
+- Phase 2 end-to-end tests scaffold (phase2_e2e.spec.ts)
 
 Go/No-Go Criteria:
 - Demonstrable LMS ingest + aggregate flow (mock or real) and aggregated context surface

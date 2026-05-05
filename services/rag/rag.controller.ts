@@ -8,4 +8,9 @@ export class RagController {
   query(@Body() body: { query: string }) {
     return this.rag.query(body.query);
   }
+
+  @Post('index')
+  index(@Body() body: { id: string; text: string }) {
+    return this.rag.indexDocument(body.id, body.text);
+  }
 }
