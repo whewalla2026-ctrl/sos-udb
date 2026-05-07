@@ -1,0 +1,11 @@
+{
+  "generatedAt": "2026-05-07T15:32:51.232Z",
+  "totalRequests": 420,
+  "fallbackRate": 0,
+  "budgetPerUserMonthly": 0.5,
+  "costPerHint": 0.0004,
+  "cacheHitRate": "simulated",
+  "avgLatencyMs": 0.01,
+  "model": "gpt-4o-mini",
+  "status": "within_limits"
+}

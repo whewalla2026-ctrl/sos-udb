@@ -1,0 +1,50 @@
+{
+  "generatedAt": "2026-05-07T15:32:51.232Z",
+  "services": {
+    "auth": {
+      "endpoints": 2,
+      "status": "wired",
+      "session": true,
+      "validation": true
+    },
+    "planning": {
+      "endpoints": 2,
+      "status": "wired",
+      "crud": true
+    },
+    "aiLite": {
+      "endpoints": 1,
+      "status": "wired",
+      "costGuarded": true,
+      "cacheEnabled": true,
+      "timeoutMs": 500
+    },
+    "monitoring": {
+      "endpoints": 4,
+      "status": "wired",
+      "signals": 12
+    },
+    "waitlist": {
+      "endpoints": 1,
+      "status": "wired",
+      "validation": true
+    },
+    "lms": {
+      "endpoints": 0,
+      "status": "wired_as_service"
+    },
+    "vector": {
+      "endpoints": 2,
+      "status": "wired"
+    },
+    "audit": {
+      "endpoints": 2,
+      "status": "wired"
+    },
+    "costGuard": {
+      "perUserBudget": 0.5,
+      "monthlyReset": true,
+      "cacheEnabled": true
+    }
+  }
+}

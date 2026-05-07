@@ -1,0 +1,37 @@
+{
+  "generatedAt": "2026-05-07T15:32:51.232Z",
+  "signupFlow": {
+    "steps": 3,
+    "estimatedTimeMin": 4,
+    "status": "complete"
+  },
+  "onboardingFlow": {
+    "steps": 3,
+    "estimatedTimeMin": 3,
+    "status": "complete"
+  },
+  "plannerFlow": {
+    "status": "complete",
+    "generatesBlocks": true,
+    "editable": true
+  },
+  "aiFlow": {
+    "status": "complete",
+    "hasFallback": true,
+    "budgetLimited": true
+  },
+  "sharingFlow": {
+    "status": "complete",
+    "referralCodes": true,
+    "teacherInvite": true
+  },
+  "mobileResponsive": {
+    "status": "pwa_ready",
+    "tested": false
+  },
+  "funnelMetrics": {
+    "signupToActivationTarget": ">40%",
+    "timeToFirstValueTarget": "<10 min",
+    "d7RetentionTarget": ">30%"
+  }
+}

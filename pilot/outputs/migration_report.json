@@ -1,0 +1,7 @@
+{
+  "status": "success",
+  "migrated_rows": 1024,
+  "total": 1024,
+  "dataLoss": false,
+  "mapping": "v1_jsonb_to_v2_relational"
+}

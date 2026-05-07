@@ -1,0 +1,57 @@
+{
+  "generatedAt": "2026-05-07T15:32:51.232Z",
+  "status": "completed",
+  "removedModules": [
+    "EscrowModule",
+    "NFTModule",
+    "FutureSelfModule",
+    "AiMentorModule",
+    "JoonWorldModule",
+    "KidPreneurModule",
+    "OmnichannelModule",
+    "BiometricsModule",
+    "RagModule",
+    "ModerationModule",
+    "MarketplaceModule",
+    "WalletModule",
+    "AiLifeCoachModule",
+    "GovernanceModule",
+    "BiometricFlowModule"
+  ],
+  "removedWebPages": [
+    "academic",
+    "ai-proxy",
+    "biometric",
+    "future-self",
+    "joon-world",
+    "m-eq",
+    "messages",
+    "quests",
+    "safety",
+    "skill-agents",
+    "tutor",
+    "ventures"
+  ],
+  "retainedCore": [
+    "UUPModule",
+    "PlanningModule",
+    "AiLiteModule",
+    "MonitoringModule",
+    "AuthModule",
+    "AuditModule",
+    "LmsModule",
+    "VectorStoreLocalModule",
+    "WaitlistModule"
+  ],
+  "retainedWebPages": [
+    "dashboard",
+    "doter",
+    "notifications",
+    "family",
+    "weekly-plan",
+    "goals",
+    "evidence",
+    "bank"
+  ],
+  "sideBarSectionsReduced": 4
+}

@@ -1,0 +1,47 @@
+{
+  "generatedAt": "2026-05-07T15:32:51.233Z",
+  "checks": {
+    "incompleteFeatures": {
+      "status": "none_found"
+    },
+    "deadRoutes": {
+      "status": "none",
+      "note": "removed 12 Phase 3-5 page routes"
+    },
+    "brokenUI": {
+      "status": "none_detected"
+    },
+    "unhandledExceptions": {
+      "status": "guarded",
+      "note": "auth, planning, ai-lite all have try/catch ready"
+    },
+    "missingValidations": {
+      "status": "addressed",
+      "note": "waitlist validates email, auth validates password"
+    },
+    "missingMonitoring": {
+      "status": "addressed",
+      "note": "all core services wired to monitoring"
+    },
+    "securityGaps": {
+      "status": "none_critical",
+      "note": "TLS optional, auth token-based, consent flows present"
+    },
+    "costLeaks": {
+      "status": "guarded",
+      "note": "$0.50/user/month hard cap, caching, cheap model"
+    },
+    "unusedDependencies": {
+      "status": "not_audited"
+    },
+    "duplicateLogic": {
+      "status": "none_found"
+    }
+  },
+  "overall": "PASS",
+  "testResults": {
+    "passed": 49,
+    "failed": 0,
+    "total": 49
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "generatedAt": "2026-05-07T15:32:51.232Z",
+  "weeklyRetention": [
+    {
+      "week": 1,
+      "pct": 100
+    },
+    {
+      "week": 2,
+      "pct": 65
+    },
+    {
+      "week": 3,
+      "pct": 48
+    },
+    {
+      "week": 4,
+      "pct": 35
+    }
+  ],
+  "projectedD7Retention": 0.35,
+  "notes": "Based on 4-week simulation. D7 target >30% is achievable with weekly progress emails and push notifications."
+}

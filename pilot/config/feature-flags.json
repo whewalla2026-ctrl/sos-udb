@@ -1,0 +1,36 @@
+{
+  "_comment": "Feature flags for UDB Phase 1+2 production. Phase 3-5 features are DISABLED by default.",
+  "phases": {
+    "phase1_habits": { "enabled": true, "gate": "core" },
+    "phase2_academic": { "enabled": true, "gate": "core" },
+    "phase3_social": { "enabled": false, "gate": "future" },
+    "phase4_entrepreneurship": { "enabled": false, "gate": "future" },
+    "phase5_future_self": { "enabled": false, "gate": "future" }
+  },
+  "features": {
+    "doter_avatar": { "enabled": true, "note": "Test retention; disable if D7 < 30%" },
+    "weekly_planner": { "enabled": true, "note": "Core value prop" },
+    "ai_hints": { "enabled": true, "cost_guarded": true, "per_user_monthly_budget": 0.50 },
+    "socratic_tutor": { "enabled": false, "note": "Disable until AI cost per user is < $0.10/mo" },
+    "rag_pipeline": { "enabled": false, "note": "Disable until user base > 100 active users" },
+    "lms_sync": { "enabled": false, "note": "Too complex for pilot. Manual planner entry only." },
+    "nft_minting": { "enabled": false, "note": "Phase 3+ feature. Disabled indefinitely." },
+    "stripe_escrow": { "enabled": false, "note": "Phase 4+ feature. Disabled indefinitely." },
+    "biometric_integration": { "enabled": false, "note": "Requires hardware. Will not ship." },
+    "teacher_invite": { "enabled": true, "note": "Distribution channel experiment" },
+    "shareable_progress": { "enabled": true, "note": "Viral loop experiment" }
+  },
+  "cost_guardrails": {
+    "per_user_monthly_budget": 0.50,
+    "per_request_cost_cap": 0.001,
+    "kill_switch_enabled": true,
+    "cache_ttl_seconds": 3600,
+    "model_tier": "gpt-4o-mini",
+    "cost_alert_threshold": 100.00
+  },
+  "onboarding": {
+    "minimal_steps": 3,
+    "require_integrations": false,
+    "quick_start_enabled": true
+  }
+}

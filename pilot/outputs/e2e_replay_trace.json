@@ -1,0 +1,72 @@
+{
+  "timestamp": "2026-05-07T15:51:56.239Z",
+  "flow": [
+    "signup",
+    "consent",
+    "planner",
+    "ai_hints",
+    "monitoring",
+    "failure_injection",
+    "persistence_check"
+  ],
+  "steps": [
+    {
+      "ts": 1778169115727,
+      "label": "USER_CREATED",
+      "data": {
+        "userId": "u-7e5e675c",
+        "parentId": "u-7e5e675c-p",
+        "childId": "u-7e5e675c-c",
+        "consentToken": "11358378..."
+      }
+    },
+    {
+      "ts": 1778169115728,
+      "label": "CONSENT_VERIFIED",
+      "data": {
+        "verified": true,
+        "authToken": "eyJ1aWQiOiJ1LTdlNWU2..."
+      }
+    },
+    {
+      "ts": 1778169115728,
+      "label": "PLANNER_GENERATED",
+      "data": {
+        "dayCount": 7,
+        "totalSlots": 42
+      }
+    },
+    {
+      "ts": 1778169115728,
+      "label": "AI_HINTS",
+      "data": {
+        "count": 3,
+        "totalCost": "0.001200",
+        "budgetRemaining": "0.498800"
+      }
+    },
+    {
+      "ts": 1778169115728,
+      "label": "MONITORING_SIGNALS",
+      "data": {
+        "activationRate": 100,
+        "activationStatus": "healthy",
+        "aiCostPerActive": 0.0012000000000000001,
+        "aiCostStatus": "healthy"
+      }
+    },
+    {
+      "ts": 1778169116238,
+      "label": "FAILURE_INJECTION",
+      "data": {
+        "scenario": "AI_timeout_500ms",
+        "actualLatency": "510ms",
+        "fallbackTriggered": true
+      }
+    }
+  ],
+  "passed": true,
+  "crash": false,
+  "fallbacksTriggered": 1,
+  "costTracked": true
+}

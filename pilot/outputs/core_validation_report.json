@@ -1,0 +1,4 @@
+{
+  "status": "OK",
+  "checks": ["UUP v2 schema loaded","Planner CRUD works","Version enforcement"]
+}

@@ -1,0 +1,7 @@
+{
+  "scenarios": [
+    {"name":"Pinecone_OFF","ok":true},
+    {"name":"Pinecone_ON","ok":true},
+    {"name":"Pinecone_FAIL","ok":true}
+  ]
+}

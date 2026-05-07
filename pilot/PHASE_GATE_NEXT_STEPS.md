@@ -1,0 +1,31 @@
+Next steps to execute Phase 1 + Phase 2 gate:
+- Step 1: ENVIRONMENT SETUP
+  - Run pilot/scripts/env_validate.sh to generate env_validation.json
+  - Ensure Linux runner (Node 18+, Postgres available) and reachable Canvas adapter
+  - Collect env_validation.json as gating artifact
+- Step 2: MIGRATION (P0)
+  - Create v1->v2 migration scripts: add to db/migrate/2026xxxx_v2.sql and a rollback script
+  - Run migrations on staging, verify counts and referential integrity
+  - Run rollback test and re-run forward
+- Step 3: CORE SYSTEM VALIDATION
+  - Validate UUP v2 schema in staging: planner CRUD, user.version = 2
+- Step 4: AI-LITE SYSTEM (P0)
+  - Enforce 500 ms latency, implement hints-only mode and fallback path
+- Step 5: COST GUARDRAILS (P0)
+  - Implement cost guards, simulate spike, generate cost reports
+- Step 6: VECTOR STORE (P0)
+  - Validate local vector store as primary with Pinecone behind flag
+- Step 7: LMS INTEGRATION (P0)
+  - Validate Canvas adapter path and fallback when LMS is down
+- Step 8: MONITORING (P0)
+  - Validate /metrics, logs, and alerting in CI
+- Step 9: END-TO-END FLOW (CRITICAL)
+  - Run full journey with 10 users, then 30, then 100
+- Step 10: LOAD & PILOT SIMULATION
+  - Execute Day 0–Day 14 plan; generate all JSON artifacts
+- Step 11: FINAL GATE DECISION
+  - Generate go_no_go_recommendation.md; GO if all gates pass
+- Step 12: FINAL ARTIFACTS (MANDATORY)
+  - Ensure all JSON reports and logs are produced; attach gating evidence to PR
+
+Note: This file is a living checklist updated as gates are implemented.

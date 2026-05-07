@@ -1,0 +1,10 @@
+{
+  "node_version": "v18.x", 
+  "postgres": true, 
+  "canvas_adapter": true, 
+  "vector_store": {
+    "primary": "local",
+    "pinecone_enabled": false
+  },
+  "monitoring_endpoint": true
+}

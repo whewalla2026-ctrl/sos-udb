@@ -7,38 +7,15 @@ const NAV_ITEMS = [
     { href: '/dashboard', icon: '🏠', label: 'Dashboard' },
     { href: '/dashboard/doter', icon: '🐣', label: 'My Doter' },
     { href: '/dashboard/notifications', icon: '🔔', label: 'Notifications' },
+    { href: '/dashboard/family', icon: '👨‍👩‍👧', label: 'Family' },
   ]},
-  { section: 'GROWTH', items: [
-    { href: '/dashboard/quests', icon: '⚔️', label: 'Quests' },
-    { href: '/dashboard/goals', icon: '🎯', label: 'Goals' },
-    { href: '/dashboard/m-eq', icon: '🧠', label: 'mEQ Hub' },
-    { href: '/dashboard/calendar', icon: '📅', label: 'Calendar' },
+  { section: 'PLANNING', items: [
     { href: '/dashboard/weekly-plan', icon: '🗓️', label: 'Weekly Plan' },
+    { href: '/dashboard/goals', icon: '🎯', label: 'Goals' },
+    { href: '/dashboard/evidence', icon: '📸', label: 'Evidence' },
   ]},
-  { section: 'LEARNING', items: [
-    { href: '/dashboard/academic', icon: '🎓', label: 'Academic' },
-    { href: '/dashboard/tutor', icon: '🧠', label: 'AI Tutor' },
-    { href: '/dashboard/evidence', icon: '📸', label: 'Evidence Gallery' },
-  ]},
-  { section: 'HEALTH', items: [
-    { href: '/dashboard/biometric', icon: '💓', label: 'Health & Biometrics' },
-  ]},
-  { section: 'MONEY', items: [
+  { section: 'REWARDS', items: [
     { href: '/dashboard/bank', icon: '🏦', label: 'My Bank' },
-    { href: '/dashboard/ventures', icon: '💼', label: 'Ventures' },
-  ]},
-  { section: 'FAMILY', items: [
-    { href: '/dashboard/family', icon: '👨‍👩‍👧', label: 'Family Hub' },
-    { href: '/dashboard/messages', icon: '💬', label: 'Messages' },
-    { href: '/dashboard/safety', icon: '🛡️', label: 'Safety' },
-  ]},
-  { section: 'FUTURE', items: [
-    { href: '/dashboard/future-self', icon: '🔮', label: 'Future Self' },
-    { href: '/dashboard/ai-proxy', icon: '🤖', label: 'AI Proxy' },
-    { href: '/dashboard/skill-agents', icon: '⚡', label: 'Skill Agents' },
-    { href: '/dashboard/achievements', icon: '🏆', label: 'Achievements' },
-    { href: '/dashboard/joon-world', icon: '🌍', label: 'Joon World' },
-    { href: '/dashboard/marketplace', icon: '🏪', label: 'Marketplace' },
   ]},
 ];
 

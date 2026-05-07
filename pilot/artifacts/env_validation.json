@@ -1,0 +1,23 @@
+﻿{
+    "node_version":  "v24.15.0",
+    "phase4_disabled":  true,
+    "npm_version":  "11.12.1",
+    "phase5_disabled":  true,
+    "ai_model_tier":  "gpt-4o-mini",
+    "ai_budget_per_user_monthly":  0.5,
+    "vector_store_guarded":  true,
+    "ai_cache_enabled":  true,
+    "feature_gates_validated":  true,
+    "env_generated_at":  "2026-05-07T17:08:16.5804795+03:00",
+    "canvas_health":  false,
+    "pre_mortem_mitigation_applied":  "2026-05-07",
+    "early_warning_signals_tracked":  12,
+    "onboarding_steps":  3,
+    "distribution_hooks":  [
+                               "teacher_invite",
+                               "weekly_progress",
+                               "referral"
+                           ],
+    "phase3_disabled":  true,
+    "require_integrations":  false
+}

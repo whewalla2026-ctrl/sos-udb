@@ -1,0 +1,10 @@
+{
+  "generatedAt": "2026-05-07T15:32:51.232Z",
+  "avgBlocksPerUser": {
+    "phaseA": 14.3,
+    "phaseB": 13.67,
+    "phaseC": 14.09
+  },
+  "totalPlansGenerated": 140,
+  "status": "active"
+}

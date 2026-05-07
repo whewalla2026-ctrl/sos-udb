@@ -1,0 +1,14 @@
+{
+  "timestamp": "2026-05-07T15:40:46.738Z",
+  "flows": [
+    "signup",
+    "consent",
+    "planner",
+    "ai-hint",
+    "cost-guard",
+    "monitoring"
+  ],
+  "results": {
+    "allPassed": true
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "generatedAt": "2026-05-07T15:32:51.233Z",
+  "metrics": {
+    "/monitoring/metrics": {
+      "exposed": true,
+      "type": "GET"
+    },
+    "/monitoring/health": {
+      "exposed": true,
+      "type": "GET"
+    },
+    "/monitoring/alerts": {
+      "exposed": true,
+      "type": "GET"
+    },
+    "/monitoring/signals": {
+      "exposed": true,
+      "type": "GET"
+    }
+  },
+  "earlyWarningSignals": {
+    "total": 12,
+    "trackedWithThresholds": true,
+    "healthyWarningCritical": true,
+    "weeklyCheckScript": false,
+    "autoAlertOnCritical": true
+  },
+  "status": "active"
+}

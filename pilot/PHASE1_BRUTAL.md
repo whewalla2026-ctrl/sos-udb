@@ -1,0 +1,1 @@
+- Brutal founder truth for Phase 1: The lean spine must deliver the simplest onboarding with a visible, early win. If migration is failing or onboarding is broken, Phase 2 will fail too.

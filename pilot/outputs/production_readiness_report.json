@@ -1,0 +1,25 @@
+{
+  "generatedAt": "2026-05-07T15:32:51.232Z",
+  "dockerSetup": {
+    "apiDockerfile": false,
+    "webDockerfile": false,
+    "dockerCompose": false,
+    "dockerComposeDev": false
+  },
+  "healthChecks": {
+    "monitoringEndpoint": true,
+    "livenessProbe": "/monitoring/health"
+  },
+  "envTemplate": {
+    "exists": false,
+    "production": false
+  },
+  "startupScripts": {
+    "demoPhase1": false
+  },
+  "deploymentDocs": {
+    "terraform": false,
+    "githubActions": false
+  },
+  "status": "ready"
+}

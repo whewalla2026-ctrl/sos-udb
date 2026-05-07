@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Familia — Weekly planner for your child</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f8fafc; color: #1e293b; line-height: 1.6; }
+    .container { max-width: 640px; margin: 0 auto; padding: 40px 20px; }
+    h1 { font-size: 2rem; font-weight: 700; margin-bottom: 8px; letter-spacing: -0.02em; }
+    .subtitle { font-size: 1.1rem; color: #64748b; margin-bottom: 32px; }
+    .card { background: white; border-radius: 16px; padding: 32px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); margin-bottom: 24px; }
+    .card h2 { font-size: 1.2rem; margin-bottom: 12px; }
+    .card p { color: #64748b; margin-bottom: 8px; }
+    .feature-list { list-style: none; margin: 16px 0; }
+    .feature-list li { padding: 8px 0; border-bottom: 1px solid #f1f5f9; display: flex; align-items: center; gap: 8px; }
+    .feature-list li:last-child { border-bottom: none; }
+    .check { color: #10b981; font-weight: bold; }
+    .price { font-size: 2.5rem; font-weight: 700; margin: 16px 0; }
+    .price span { font-size: 1rem; color: #64748b; font-weight: 400; }
+    form { display: flex; flex-direction: column; gap: 12px; }
+    input { padding: 12px 16px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 1rem; }
+    button { padding: 12px 24px; background: #2563eb; color: white; border: none; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; }
+    button:hover { background: #1d4ed8; }
+    .note { font-size: 0.85rem; color: #94a3b8; margin-top: 8px; }
+    .footer { text-align: center; color: #94a3b8; font-size: 0.85rem; margin-top: 40px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Your child's weekly plan,<br>in 3 minutes.</h1>
+    <p class="subtitle">No integrations. No setup. Just a simple planner that helps your child build consistent habits.</p>
+
+    <div class="card">
+      <h2>What you get</h2>
+      <ul class="feature-list">
+        <li><span class="check">✓</span> Weekly planner customized for your child's age</li>
+        <li><span class="check">✓</span> Daily focus blocks (reading, math, creative, active, life skills)</li>
+        <li><span class="check">✓</span> Simple check-off to build momentum</li>
+        <li><span class="check">✓</span> Weekly progress summary shared with family</li>
+        <li><span class="check">✓</span> AI suggestions to keep things fresh</li>
+      </ul>
+      <div class="price">$19 <span>/ month</span></div>
+      <p style="color:#64748b;font-size:0.9rem;">14-day free trial. Cancel anytime.</p>
+    </div>
+
+    <div class="card">
+      <h2>Join the waitlist</h2>
+      <p>We're launching soon. Get early access and a founder's discount.</p>
+      <form id="waitlist-form" onsubmit="submitWaitlist(event)">
+        <input type="email" id="email" placeholder="Your email" required>
+        <input type="text" id="child_age" placeholder="Your child's age (optional)">
+        <button type="submit">Join Waitlist — Save 40%</button>
+        <p class="note">Launching in Q3 2026. Early subscribers lock in $11.40/month forever.</p>
+      </form>
+      <p id="thankyou" style="display:none;color:#10b981;font-weight:600;">Thanks! We'll reach out when we launch.</p>
+    </div>
+
+    <div class="card" style="background:#fef3c7;">
+      <h2>⚠️ Honest caveats</h2>
+      <ul class="feature-list">
+        <li>This is NOT a school replacement. Your child still needs school.</li>
+        <li>This is NOT a surveillance tool. Your child should WANT to use it.</li>
+        <li>This WON'T fix every habit. It's a planner, not a miracle.</li>
+        <li>We're a small team. Some features will come later.</li>
+      </ul>
+    </div>
+
+    <div class="footer">
+      <p>Familia (working title) — Built by SOS-UDB</p>
+    </div>
+  </div>
+
+  <script>
+    async function submitWaitlist(e) {
+      e.preventDefault();
+      const email = document.getElementById('email').value;
+      const age = document.getElementById('child_age').value;
+      const form = document.getElementById('waitlist-form');
+      const thank = document.getElementById('thankyou');
+
+      // In production: POST to /api/waitlist
+      try {
+        await fetch('/api/waitlist', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, childAge: age, source: 'landing-page' })
+        });
+      } catch (err) {
+        // silently handle in MVP
+      }
+
+      form.style.display = 'none';
+      thank.style.display = 'block';
+    }
+  </script>
+</body>
+</html>

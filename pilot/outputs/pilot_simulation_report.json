@@ -1,0 +1,48 @@
+{
+  "generatedAt": "2026-05-07T15:32:51.232Z",
+  "phases": {
+    "A_10_users": {
+      "userCount": 10,
+      "totalHints": 30,
+      "hintFallbacks": 0,
+      "fallbackRate": 0,
+      "avgBlocksPerUser": 14.3,
+      "totalCost": 0.012,
+      "avgCostPerUser": 0.0012,
+      "elapsedMs": 0,
+      "avgLatencyMs": 0,
+      "completedAt": "2026-05-07T15:32:51.229Z"
+    },
+    "B_30_users": {
+      "userCount": 30,
+      "totalHints": 90,
+      "hintFallbacks": 0,
+      "fallbackRate": 0,
+      "avgBlocksPerUser": 13.67,
+      "totalCost": 0.036,
+      "avgCostPerUser": 0.0012,
+      "elapsedMs": 1,
+      "avgLatencyMs": 0.01,
+      "completedAt": "2026-05-07T15:32:51.230Z"
+    },
+    "C_100_users": {
+      "userCount": 100,
+      "totalHints": 300,
+      "hintFallbacks": 0,
+      "fallbackRate": 0,
+      "avgBlocksPerUser": 14.09,
+      "totalCost": 0.12,
+      "avgCostPerUser": 0.0012,
+      "elapsedMs": 2,
+      "avgLatencyMs": 0.01,
+      "completedAt": "2026-05-07T15:32:51.232Z"
+    }
+  },
+  "summary": {
+    "totalSimulatedUsers": 140,
+    "totalHints": 420,
+    "totalCost": 0.168,
+    "avgFallbackRate": 0,
+    "maxLatencyMs": 0.01
+  }
+}

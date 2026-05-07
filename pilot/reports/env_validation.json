@@ -1,0 +1,7 @@
+{
+  "node": "v24.15.0",
+  "postgres": false,
+  "canvasAdapter": false,
+  "pineconeFlag": false,
+  "monitoring": true
+}
