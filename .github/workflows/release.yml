@@ -1,0 +1,74 @@
+name: Phase 1-2 MVP Release Pipeline
+
+on:
+  push:
+    branches: [release/phase-2, release/phase1-2-final]
+  pull_request:
+    branches: [release/phase-2]
+
+env:
+  NODE_VERSION: "18"
+  PNPM_VERSION: "8"
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: pnpm/action-setup@v2
+        with: { version: "${{ env.PNPM_VERSION }}" }
+      - uses: actions/setup-node@v3
+        with: { node-version: "${{ env.NODE_VERSION }}" }
+      - run: pnpm install --no-frozen-lockfile
+      - run: pnpm lint
+
+  unit:
+    runs-on: ubuntu-latest
+    needs: [lint]
+    steps:
+      - uses: actions/checkout@v3
+      - uses: pnpm/action-setup@v2
+        with: { version: "${{ env.PNPM_VERSION }}" }
+      - uses: actions/setup-node@v3
+        with: { node-version: "${{ env.NODE_VERSION }}" }
+      - run: pnpm install --no-frozen-lockfile
+      - run: node pilot/scripts/mvp-validate.js
+      - run: node pilot/scripts/failure-injection-tests.js
+
+  validate-gates:
+    runs-on: ubuntu-latest
+    needs: [lint]
+    steps:
+      - uses: actions/checkout@v3
+      - uses: pnpm/action-setup@v2
+        with: { version: "${{ env.PNPM_VERSION }}" }
+      - uses: actions/setup-node@v3
+        with: { node-version: "${{ env.NODE_VERSION }}" }
+      - run: pwsh -File pilot/scripts/validate-feature-gates.ps1
+      - run: pwsh -File pilot/scripts/final-release-audit.ps1
+
+  stress:
+    runs-on: ubuntu-latest
+    needs: [unit]
+    steps:
+      - uses: actions/checkout@v3
+      - uses: pnpm/action-setup@v2
+        with: { version: "${{ env.PNPM_VERSION }}" }
+      - uses: actions/setup-node@v3
+        with: { node-version: "${{ env.NODE_VERSION }}" }
+      - run: node pilot/scripts/failure-injection-tests.js
+
+  release-verdict:
+    runs-on: ubuntu-latest
+    needs: [unit, validate-gates, stress]
+    if: success()
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with: { node-version: "${{ env.NODE_VERSION }}" }
+      - run: node pilot/scripts/release-verdict.js
+      - name: Upload release evidence
+        uses: actions/upload-artifact@v3
+        with:
+          name: release-evidence
+          path: pilot/outputs/

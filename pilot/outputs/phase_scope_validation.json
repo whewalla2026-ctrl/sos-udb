@@ -1,0 +1,120 @@
+{
+  "timestamp": "2026-05-07T21:04:03.560Z",
+  "branch": "release/phase-2",
+  "appModule": {
+    "approvedPhase1_2": [
+      "UUPModule",
+      "PlanningModule",
+      "MonitoringModule",
+      "AuthModule",
+      "AuditModule",
+      "LmsModule",
+      "AiLiteModule",
+      "VectorStoreLocalModule",
+      "WaitlistModule",
+      "GraphQLAppModule"
+    ],
+    "phase3_5Found": [],
+    "phase3_5Blocked": [
+      "escrow",
+      "nft",
+      "futureself",
+      "aiMentor",
+      "ai-mentor",
+      "joonworld",
+      "kidpreneur",
+      "omnichannel",
+      "biometrics",
+      "rag",
+      "moderation",
+      "marketplace",
+      "wallet",
+      "aiLifeCoach",
+      "ai_life_coach",
+      "governance",
+      "biometric_flow",
+      "entrepreneurship",
+      "blockchain"
+    ]
+  },
+  "deadModulesOnDisk": [
+    {
+      "name": "biometrics",
+      "status": "UNUSED",
+      "phase": 3
+    },
+    {
+      "name": "kidpreneur",
+      "status": "UNUSED",
+      "phase": 4
+    },
+    {
+      "name": "omnichannel",
+      "status": "UNUSED",
+      "phase": 3
+    },
+    {
+      "name": "escrow",
+      "status": "UNUSED",
+      "phase": 4
+    },
+    {
+      "name": "nft",
+      "status": "UNUSED",
+      "phase": 5
+    },
+    {
+      "name": "wallet",
+      "status": "UNUSED",
+      "phase": 4
+    },
+    {
+      "name": "marketplace",
+      "status": "UNUSED",
+      "phase": 4
+    },
+    {
+      "name": "futureself",
+      "status": "UNUSED",
+      "phase": 5
+    },
+    {
+      "name": "governance",
+      "status": "UNUSED",
+      "phase": 5
+    },
+    {
+      "name": "moderation",
+      "status": "UNUSED",
+      "phase": 3
+    },
+    {
+      "name": "rag",
+      "status": "UNUSED",
+      "phase": 3
+    },
+    {
+      "name": "aiMentor",
+      "status": "UNUSED",
+      "phase": 3
+    },
+    {
+      "name": "aiLifeCoach",
+      "status": "UNUSED",
+      "phase": 3
+    },
+    {
+      "name": "joonworld",
+      "status": "UNUSED",
+      "phase": 5
+    },
+    {
+      "name": "consent",
+      "status": "UNUSED",
+      "phase": 3
+    }
+  ],
+  "runtimeImportsClean": true,
+  "forbiddenModulesInRuntime": [],
+  "verdict": "PASS"
+}

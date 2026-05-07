@@ -1,4 +1,7 @@
 import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
+import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
+import { APP_GUARD } from '@nestjs/core';
 import { UUPModule } from './uup/uup.module';
 import { PlanningModule } from '../../planning/planning.module';
 import { MonitoringModule } from '../../services/monitoring/monitoring.module';
@@ -12,6 +15,8 @@ import { WaitlistModule } from './waitlist/waitlist.module';
 
 @Module({
   imports: [
+    ConfigModule.forRoot({ isGlobal: true, envFilePath: ['.env', '.env.local'] }),
+    ThrottlerModule.forRoot([{ name: 'default', ttl: 60000, limit: 60 }]),
     // Core Phase 1-2
     UUPModule,
     PlanningModule,
@@ -24,6 +29,9 @@ import { WaitlistModule } from './waitlist/waitlist.module';
     GraphQLAppModule,
     // Distribution
     WaitlistModule,
+  ],
+  providers: [
+    { provide: APP_GUARD, useClass: ThrottlerGuard },
   ],
 })
 export class AppModule {}

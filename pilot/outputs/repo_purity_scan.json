@@ -1,0 +1,512 @@
+{
+  "scanned": [
+    "services",
+    "apps",
+    "pilot"
+  ],
+  "excludeDirs": [
+    "node_modules",
+    ".git",
+    "dist",
+    "build",
+    ".next",
+    "coverage",
+    ".turbo"
+  ],
+  "totalFindings": 76,
+  "byPattern": {
+    "placeholder": 12,
+    "mock": 25,
+    "fake": 4,
+    "stub": 12,
+    "TODO/FIXME": 19,
+    "hardcoded": 4
+  },
+  "byDirectory": {
+    "apps\\web\\next.config.js": 1,
+    "pilot\\artifacts\\release_verdict.json": 5,
+    "pilot\\outputs\\final_release_enforcement_audit.json": 8,
+    "pilot\\outputs\\release_candidate_report.json": 1,
+    "pilot\\outputs\\release_verdict.json": 5,
+    "pilot\\scripts\\artifacts\\release_candidate_report.json": 1,
+    "pilot\\scripts\\final-release-audit.ps1": 28,
+    "pilot\\scripts\\mvp-validate.js": 1,
+    "pilot\\scripts\\release-verdict.js": 5,
+    "pilot\\waitlist\\index.html": 2,
+    "services\\aiMentor\\aiMentor.service.ts": 1,
+    "services\\api\\mock-api.js": 1,
+    "services\\api\\src\\auth\\strategies\\firebase.strategy.ts": 1,
+    "services\\api\\src\\blockchain\\blockchain.service.ts": 1,
+    "services\\api\\src\\entrepreneurship\\entrepreneurship.service.ts": 1,
+    "services\\api\\test\\app.e2e-spec.ts": 1,
+    "services\\api\\test\\e2e-phase4-simulation.e2e-spec.ts": 2,
+    "services\\api\\test\\holistic-stress.e2e-spec.ts": 1,
+    "services\\api\\test\\udb-full-flow.e2e-spec.ts": 2,
+    "services\\auth\\auth.controller.ts": 1,
+    "services\\auth\\auth.service.ts": 1,
+    "services\\futureself\\futureself.service.ts": 1,
+    "services\\lms-sync\\src\\index.ts": 1,
+    "services\\lms\\lms-sync.service.ts": 2,
+    "services\\lms\\lms.service.ts": 1,
+    "services\\moderation\\moderation.service.ts": 1
+  },
+  "findings": [
+    {
+      "file": "apps\\web\\next.config.js",
+      "line": 1,
+      "pattern": "placeholder",
+      "match": "placeholder"
+    },
+    {
+      "file": "pilot\\artifacts\\release_verdict.json",
+      "line": 9,
+      "pattern": "mock",
+      "match": "mock"
+    },
+    {
+      "file": "pilot\\artifacts\\release_verdict.json",
+      "line": 9,
+      "pattern": "fake",
+      "match": "fake"
+    },
+    {
+      "file": "pilot\\artifacts\\release_verdict.json",
+      "line": 9,
+      "pattern": "stub",
+      "match": "stub"
+    },
+    {
+      "file": "pilot\\artifacts\\release_verdict.json",
+      "line": 11,
+      "pattern": "TODO/FIXME",
+      "match": "TODO"
+    },
+    {
+      "file": "pilot\\artifacts\\release_verdict.json",
+      "line": 13,
+      "pattern": "TODO/FIXME",
+      "match": "TODO"
+    },
+    {
+      "file": "pilot\\outputs\\final_release_enforcement_audit.json",
+      "line": 84,
+      "pattern": "mock",
+      "match": "mock"
+    },
+    {
+      "file": "pilot\\outputs\\final_release_enforcement_audit.json",
+      "line": 86,
+      "pattern": "hardcoded",
+      "match": "hardcoded"
+    },
+    {
+      "file": "pilot\\outputs\\final_release_enforcement_audit.json",
+      "line": 92,
+      "pattern": "mock",
+      "match": "mock"
+    },
+    {
+      "file": "pilot\\outputs\\final_release_enforcement_audit.json",
+      "line": 100,
+      "pattern": "stub",
+      "match": "stub"
+    },
+    {
+      "file": "pilot\\outputs\\final_release_enforcement_audit.json",
+      "line": 108,
+      "pattern": "mock",
+      "match": "mock"
+    },
+    {
+      "file": "pilot\\outputs\\final_release_enforcement_audit.json",
+      "line": 119,
+      "pattern": "mock",
+      "match": "mock"
+    },
+    {
+      "file": "pilot\\outputs\\final_release_enforcement_audit.json",
+      "line": 130,
+      "pattern": "mock",
+      "match": "mock"
+    },
+    {
+      "file": "pilot\\outputs\\final_release_enforcement_audit.json",
+      "line": 130,
+      "pattern": "hardcoded",
+      "match": "hardcoded"
+    },
+    {
+      "file": "pilot\\outputs\\release_candidate_report.json",
+      "line": 28,
+      "pattern": "TODO/FIXME",
+      "match": "TODO"
+    },
+    {
+      "file": "pilot\\outputs\\release_verdict.json",
+      "line": 9,
+      "pattern": "mock",
+      "match": "mock"
+    },
+    {
+      "file": "pilot\\outputs\\release_verdict.json",
+      "line": 9,
+      "pattern": "fake",
+      "match": "fake"
+    },
+    {
+      "file": "pilot\\outputs\\release_verdict.json",
+      "line": 9,
+      "pattern": "stub",
+      "match": "stub"
+    },
+    {
+      "file": "pilot\\outputs\\release_verdict.json",
+      "line": 11,
+      "pattern": "TODO/FIXME",
+      "match": "TODO"
+    },
+    {
+      "file": "pilot\\outputs\\release_verdict.json",
+      "line": 13,
+      "pattern": "TODO/FIXME",
+      "match": "TODO"
+    },
+    {
+      "file": "pilot\\scripts\\artifacts\\release_candidate_report.json",
+      "line": 28,
+      "pattern": "TODO/FIXME",
+      "match": "TODO"
+    },
+    {
+      "file": "pilot\\scripts\\final-release-audit.ps1",
+      "line": 2,
+      "pattern": "TODO/FIXME",
+      "match": "TODO"
+    },
+    {
+      "file": "pilot\\scripts\\final-release-audit.ps1",
+      "line": 2,
+      "pattern": "stub",
+      "match": "stub"
+    },
+    {
+      "file": "pilot\\scripts\\final-release-audit.ps1",
+      "line": 2,
+      "pattern": "placeholder",
+      "match": "placeholder"
+    },
+    {
+      "file": "pilot\\scripts\\final-release-audit.ps1",
+      "line": 25,
+      "pattern": "stub",
+      "match": "Stub"
+    },
+    {
+      "file": "pilot\\scripts\\final-release-audit.ps1",
+      "line": 27,
+      "pattern": "stub",
+      "match": "Stub"
+    },
+    {
+      "file": "pilot\\scripts\\final-release-audit.ps1",
+      "line": 47,
+      "pattern": "mock",
+      "match": "Mock"
+    },
+    {
+      "file": "pilot\\scripts\\final-release-audit.ps1",
+      "line": 49,
+      "pattern": "mock",
+      "match": "Mock"
+    },
+    {
+      "file": "pilot\\scripts\\final-release-audit.ps1",
+      "line": 49,
+      "pattern": "stub",
+      "match": "Stub"
+    },
+    {
+      "file": "pilot\\scripts\\final-release-audit.ps1",
+      "line": 51,
+      "pattern": "mock",
+      "match": "mock"
+    },
+    {
+      "file": "pilot\\scripts\\final-release-audit.ps1",
+      "line": 53,
+      "pattern": "placeholder",
+      "match": "placeholder"
+    },
+    {
+      "file": "pilot\\scripts\\final-release-audit.ps1",
+      "line": 54,
+      "pattern": "stub",
+      "match": "stub"
+    },
+    {
+      "file": "pilot\\scripts\\final-release-audit.ps1",
+      "line": 55,
+      "pattern": "fake",
+      "match": "fake"
+    },
+    {
+      "file": "pilot\\scripts\\final-release-audit.ps1",
+      "line": 63,
+      "pattern": "stub",
+      "match": "stub"
+    },
+    {
+      "file": "pilot\\scripts\\final-release-audit.ps1",
+      "line": 63,
+      "pattern": "placeholder",
+      "match": "placeholder"
+    },
+    {
+      "file": "pilot\\scripts\\final-release-audit.ps1",
+      "line": 64,
+      "pattern": "mock",
+      "match": "mock"
+    },
+    {
+      "file": "pilot\\scripts\\final-release-audit.ps1",
+      "line": 70,
+      "pattern": "mock",
+      "match": "mock"
+    },
+    {
+      "file": "pilot\\scripts\\final-release-audit.ps1",
+      "line": 70,
+      "pattern": "stub",
+      "match": "stub"
+    },
+    {
+      "file": "pilot\\scripts\\final-release-audit.ps1",
+      "line": 72,
+      "pattern": "TODO/FIXME",
+      "match": "TODO"
+    },
+    {
+      "file": "pilot\\scripts\\final-release-audit.ps1",
+      "line": 74,
+      "pattern": "TODO/FIXME",
+      "match": "TODO"
+    },
+    {
+      "file": "pilot\\scripts\\final-release-audit.ps1",
+      "line": 75,
+      "pattern": "TODO/FIXME",
+      "match": "TODO"
+    },
+    {
+      "file": "pilot\\scripts\\final-release-audit.ps1",
+      "line": 75,
+      "pattern": "hardcoded",
+      "match": "HARDCODED"
+    },
+    {
+      "file": "pilot\\scripts\\final-release-audit.ps1",
+      "line": 76,
+      "pattern": "TODO/FIXME",
+      "match": "TODO"
+    },
+    {
+      "file": "pilot\\scripts\\final-release-audit.ps1",
+      "line": 76,
+      "pattern": "hardcoded",
+      "match": "HARDCODED"
+    },
+    {
+      "file": "pilot\\scripts\\final-release-audit.ps1",
+      "line": 83,
+      "pattern": "TODO/FIXME",
+      "match": "TODO"
+    },
+    {
+      "file": "pilot\\scripts\\final-release-audit.ps1",
+      "line": 84,
+      "pattern": "TODO/FIXME",
+      "match": "TODO"
+    },
+    {
+      "file": "pilot\\scripts\\final-release-audit.ps1",
+      "line": 87,
+      "pattern": "TODO/FIXME",
+      "match": "TODO"
+    },
+    {
+      "file": "pilot\\scripts\\final-release-audit.ps1",
+      "line": 89,
+      "pattern": "TODO/FIXME",
+      "match": "TODO"
+    },
+    {
+      "file": "pilot\\scripts\\final-release-audit.ps1",
+      "line": 114,
+      "pattern": "TODO/FIXME",
+      "match": "TODO"
+    },
+    {
+      "file": "pilot\\scripts\\mvp-validate.js",
+      "line": 572,
+      "pattern": "TODO/FIXME",
+      "match": "TODO"
+    },
+    {
+      "file": "pilot\\scripts\\release-verdict.js",
+      "line": 17,
+      "pattern": "mock",
+      "match": "mock"
+    },
+    {
+      "file": "pilot\\scripts\\release-verdict.js",
+      "line": 17,
+      "pattern": "fake",
+      "match": "fake"
+    },
+    {
+      "file": "pilot\\scripts\\release-verdict.js",
+      "line": 17,
+      "pattern": "stub",
+      "match": "stub"
+    },
+    {
+      "file": "pilot\\scripts\\release-verdict.js",
+      "line": 19,
+      "pattern": "TODO/FIXME",
+      "match": "TODO"
+    },
+    {
+      "file": "pilot\\scripts\\release-verdict.js",
+      "line": 21,
+      "pattern": "TODO/FIXME",
+      "match": "TODO"
+    },
+    {
+      "file": "pilot\\waitlist\\index.html",
+      "line": 52,
+      "pattern": "placeholder",
+      "match": "placeholder"
+    },
+    {
+      "file": "pilot\\waitlist\\index.html",
+      "line": 53,
+      "pattern": "placeholder",
+      "match": "placeholder"
+    },
+    {
+      "file": "services\\aiMentor\\aiMentor.service.ts",
+      "line": 6,
+      "pattern": "placeholder",
+      "match": "placeholder"
+    },
+    {
+      "file": "services\\api\\mock-api.js",
+      "line": 21,
+      "pattern": "mock",
+      "match": "Mock"
+    },
+    {
+      "file": "services\\api\\src\\auth\\strategies\\firebase.strategy.ts",
+      "line": 12,
+      "pattern": "mock",
+      "match": "mock"
+    },
+    {
+      "file": "services\\api\\src\\blockchain\\blockchain.service.ts",
+      "line": 51,
+      "pattern": "placeholder",
+      "match": "Placeholder"
+    },
+    {
+      "file": "services\\api\\src\\entrepreneurship\\entrepreneurship.service.ts",
+      "line": 58,
+      "pattern": "stub",
+      "match": "stub"
+    },
+    {
+      "file": "services\\api\\test\\app.e2e-spec.ts",
+      "line": 15,
+      "pattern": "mock",
+      "match": "Mock"
+    },
+    {
+      "file": "services\\api\\test\\e2e-phase4-simulation.e2e-spec.ts",
+      "line": 17,
+      "pattern": "mock",
+      "match": "Mock"
+    },
+    {
+      "file": "services\\api\\test\\e2e-phase4-simulation.e2e-spec.ts",
+      "line": 58,
+      "pattern": "mock",
+      "match": "mock"
+    },
+    {
+      "file": "services\\api\\test\\holistic-stress.e2e-spec.ts",
+      "line": 29,
+      "pattern": "mock",
+      "match": "Mock"
+    },
+    {
+      "file": "services\\api\\test\\udb-full-flow.e2e-spec.ts",
+      "line": 104,
+      "pattern": "mock",
+      "match": "mock"
+    },
+    {
+      "file": "services\\api\\test\\udb-full-flow.e2e-spec.ts",
+      "line": 161,
+      "pattern": "mock",
+      "match": "mock"
+    },
+    {
+      "file": "services\\auth\\auth.controller.ts",
+      "line": 24,
+      "pattern": "mock",
+      "match": "mock"
+    },
+    {
+      "file": "services\\auth\\auth.service.ts",
+      "line": 27,
+      "pattern": "placeholder",
+      "match": "placeholder"
+    },
+    {
+      "file": "services\\futureself\\futureself.service.ts",
+      "line": 6,
+      "pattern": "placeholder",
+      "match": "placeholder"
+    },
+    {
+      "file": "services\\lms-sync\\src\\index.ts",
+      "line": 17,
+      "pattern": "mock",
+      "match": "Mock"
+    },
+    {
+      "file": "services\\lms\\lms-sync.service.ts",
+      "line": 16,
+      "pattern": "mock",
+      "match": "mock"
+    },
+    {
+      "file": "services\\lms\\lms-sync.service.ts",
+      "line": 46,
+      "pattern": "mock",
+      "match": "mock"
+    },
+    {
+      "file": "services\\lms\\lms.service.ts",
+      "line": 6,
+      "pattern": "placeholder",
+      "match": "Placeholder"
+    },
+    {
+      "file": "services\\moderation\\moderation.service.ts",
+      "line": 6,
+      "pattern": "placeholder",
+      "match": "placeholder"
+    }
+  ],
+  "generatedAt": "2026-05-07T21:03:33.974Z"
+}

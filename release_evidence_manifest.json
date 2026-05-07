@@ -1,0 +1,51 @@
+{
+  "release": "Phase 1-2 MVP",
+  "tag": "phase-1-2-mvp-rc1",
+  "branch": "release/phase-2",
+  "generated": "2026-05-08T00:06:56.000Z",
+  "evidence": {
+    "reports": {
+      "repo_purity": "pilot/outputs/repo_purity_scan.json",
+      "phase_scope_validation": "pilot/outputs/phase_scope_validation.json",
+      "mvp_validation": "pilot/outputs/release_candidate_report.json",
+      "failure_injection": "pilot/outputs/failure_injection_report.json",
+      "release_verdict": "pilot/outputs/release_verdict.json",
+      "production_readiness": "pilot/outputs/production_readiness_report.json",
+      "final_audit": "pilot/outputs/final_release_enforcement_audit.json",
+      "e2e_trace": "pilot/outputs/e2e_replay_trace.json",
+      "runtime_simulation": "pilot/outputs/runtime_simulation_log.json"
+    },
+    "documentation": {
+      "phase1_final": "PHASE1_FINAL.md",
+      "phase2_final": "PHASE2_FINAL.md",
+      "final_release_audit": "FINAL_RELEASE_AUDIT.md",
+      "final_go_nogo": "FINAL_GO_NO_GO.md",
+      "final_known_limitations": "FINAL_KNOWN_LIMITATIONS.md",
+      "final_rollback_runbook": "FINAL_ROLLBACK_RUNBOOK.md",
+      "final_deployment_runbook": "FINAL_DEPLOYMENT_RUNBOOK.md",
+      "final_observability_runbook": "FINAL_OBSERVABILITY_RUNBOOK.md",
+      "final_system_architecture": "FINAL_SYSTEM_ARCHITECTURE.md"
+    },
+    "ci_cd": {
+      "release_pipeline": ".github/workflows/release.yml",
+      "deploy_pipeline": ".github/workflows/deploy.yml"
+    },
+    "config": {
+      "feature_flags": "pilot/config/feature-flags.json",
+      "env_sample": "pilot/.env.sample",
+      "early_warning_signals": "pilot/runbooks/early-warning-signals.json"
+    },
+    "test_results": {
+      "mvp_validation": "49/49 PASS",
+      "failure_injection": "46/46 PASS",
+      "total": "95/95 PASS"
+    },
+    "security": {
+      "auth": "JWT with scrypt password hashing",
+      "rate_limiting": "Active (60 req/min global)",
+      "helmet": "Active",
+      "cors": "Restricted origins",
+      "validation": "Global ValidationPipe with whitelist"
+    }
+  }
+}
