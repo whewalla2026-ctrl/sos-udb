@@ -13,3 +13,8 @@ dist/
 .env.test
 .env.development
 coverage/
+
+# Local/prototype artifacts (not part of runtime)
+prisma/
+services/api/prisma/phase3/
+services/api/prisma/generate-sql.js
