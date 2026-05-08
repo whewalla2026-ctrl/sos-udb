@@ -1,0 +1,64 @@
+{
+  "report": "Phase 3 - Redis Cache Load Test Results",
+  "timestamp": "2026-05-08T03:48:00Z",
+  "status": "PASS",
+  "test_script": "services/api/prisma/phase3-cache-load-test.js",
+  "total_requests": 2600,
+  "total_errors": 0,
+  "total_cache_hits": 2090,
+  "cache_hit_rate_percent": 80.4,
+  "scenarios": [
+    {
+      "label": "Plan (uncached - 100 unique users)",
+      "total_requests": 100,
+      "errors": 0,
+      "cache_hits": 0,
+      "p50_ms": 1,
+      "p95_ms": 3,
+      "p99_ms": 4
+    },
+    {
+      "label": "Plan (cached - 1000 same user requests)",
+      "total_requests": 1000,
+      "errors": 0,
+      "cache_hits": 999,
+      "p50_ms": 0,
+      "p95_ms": 2,
+      "p99_ms": 3
+    },
+    {
+      "label": "AI Hint (uncached - 100 unique subjects)",
+      "total_requests": 100,
+      "errors": 0,
+      "cache_hits": 0,
+      "p50_ms": 0,
+      "p95_ms": 1,
+      "p99_ms": 2
+    },
+    {
+      "label": "AI Hint (cached - 1000 same subject)",
+      "total_requests": 1000,
+      "errors": 0,
+      "cache_hits": 1000,
+      "p50_ms": 0,
+      "p95_ms": 1,
+      "p99_ms": 2
+    },
+    {
+      "label": "Health (always live, 100 requests)",
+      "total_requests": 100,
+      "errors": 0,
+      "p50_ms": 0,
+      "p95_ms": 2,
+      "p99_ms": 2
+    },
+    {
+      "label": "Mixed workload (300 requests)",
+      "total_requests": 300,
+      "errors": 0,
+      "throughput_req_per_sec": 1141,
+      "duration_ms": 263
+    }
+  ],
+  "verdict": "PASS"
+}

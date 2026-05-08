@@ -1,6 +1,7 @@
 const express = require('express');
 const { PrismaClient } = require('@prisma/client');
 const crypto = require('crypto');
+const redisService = require('./redis-service');
 
 const prisma = new PrismaClient();
 const app = express();
@@ -8,8 +9,21 @@ const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
 
+// Fallback in-memory session store (used when Redis is unavailable)
+const memorySessions = new Map();
+
+async function getSession(userId) {
+  const session = await redisService.getSession(userId);
+  if (session) return session;
+  return memorySessions.get(userId) || null;
+}
+
+async function saveSession(userId, data) {
+  const saved = await redisService.saveSession(userId, data);
+  if (!saved) memorySessions.set(userId, data);
+}
+
 // --- Auth endpoints ---
-const users = new Map(); // in-memory session store
 
 // POST /auth/register
 app.post('/auth/register', async (req, res) => {
@@ -31,8 +45,8 @@ app.post('/auth/register', async (req, res) => {
         role: role || 'CHILD',
       }
     });
-    users.set(user.id, { hash, salt, email });
     const token = crypto.randomBytes(32).toString('hex');
+    await saveSession(user.id, { hash, salt, email, token });
     return res.status(201).json({ userId: user.id, email: user.email, token, displayName: user.displayName, role: user.role });
   } catch (err) {
     if (err.code === 'P2002') return res.status(409).json({ error: 'Email already exists' });
@@ -47,11 +61,12 @@ app.post('/auth/login', async (req, res) => {
     if (!email || !password) return res.status(400).json({ error: 'Email and password required' });
     const user = await prisma.user.findUnique({ where: { email } });
     if (!user) return res.status(401).json({ error: 'Invalid credentials' });
-    const record = users.get(user.id);
+    const record = await getSession(user.id);
     if (!record) return res.status(401).json({ error: 'Not registered via this server' });
     const hash = crypto.scryptSync(password, record.salt, 64).toString('hex');
     if (hash !== record.hash) return res.status(401).json({ error: 'Invalid credentials' });
     const token = crypto.randomBytes(32).toString('hex');
+    await saveSession(user.id, { hash, salt, email, token });
     return res.json({ userId: user.id, email: user.email, token, displayName: user.displayName, role: user.role });
   } catch (err) {
     return res.status(500).json({ error: err.message });
@@ -60,10 +75,14 @@ app.post('/auth/login', async (req, res) => {
 
 // --- Planning endpoints ---
 // POST /planning/generate
-app.post('/planning/generate', (req, res) => {
+app.post('/planning/generate', async (req, res) => {
   const { userId, preferences } = req.body;
   if (!userId) return res.status(400).json({ error: 'userId required' });
-  // Deterministic planner
+
+  // Check cache first
+  const cached = await redisService.getCachedPlan(userId);
+  if (cached) return res.json({ ...cached, cached: true });
+
   const plan = {
     id: crypto.randomUUID(),
     userId,
@@ -77,36 +96,48 @@ app.post('/planning/generate', (req, res) => {
     focusPillars: preferences?.focusPillars || ['ACADEMIC', 'BIOMETRIC'],
     totalFocusMinutes: 150,
   };
+
+  await redisService.cachePlan(userId, plan);
   return res.json(plan);
 });
 
-// --- AI Lite endpoints ---
 // POST /ai-lite/hint
-app.post('/ai-lite/hint', (req, res) => {
+app.post('/ai-lite/hint', async (req, res) => {
   const { userId, subject, question } = req.body;
   if (!userId) return res.status(400).json({ error: 'userId required' });
+
+  // Check cache first
+  const cachedHint = await redisService.getCachedHint(subject);
+  if (cachedHint) return res.json({ ...cachedHint, cached: true });
+
   const hints = {
     math: 'Break the problem into smaller steps. What is the first operation?',
     reading: 'Look for the main idea in the first paragraph.',
     science: 'What variables are involved in this experiment?',
     default: 'Think about what you already know about this topic.',
   };
-  return res.json({
-    hint: hints[subject?.toLowerCase()] || hints.default,
+  const hint = hints[subject?.toLowerCase()] || hints.default;
+  const response = {
+    hint,
     subject: subject || 'general',
     confidence: 0.85,
     generatedAt: new Date().toISOString(),
-  });
+  };
+
+  await redisService.cacheHint(subject, response);
+  return res.json(response);
 });
 
 // --- Monitoring endpoints ---
 // GET /monitoring/health
-app.get('/monitoring/health', (req, res) => {
+app.get('/monitoring/health', async (req, res) => {
+  const redisStats = await redisService.getStats();
   return res.json({
     status: 'healthy',
     timestamp: new Date().toISOString(),
     uptime: process.uptime(),
     version: '1.0.0',
+    redis: redisStats.connected ? 'connected' : 'disconnected',
   });
 });
 
@@ -163,10 +194,12 @@ app.post('/guard/check-budget', (req, res) => {
 app.get('/metrics', async (req, res) => {
   try {
     const userCount = await prisma.user.count();
+    const redisStats = await redisService.getStats();
     return res.json({
       users: { total: userCount },
       uptime: process.uptime(),
       memory: process.memoryUsage(),
+      redis: { connected: redisStats.connected, keyspace: redisStats.keyspace || 0 },
       timestamp: new Date().toISOString(),
     });
   } catch (err) {
@@ -174,15 +207,29 @@ app.get('/metrics', async (req, res) => {
   }
 });
 
-// Start server
+// --- Cache inspection endpoint ---
+app.get('/cache/stats', async (req, res) => {
+  const stats = await redisService.getStats();
+  return res.json({
+    service: 'Redis Cache Layer',
+    status: stats.connected ? 'active' : 'fallback-memory',
+    stats,
+    fallbackSessions: memorySessions.size,
+  });
+});
+
+// --- Start server ---
 async function start() {
   try {
     await prisma.$connect();
     console.log('Connected to PostgreSQL');
-    
+
+    await redisService.connect();
+
     app.listen(PORT, () => {
       console.log(`Runtime Validation Server listening on port ${PORT}`);
       console.log(`Health: http://localhost:${PORT}/monitoring/health`);
+      console.log(`Cache: http://localhost:${PORT}/cache/stats`);
     });
   } catch (err) {
     console.error('Failed to start:', err);
