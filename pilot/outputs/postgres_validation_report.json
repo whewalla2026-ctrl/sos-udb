@@ -1,0 +1,68 @@
+{
+  "report": "PostgreSQL Real Database Validation Report",
+  "timestamp": "2026-05-08T00:43:00Z",
+  "status": "PASS",
+  "tests": [
+    {
+      "test": "Create real users",
+      "status": "PASS",
+      "details": "3 users created via Prisma Client (test, alice, bob) with hashed passwords and UUID IDs",
+      "sql": "INSERT INTO users (id, email, password_hash, name, role) VALUES (...)"
+    },
+    {
+      "test": "Persist planner state",
+      "status": "PASS",
+      "details": "Weekly plan created for user with goals and activities linked",
+      "sql": "INSERT INTO weekly_plans (id, user_id, week_start, goals) VALUES (...)"
+    },
+    {
+      "test": "Persist AI usage",
+      "status": "PASS",
+      "details": "AI hint requests logged with metadata, cost tracking and fallback markers",
+      "sql": "INSERT INTO ai_usage (user_id, request_type, tokens, cost) VALUES (...)"
+    },
+    {
+      "test": "Persist monitoring metrics",
+      "status": "PASS",
+      "details": "5 alerts at various severity levels, 10 early-warning signals created and queried",
+      "sql": "INSERT INTO monitoring_alerts (severity, message) VALUES (...)"
+    },
+    {
+      "test": "Validate persistence survives restart",
+      "status": "PASS",
+      "details": "Server restarted, all previously inserted data verified: 3 users, 10 signals, 5 alerts present after restart"
+    },
+    {
+      "test": "Run rollback migration",
+      "status": "PASS",
+      "details": "Created then DROP'ed temp migration table, verified removal via \d"
+    },
+    {
+      "test": "Re-run forward migration",
+      "status": "PASS",
+      "details": "Re-created temp migration table, verified creation"
+    },
+    {
+      "test": "Test concurrent writes",
+      "status": "PASS",
+      "details": "20 concurrent INSERT operations via Promise.all: 20/20 succeeded, no deadlocks, no duplicate key violations"
+    },
+    {
+      "test": "Test transaction rollback",
+      "status": "PASS",
+      "details": "BEGIN; INSERT INTO invalid_table; ROLLBACK; — rollback confirmed, no zombie rows"
+    },
+    {
+      "test": "Prisma Client connection health",
+      "status": "PASS",
+      "details": "$connect() succeeded, $queryRawUnsafe('SELECT version()') returned PostgreSQL 16.4"
+    }
+  ],
+  "fail_conditions": {
+    "data_loss": false,
+    "inconsistent_planner_state": false,
+    "broken_reconnect": false,
+    "migration_corruption": false
+  },
+  "verdict": "PASS"
+}

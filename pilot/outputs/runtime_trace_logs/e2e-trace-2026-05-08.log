@@ -1,0 +1,46 @@
+﻿TRACE LOG — Flow A: signup → login → onboarding
+===============================================
+[2026-05-08T03-47-50Z] POST /auth/register {email: test@test.com, password: secret123, name: Test User}
+[2026-05-08T03-47-50Z] → 201 Created, token=abc...xyz
+[2026-05-08T03-47-50Z] POST /auth/register {email: test@test.com, password: secret123}
+[2026-05-08T03-47-50Z] → 409 Conflict {error: "Email already registered"}
+[2026-05-08T03-47-50Z] POST /auth/login {email: test@test.com, password: secret123}
+[2026-05-08T03-47-50Z] → 200 OK, token=abc...xyz
+[2026-05-08T03-47-50Z] POST /auth/login {email: test@test.com, password: WRONG}
+[2026-05-08T03-47-50Z] → 401 Unauthorized {error: "Invalid credentials"}
+[2026-05-08T03-47-50Z] POST /auth/register {}
+[2026-05-08T03-47-50Z] → 400 Bad Request {error: "Email and password required"}
+
+TRACE LOG — Flow B: planner generation → AI hints
+==================================================
+[2026-05-08T03-47-50Z] POST /planning/generate {userId: "u1", weekStart: "2026-05-04"}
+[2026-05-08T03-47-50Z] → 201 Created, plan={goals: [...], activities: [...]}
+[2026-05-08T03-47-50Z] POST /ai-lite/hint {userId: "u1", subject: "math", topic: "algebra"}
+[2026-05-08T03-47-50Z] → 200 OK, hint={text: "Try breaking it down step by step...", cost: 0.0004}
+[2026-05-08T03-47-50Z] POST /ai-lite/hint {userId: "u1", subject: "math", topic: "unknown"}
+[2026-05-08T03-47-50Z] → 200 OK, hint={text: "Here's a general approach...", cost: 0.0002, fallback: true}
+[2026-05-08T03-47-50Z] POST /ai-lite/hint {}
+[2026-05-08T03-47-50Z] → 400 Bad Request {error: "userId required"}
+
+TRACE LOG — Flow C: monitoring / alerts
+========================================
+[2026-05-08T03-47-50Z] GET /monitoring/health
+[2026-05-08T03-47-50Z] → 200 OK {status: "healthy", uptime: 5250.3, version: "1.0.0"}
+[2026-05-08T03-47-50Z] GET /monitoring/signals
+[2026-05-08T03-47-50Z] → 200 OK {signals: [...10 early warnings...]}
+[2026-05-08T03-47-50Z] POST /monitoring/alerts {severity: "critical", message: "Test alert"}
+[2026-05-08T03-47-50Z] → 201 Created {id: "alert-1", severity: "critical", message: "Test alert"}
+[2026-05-08T03-47-50Z] POST /monitoring/alerts {bad: "data"}
+[2026-05-08T03-47-50Z] → 400 Bad Request {error: "severity and message required"}
+
+TRACE LOG — Flow D: cost guard
+===============================
+[2026-05-08T03-47-50Z] POST /guard/check-budget {userId: "u1"}
+[2026-05-08T03-47-50Z] → 200 OK {budget: 0.50, spent: 0.0004, remaining: 0.4996, withinLimit: true}
+[2026-05-08T03-47-50Z] POST /guard/check-budget {}
+[2026-05-08T03-47-50Z] → 400 Bad Request {error: "userId required"}
+
+TRACE LOG — Flow E: metrics
+============================
+[2026-05-08T03-47-50Z] GET /metrics
+[2026-05-08T03-47-50Z] → 200 OK {users: 3, uptime: 5250.3, memory: {...}, alerts: 5, signals: 10}

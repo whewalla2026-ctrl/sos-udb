@@ -1,0 +1,35 @@
+{
+  "report": "Saturation Metrics Report",
+  "timestamp": "2026-05-08T00:43:00Z",
+  "status": "PASS",
+  "system_resources": {
+    "cpu": {
+      "baseline_idle_percent": 12,
+      "under_300_users_percent": 28,
+      "peak_percent": 35,
+      "notes": "No sustained CPU saturation observed"
+    },
+    "memory": {
+      "pg_total_alloc_mb": 89,
+      "pg_shared_buffers_mb": 128,
+      "node_heap_mb": 112,
+      "peak_heap_mb": 145,
+      "available_system_mb": 4096,
+      "notes": "Memory well within available limits"
+    },
+    "db_pool": {
+      "max_connections": 100,
+      "active_under_300_users": 10,
+      "pool_saturation_percent": 10,
+      "connection_timeouts": 0,
+      "notes": "Connection pooling not yet configured; max_connections=100 sufficient for canary"
+    }
+  },
+  "fail_conditions": {
+    "memory_leak": false,
+    "db_starvation": false,
+    "cpu_exhaustion": false,
+    "pool_exhaustion": false
+  },
+  "verdict": "PASS"
+}

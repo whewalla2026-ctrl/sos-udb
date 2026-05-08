@@ -1,0 +1,51 @@
+{
+  "report": "Service Boot Report",
+  "timestamp": "2026-05-08T00:43:00Z",
+  "status": "PASS",
+  "services": [
+    {
+      "name": "PostgreSQL 16.4",
+      "status": "RUNNING",
+      "pid": [9344, 12620, 13680, 20048, 21888, 22312, 23964, 24896, 27416, 29212, 30292, 42564, 44652],
+      "port": 5432,
+      "uptime_seconds": 5240,
+      "accepting_connections": true,
+      "databases": ["udb", "postgres", "template0", "template1"],
+      "log_file": "C:/Users/admin/AppData/Local/Temp/pgdata/pg.log"
+    },
+    {
+      "name": "Runtime Validation Server (Express)",
+      "status": "RUNNING",
+      "pid": 17632,
+      "port": 3000,
+      "uptime_seconds": 5250,
+      "health_endpoint": "/monitoring/health",
+      "last_health_check": {"status": "healthy", "version": "1.0.0"},
+      "endpoints": [
+        "POST /auth/register",
+        "POST /auth/login",
+        "POST /planning/generate",
+        "POST /ai-lite/hint",
+        "GET /monitoring/health",
+        "GET /monitoring/signals",
+        "POST /monitoring/alerts",
+        "GET /monitoring/alerts",
+        "POST /guard/check-budget",
+        "GET /metrics"
+      ]
+    }
+  ],
+  "env_configuration": {
+    "DATABASE_URL": "postgresql://udb:udb@localhost:5432/udb?schema=public",
+    "PORT": 3000,
+    "NODE_ENV": "production",
+    "DB_CONNECTION": "VERIFIED (Prisma Client connected)"
+  },
+  "fail_conditions": {
+    "dependency_conflict": false,
+    "migration_failure": false,
+    "failed_boot": false,
+    "missing_env_variable": false
+  },
+  "verdict": "PASS"
+}

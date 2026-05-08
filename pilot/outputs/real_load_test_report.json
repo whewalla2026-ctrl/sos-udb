@@ -1,0 +1,53 @@
+{
+  "report": "Real Load & Stress Test Report",
+  "timestamp": "2026-05-08T00:43:00Z",
+  "status": "PASS",
+  "test_script": "services/api/prisma/real-load-test.js",
+  "target": "http://localhost:3000",
+  "tiers": [
+    {
+      "tier": "10 users",
+      "total_requests": 50,
+      "duration_seconds": 0.17,
+      "throughput_req_per_sec": 294,
+      "latency_ms": {"p50": 45, "p95": 60, "p99": 62, "min": 38, "max": 62},
+      "error_rate": 0,
+      "errors": 0,
+      "estimated_ai_cost": 0.0004,
+      "status": "PASS"
+    },
+    {
+      "tier": "100 users",
+      "total_requests": 500,
+      "duration_seconds": 0.436,
+      "throughput_req_per_sec": 1146,
+      "latency_ms": {"p50": 266, "p95": 344, "p99": 365, "min": 78, "max": 365},
+      "error_rate": 0,
+      "errors": 0,
+      "estimated_ai_cost": 0.008,
+      "status": "PASS"
+    },
+    {
+      "tier": "300 users",
+      "total_requests": 1500,
+      "duration_seconds": 1.345,
+      "throughput_req_per_sec": 1115,
+      "latency_ms": {"p50": 1021, "p95": 1207, "p99": 1239, "min": 248, "max": 1239},
+      "error_rate": 0,
+      "errors": 0,
+      "db_operations": 237,
+      "estimated_ai_cost": 0.12,
+      "status": "PASS",
+      "notes": "p99=1239ms — acceptable for canary, connection pooling recommended for sustained >100 users"
+    }
+  ],
+  "verdict": "PASS",
+  "fail_conditions": {
+    "crash": false,
+    "memory_leak": false,
+    "db_starvation": false,
+    "runaway_latency": false,
+    "failed_fallback": false,
+    "uncontrolled_cost_growth": false
+  }
+}

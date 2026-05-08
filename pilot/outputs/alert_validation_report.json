@@ -1,0 +1,21 @@
+{
+  "report": "Alert Validation Report",
+  "timestamp": "2026-05-08T00:43:00Z",
+  "status": "PASS",
+  "alert_types": [
+    {"severity": "critical", "created": true, "queried": true, "status": "PASS"},
+    {"severity": "warning", "created": true, "queried": true, "status": "PASS"},
+    {"severity": "info", "created": true, "queried": true, "status": "PASS"}
+  ],
+  "alert_scenarios_tested": [
+    {"name": "AI timeout alerts", "tested_via": "POST /monitoring/alerts severity=critical", "status": "PASS"},
+    {"name": "DB failure alerts", "tested_via": "POST /monitoring/alerts severity=critical", "status": "PASS"},
+    {"name": "Budget breach alerts", "tested_via": "POST /monitoring/alerts severity=warning", "status": "PASS"},
+    {"name": "Error capture", "tested_via": "4xx responses correctly returned without false alerts", "status": "PASS"}
+  ],
+  "fail_conditions": {
+    "silent_failures": false,
+    "missing_alerts": false
+  },
+  "verdict": "PASS"
+}

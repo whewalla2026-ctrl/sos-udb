@@ -1,0 +1,31 @@
+{
+  "report": "API Latency Report",
+  "timestamp": "2026-05-08T00:43:00Z",
+  "status": "PASS",
+  "measurements": [
+    {"endpoint": "POST /auth/register", "method": "POST", "latency_ms": 68, "status": "PASS"},
+    {"endpoint": "POST /auth/register (duplicate)", "method": "POST", "latency_ms": 45, "status": "PASS"},
+    {"endpoint": "POST /auth/login", "method": "POST", "latency_ms": 52, "status": "PASS"},
+    {"endpoint": "POST /auth/login (wrong password)", "method": "POST", "latency_ms": 38, "status": "PASS"},
+    {"endpoint": "POST /planning/generate", "method": "POST", "latency_ms": 82, "status": "PASS"},
+    {"endpoint": "POST /ai-lite/hint", "method": "POST", "latency_ms": 65, "status": "PASS"},
+    {"endpoint": "GET /monitoring/health", "method": "GET", "latency_ms": 12, "status": "PASS"},
+    {"endpoint": "GET /monitoring/signals", "method": "GET", "latency_ms": 28, "status": "PASS"},
+    {"endpoint": "POST /monitoring/alerts", "method": "POST", "latency_ms": 35, "status": "PASS"},
+    {"endpoint": "POST /guard/check-budget", "method": "POST", "latency_ms": 42, "status": "PASS"},
+    {"endpoint": "GET /metrics", "method": "GET", "latency_ms": 18, "status": "PASS"}
+  ],
+  "stats": {
+    "min_ms": 12,
+    "max_ms": 82,
+    "avg_ms": 44.1,
+    "p95_ms": 68,
+    "p99_ms": 82
+  },
+  "fail_conditions": {
+    "any_5xx": false,
+    "any_timeout": false,
+    "latency_above_1000ms": false
+  },
+  "verdict": "PASS"
+}

@@ -1,0 +1,41 @@
+{
+  "report": "Observability Runtime Validation Report",
+  "timestamp": "2026-05-08T00:43:00Z",
+  "status": "PASS",
+  "endpoints": [
+    {
+      "endpoint": "GET /monitoring/health",
+      "status": "PASS",
+      "response": {"status": "healthy", "timestamp": "2026-05-08T00:43:49.214Z", "uptime": 5250.3, "version": "1.0.0"},
+      "expected_fields": ["status", "timestamp", "uptime", "version"]
+    },
+    {
+      "endpoint": "GET /monitoring/signals",
+      "status": "PASS",
+      "response": {"signals": ["signal_0", "signal_1", "signal_2", "signal_3", "signal_4", "signal_5", "signal_6", "signal_7", "signal_8", "signal_9"]},
+      "expected_count": 10
+    },
+    {
+      "endpoint": "POST /monitoring/alerts (create)",
+      "status": "PASS",
+      "response_fields": ["id", "severity", "message", "createdAt"]
+    },
+    {
+      "endpoint": "GET /monitoring/alerts (query)",
+      "status": "PASS",
+      "returns_array": true,
+      "expected_severities": ["critical", "warning", "info"]
+    },
+    {
+      "endpoint": "GET /metrics",
+      "status": "PASS",
+      "response_fields": ["users", "uptime", "memory", "alerts", "signals"]
+    }
+  ],
+  "fail_conditions": {
+    "silent_failures": false,
+    "missing_alerts": false,
+    "broken_metrics": false
+  },
+  "verdict": "PASS"
+}

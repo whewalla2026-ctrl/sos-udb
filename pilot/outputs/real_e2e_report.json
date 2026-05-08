@@ -1,0 +1,75 @@
+{
+  "report": "Real HTTP End-to-End Test Report",
+  "timestamp": "2026-05-08T00:43:00Z",
+  "status": "PASS",
+  "target": "http://localhost:3000",
+  "test_script": "services/api/prisma/e2e-real-http-tests.js",
+  "flows": [
+    {
+      "flow": "A: signup → login → onboarding",
+      "tests": [
+        {"name": "Register new user", "endpoint": "POST /auth/register", "expected": 201, "actual": 201, "status": "PASS"},
+        {"name": "Duplicate registration", "endpoint": "POST /auth/register", "expected": 409, "actual": 409, "status": "PASS"},
+        {"name": "Login with valid credentials", "endpoint": "POST /auth/login", "expected": 200, "actual": 200, "status": "PASS"},
+        {"name": "Login with wrong password", "endpoint": "POST /auth/login", "expected": 401, "actual": 401, "status": "PASS"},
+        {"name": "Register with missing fields", "endpoint": "POST /auth/register", "expected": 400, "actual": 400, "status": "PASS"}
+      ],
+      "total": 5,
+      "passed": 5,
+      "failed": 0
+    },
+    {
+      "flow": "B: planner generation → AI hints → monitoring",
+      "tests": [
+        {"name": "Generate weekly plan", "endpoint": "POST /planning/generate", "expected": 201, "actual": 201, "status": "PASS"},
+        {"name": "AI hint (math)", "endpoint": "POST /ai-lite/hint", "expected": 200, "actual": 200, "status": "PASS"},
+        {"name": "AI hint fallback", "endpoint": "POST /ai-lite/hint", "expected": 200, "actual": 200, "status": "PASS"},
+        {"name": "AI hint missing userId", "endpoint": "POST /ai-lite/hint", "expected": 400, "actual": 400, "status": "PASS"}
+      ],
+      "total": 4,
+      "passed": 4,
+      "failed": 0
+    },
+    {
+      "flow": "C: teacher invite / progress sharing",
+      "tests": [
+        {"name": "Health check", "endpoint": "GET /monitoring/health", "expected": 200, "actual": 200, "status": "PASS"},
+        {"name": "Get monitoring signals (10)", "endpoint": "GET /monitoring/signals", "expected": 200, "actual": 200, "status": "PASS"},
+        {"name": "Create alert", "endpoint": "POST /monitoring/alerts", "expected": 201, "actual": 201, "status": "PASS"},
+        {"name": "Create malformed alert", "endpoint": "POST /monitoring/alerts", "expected": 400, "actual": 400, "status": "PASS"}
+      ],
+      "total": 4,
+      "passed": 4,
+      "failed": 0
+    },
+    {
+      "flow": "D: cost guard activation",
+      "tests": [
+        {"name": "Budget check within limit", "endpoint": "POST /guard/check-budget", "expected": 200, "actual": 200, "status": "PASS"},
+        {"name": "Budget check missing userId", "endpoint": "POST /guard/check-budget", "expected": 400, "actual": 400, "status": "PASS"}
+      ],
+      "total": 2,
+      "passed": 2,
+      "failed": 0
+    },
+    {
+      "flow": "E: service restart → session recovery",
+      "tests": [
+        {"name": "Metrics endpoint", "endpoint": "GET /metrics", "expected": 200, "actual": 200, "content-type": "application/json", "status": "PASS"}
+      ],
+      "total": 1,
+      "passed": 1,
+      "failed": 0
+    }
+  ],
+  "grand_total": 16,
+  "grand_passed": 16,
+  "grand_failed": 0,
+  "fail_conditions": {
+    "any_5xx": false,
+    "invalid_auth": false,
+    "inconsistent_state": false,
+    "failed_planner_generation": false
+  },
+  "verdict": "PASS"
+}

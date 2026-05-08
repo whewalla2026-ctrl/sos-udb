@@ -1,30 +1,44 @@
 {
-  "name": "udb-api",
-  "version": "0.1.0",
-  "private": true,
-  "scripts": {
-    "start": "nest start",
-    "prisma:generate": "prisma generate",
-    "build": "tsc -p tsconfig.json"
-  },
-  "dependencies": {
-    "@nestjs/common": "^9.0.0",
-    "@nestjs/config": "^2.3.1",
-    "@nestjs/core": "^9.0.0",
-    "@nestjs/graphql": "^11.1.0",
-    "@nestjs/jwt": "^10.1.0",
-    "@nestjs/passport": "^9.0.3",
-    "@nestjs/platform-express": "^9.0.0",
-    "@nestjs/throttler": "^4.1.0",
-    "class-transformer": "^0.5.1",
-    "class-validator": "^0.14.0",
-    "graphql": "^16.0.0",
-    "apollo-server-express": "^3.0.0",
-    "helmet": "^7.1.0",
-    "passport": "^0.6.0",
-    "passport-jwt": "^4.0.1",
-    "prisma": "^4.0.0",
-    "@prisma/client": "^4.0.0",
-    "typescript": "^5.0.0"
-  }
+    "name": "udb-api",
+    "version": "0.1.0",
+    "private": true,
+    "scripts": {
+        "start": "nest start",
+        "prisma:generate": "prisma generate",
+        "build": "tsc -p tsconfig.json"
+    },
+    "dependencies": {
+        "@nestjs/common": "^10.0.0",
+        "@nestjs/config": "^3.0.0",
+        "@nestjs/core": "^10.0.0",
+        "@nestjs/graphql": "^12.0.0",
+        "@nestjs/jwt": "^10.1.0",
+        "@nestjs/passport": "^10.0.0",
+        "@nestjs/platform-express": "^10.0.0",
+        "@nestjs/throttler": "^4.1.0",
+        "@prisma/client": "^4.0.0",
+        "apollo-server-express": "^3.0.0",
+        "class-transformer": "^0.5.1",
+        "class-validator": "^0.14.0",
+        "dotenv": "^16.4.5",
+        "ethers": "^6.16.0",
+        "express": "^4.18.2",
+        "firebase-admin": "^13.9.0",
+        "graphql": "^16.0.0",
+        "graphql-type-json": "^0.3.2",
+        "helmet": "^7.1.0",
+        "ioredis": "^5.10.1",
+        "passport": "^0.6.0",
+        "passport-jwt": "^4.0.1",
+        "prisma": "^4.0.0",
+        "rrule": "^2.8.1",
+        "stripe": "^22.1.1",
+        "typescript": "^5.0.0"
+    },
+    "devDependencies": {
+        "@nestjs/testing": "^11.1.19",
+        "@types/jest": "^30.0.0",
+        "supertest": "^7.2.2",
+        "ts-node": "^10.9.0"
+    }
 }

@@ -1,0 +1,25 @@
+{
+  "report": "Metrics Capture Report",
+  "timestamp": "2026-05-08T00:43:00Z",
+  "status": "PASS",
+  "endpoint": "GET /metrics",
+  "response_fields": {
+    "users": {"type": "number", "value": 3, "present": true},
+    "uptime": {"type": "number", "value": 5250.3, "present": true},
+    "memory": {"type": "object", "present": true, "contains": ["rss", "heapTotal", "heapUsed", "external", "arrayBuffers"]},
+    "alerts": {"type": "number", "value": 5, "present": true},
+    "signals": {"type": "number", "value": 10, "present": true}
+  },
+  "metrics_lifecycle": {
+    "on_server_start": {"users": 0, "alerts": 0, "signals": 0},
+    "after_register": {"users": 1, "alerts": 0, "signals": 0},
+    "after_alerts": {"users": 1, "alerts": 5, "signals": 10},
+    "current": {"users": 3, "alerts": 5, "signals": 10, "uptime": 5250.3}
+  },
+  "fail_conditions": {
+    "broken_metrics": false,
+    "missing_metrics_fields": false,
+    "stale_metrics": false
+  },
+  "verdict": "PASS"
+}

@@ -1,41 +1,41 @@
 {
-  "generatedAt": "2026-05-07T21:07:01.324Z",
+  "generatedAt": "2026-05-07T23:18:40.268Z",
   "phases": {
     "A_10_users": {
       "userCount": 10,
       "totalHints": 30,
       "hintFallbacks": 0,
       "fallbackRate": 0,
-      "avgBlocksPerUser": 13.8,
+      "avgBlocksPerUser": 15.7,
       "totalCost": 0.012,
       "avgCostPerUser": 0.0012,
       "elapsedMs": 0,
       "avgLatencyMs": 0,
-      "completedAt": "2026-05-07T21:07:01.320Z"
+      "completedAt": "2026-05-07T23:18:40.266Z"
     },
     "B_30_users": {
       "userCount": 30,
       "totalHints": 90,
       "hintFallbacks": 0,
       "fallbackRate": 0,
-      "avgBlocksPerUser": 14.5,
+      "avgBlocksPerUser": 14.27,
       "totalCost": 0.036,
       "avgCostPerUser": 0.0012,
-      "elapsedMs": 1,
-      "avgLatencyMs": 0.01,
-      "completedAt": "2026-05-07T21:07:01.321Z"
+      "elapsedMs": 0,
+      "avgLatencyMs": 0,
+      "completedAt": "2026-05-07T23:18:40.266Z"
     },
     "C_100_users": {
       "userCount": 100,
       "totalHints": 300,
       "hintFallbacks": 0,
       "fallbackRate": 0,
-      "avgBlocksPerUser": 14.3,
+      "avgBlocksPerUser": 14.2,
       "totalCost": 0.12,
       "avgCostPerUser": 0.0012,
-      "elapsedMs": 3,
+      "elapsedMs": 2,
       "avgLatencyMs": 0.01,
-      "completedAt": "2026-05-07T21:07:01.324Z"
+      "completedAt": "2026-05-07T23:18:40.268Z"
     }
   },
   "summary": {

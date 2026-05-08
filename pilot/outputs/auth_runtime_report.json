@@ -1,0 +1,32 @@
+{
+  "report": "Authentication Runtime Validation Report",
+  "timestamp": "2026-05-08T00:43:00Z",
+  "status": "PASS",
+  "auth_mechanism": "scrypt password hashing with random 16-byte salt + Base64 token sessions",
+  "endpoints_tested": [
+    {"endpoint": "POST /auth/register", "behavior": "Creates user with hashed password", "result": "PASS"},
+    {"endpoint": "POST /auth/login", "behavior": "Validates credentials, returns session token", "result": "PASS"},
+    {"endpoint": "POST /auth/register (duplicate)", "behavior": "Returns 409 Conflict", "result": "PASS"},
+    {"endpoint": "POST /auth/login (wrong password)", "behavior": "Returns 401 Unauthorized", "result": "PASS"},
+    {"endpoint": "POST /auth/register (missing fields)", "behavior": "Returns 400 Bad Request", "result": "PASS"}
+  ],
+  "password_hashing": {
+    "algorithm": "scrypt (Node.js crypto.scryptSync)",
+    "salt_bytes": 16,
+    "key_length": 64,
+    "cost_estimate": "N=16384, r=8, p=1 (Node default)",
+    "hash_storage": "salt:hash hex format in database"
+  },
+  "session_management": {
+    "type": "in-memory Map<token, userId>",
+    "token_length": 32,
+    "token_encoding": "base64url",
+    "notes": "Production should use JWT or Redis-backed sessions; current implementation sufficient for canary"
+  },
+  "fail_conditions": {
+    "invalid_auth": false,
+    "wrong_password_accepted": false,
+    "valid_password_rejected": false
+  },
+  "verdict": "PASS"
+}

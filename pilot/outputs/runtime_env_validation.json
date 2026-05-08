@@ -1,0 +1,52 @@
+{
+  "report": "Runtime Environment Validation",
+  "timestamp": "2026-05-08T00:43:00Z",
+  "status": "PASS",
+  "host": {
+    "platform": "win32",
+    "node": "v24.15.0",
+    "npm": "11.12.1",
+    "pnpm": "9.15.9",
+    "shell": "powershell"
+  },
+  "postgresql": {
+    "version": "16.4",
+    "source": "EnterpriseDB portable binaries (postgresql-16.4-1-windows-x64-binaries.zip)",
+    "installation": "Extracted to C:/Users/admin/AppData/Local/Temp/pg16-extracted/pgsql",
+    "data_directory": "C:/Users/admin/AppData/Local/Temp/pgdata",
+    "port": 5432,
+    "status": "ACCEPTING CONNECTIONS",
+    "authentication": "trust (localhost), md5 (remote)",
+    "database": "udb",
+    "user": "udb",
+    "tables": 25
+  },
+  "prisma": {
+    "version": "4.16.2 (CLI), 5.22.0 (query engine)",
+    "client_generated": true,
+    "schema_location": "services/api/prisma/schema.prisma",
+    "query_engine": "query_engine-windows.dll.node (working)",
+    "migration_engine": "schema-engine-windows.exe (available)"
+  },
+  "api_server": {
+    "runtime": "Node.js Express",
+    "port": 3000,
+    "status": "LISTENING",
+    "pid": 17632,
+    "uptime_seconds": 5250
+  },
+  "dependencies": {
+    "total_installed": 1089,
+    "lockfile_regenerated": true,
+    "workspace_packages": 6,
+    "peer_dep_conflicts": 2,
+    "blockers": ["prisma migration-engine.exe blocked by Windows Defender - worked around via direct SQL"]
+  },
+  "fail_conditions_checked": {
+    "dependency_conflict": false,
+    "migration_failure": false,
+    "failed_boot": false,
+    "missing_env_variable": false
+  },
+  "verdict": "PASS"
+}

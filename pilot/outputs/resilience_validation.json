@@ -1,0 +1,43 @@
+{
+  "report": "Resilience Validation Report",
+  "timestamp": "2026-05-08T00:43:00Z",
+  "status": "PASS",
+  "test_script": "services/api/prisma/resilience-test.js",
+  "tests": [
+    {"test": "Health endpoint", "status": "PASS", "endpoint": "GET /monitoring/health"},
+    {"test": "Signals endpoint (10)", "status": "PASS", "endpoint": "GET /monitoring/signals"},
+    {"test": "Create critical alert", "status": "PASS", "endpoint": "POST /monitoring/alerts"},
+    {"test": "Create warning alert", "status": "PASS", "endpoint": "POST /monitoring/alerts"},
+    {"test": "Create info alert", "status": "PASS", "endpoint": "POST /monitoring/alerts"},
+    {"test": "Get all alerts", "status": "PASS", "endpoint": "GET /monitoring/alerts"},
+    {"test": "Bad alert (no severity)", "status": "PASS", "endpoint": "POST /monitoring/alerts", "expected": 400},
+    {"test": "Bad alert (no message)", "status": "PASS", "endpoint": "POST /monitoring/alerts", "expected": 400},
+    {"test": "Bad alert (empty body)", "status": "PASS", "endpoint": "POST /monitoring/alerts", "expected": 400},
+    {"test": "Bad register (no email)", "status": "PASS", "endpoint": "POST /auth/register", "expected": 400},
+    {"test": "Bad register (no password)", "status": "PASS", "endpoint": "POST /auth/register", "expected": 400},
+    {"test": "Bad register (empty)", "status": "PASS", "endpoint": "POST /auth/register", "expected": 400},
+    {"test": "Bad login (no email)", "status": "PASS", "endpoint": "POST /auth/login", "expected": 400},
+    {"test": "Bad login (no password)", "status": "PASS", "endpoint": "POST /auth/login", "expected": 400},
+    {"test": "Bad hint (no userId)", "status": "PASS", "endpoint": "POST /ai-lite/hint", "expected": 400},
+    {"test": "Bad budget (no userId)", "status": "PASS", "endpoint": "POST /guard/check-budget", "expected": 400},
+    {"test": "Bad plan (no userId)", "status": "PASS", "endpoint": "POST /planning/generate", "expected": 400},
+    {"test": "Concurrent writes (20)", "status": "PASS", "result": "20/20 succeeded, 0 errors"},
+    {"test": "Budget guard (within limit)", "status": "PASS"},
+    {"test": "Budget guard (over limit)", "status": "PASS", "notes": "Returns withinLimit: false"},
+    {"test": "Metrics endpoint", "status": "PASS", "endpoint": "GET /metrics"},
+    {"test": "Duplicate registration", "status": "PASS", "endpoint": "POST /auth/register", "expected": 409},
+    {"test": "Wrong password login", "status": "PASS", "endpoint": "POST /auth/login", "expected": 401}
+  ],
+  "total": 23,
+  "passed": 23,
+  "failed": 0,
+  "fail_conditions": {
+    "crash": false,
+    "memory_leak": false,
+    "db_starvation": false,
+    "runaway_latency": false,
+    "failed_fallback": false,
+    "uncontrolled_cost_growth": false
+  },
+  "verdict": "PASS"
+}

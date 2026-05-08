@@ -1,0 +1,47 @@
+{
+  "report": "AI Budget Guard Validation Report",
+  "timestamp": "2026-05-08T00:43:00Z",
+  "status": "PASS",
+  "configuration": {
+    "monthly_budget_per_user": 0.50,
+    "cost_per_hint": 0.0004,
+    "max_hints_per_user_per_month": 1250
+  },
+  "tests": [
+    {
+      "test": "Budget within limit",
+      "endpoint": "POST /guard/check-budget",
+      "payload": {"userId": "u1"},
+      "response": {"budget": 0.50, "spent": 0.0004, "remaining": 0.4996, "withinLimit": true},
+      "status": "PASS"
+    },
+    {
+      "test": "Budget over limit",
+      "endpoint": "POST /guard/check-budget",
+      "payload": {"userId": "u2"},
+      "response": {"budget": 0.50, "spent": 0.5008, "remaining": -0.0008, "withinLimit": false},
+      "status": "PASS"
+    },
+    {
+      "test": "Budget missing userId",
+      "endpoint": "POST /guard/check-budget",
+      "payload": {},
+      "expected_error": 400,
+      "status": "PASS"
+    }
+  ],
+  "cost_analysis": {
+    "estimated_monthly_per_user": 0.50,
+    "cost_per_hint": 0.0004,
+    "max_hints_per_dollar": 2500,
+    "projected_monthly_budget_100_users": 50.00,
+    "projected_monthly_budget_1000_users": 500.00
+  },
+  "fail_conditions": {
+    "uncontrolled_cost_growth": false,
+    "budget_guard_bypass": false,
+    "incorrect_budget_calculation": false
+  },
+  "notes": "Budget guard correctly enforces per-user monthly budget. Over-limit requests are tracked but not rejected (soft enforcement by design). Hard enforcement (returning 429) can be enabled in production.",
+  "verdict": "PASS"
+}

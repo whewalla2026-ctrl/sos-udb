@@ -1,0 +1,24 @@
+{
+  "report": "Concurrent Write Test Report",
+  "timestamp": "2026-05-08T00:43:00Z",
+  "status": "PASS",
+  "method": "Promise.all with 20 concurrent Prisma Client user.create() calls",
+  "total_concurrent_operations": 20,
+  "successful": 20,
+  "failed": 0,
+  "errors": [],
+  "duration_ms": 158,
+  "throughput_ops_per_sec": 126,
+  "db_pool_config": {
+    "connection_limit": 10,
+    "pool_timeout": 30,
+    "statement_cache_size": 100
+  },
+  "fail_conditions": {
+    "deadlock": false,
+    "duplicate_key": false,
+    "connection_timeout": false,
+    "any_failure": false
+  },
+  "verdict": "PASS"
+}

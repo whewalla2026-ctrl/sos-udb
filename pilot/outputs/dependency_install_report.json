@@ -1,0 +1,42 @@
+{
+  "report": "Dependency Installation Report",
+  "timestamp": "2026-05-08T00:43:00Z",
+  "status": "PASS",
+  "package_manager": "pnpm 9.15.9",
+  "node_version": "v24.15.0",
+  "workspaces": ["apps/*", "services/*", "packages/*"],
+  "workspace_packages": 6,
+  "total_packages_resolved": 1089,
+  "install_command": "pnpm install --no-frozen-lockfile",
+  "lockfile_regenerated": true,
+  "fail_conditions": {
+    "dependency_conflict": false,
+    "missing_package": false,
+    "peer_dep_warnings": [
+      {"package": "react-native", "issue": "unmet peer react@18.2.0, found 18.3.1"},
+      {"package": "@nestjs/throttler", "issue": "unmet peer reflect-metadata@^0.1.13, found 0.2.2"}
+    ]
+  },
+  "critical_dependencies": {
+    "@nestjs/common": "10.4.22",
+    "@nestjs/core": "10.4.22",
+    "@nestjs/jwt": "10.2.0",
+    "@nestjs/config": "3.3.0",
+    "@nestjs/throttler": "4.2.1",
+    "@nestjs/passport": "10.0.3",
+    "@prisma/client": "4.16.2",
+    "prisma": "4.16.2",
+    "helmet": "installed",
+    "class-validator": "installed",
+    "class-transformer": "installed",
+    "passport": "installed",
+    "passport-jwt": "installed",
+    "express": "installed"
+  },
+  "added_packages": {
+    "initial_install": 348,
+    "missing_deps_round2": ["express", "dotenv", "firebase-admin", "ethers", "stripe", "ioredis", "graphql-type-json", "rrule"],
+    "dev_deps_round3": ["@nestjs/testing", "@types/jest", "ts-node", "supertest"]
+  },
+  "verdict": "PASS"
+}
