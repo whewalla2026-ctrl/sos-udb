@@ -6,6 +6,8 @@
   "scripts": {
     "dev": "turbo run dev",
     "build": "turbo run build",
+    "start:api": "pnpm --filter @udb/api start",
+    "start:web": "pnpm --filter @udb/web start",
     "lint": "turbo run lint",
     "test": "turbo run test",
     "db:migrate": "pnpm --filter api prisma migrate dev",
