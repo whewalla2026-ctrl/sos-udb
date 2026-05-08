@@ -1,11 +1,12 @@
 import { NestFactory } from '@nestjs/core';
-import { ValidationPipe, Logger } from '@nestjs/common';
+import { ValidationPipe } from '@nestjs/common';
 import { AppModule } from './app.module';
+import { RedactingLogger } from './shared/redacting-logger';
 
 async function bootstrap() {
-  const logger = new Logger('UDB-API');
+  const logger = new RedactingLogger('UDB-API');
   const app = await NestFactory.create(AppModule, {
-    logger: ['log', 'error', 'warn', 'debug'],
+    logger,
   });
 
   app.enableCors({
