@@ -1,6 +1,6 @@
 import { PrismaClient } from '@prisma/client';
-import { DoterState, QuestPillar, QuestStatus } from '../../src/shared/prisma-enums';
-import { UserRole } from '../../src/shared/user-role';
+import { DoterState, QuestPillar, QuestStatus } from '../src/shared/prisma-enums';
+import { UserRole } from '../src/shared/user-role';
 
 const prisma = new PrismaClient();
 
@@ -161,7 +161,7 @@ async function main() {
       { userId: child.id, transactionType: 'EARN', amount: 500, balanceAfter: 850, source: 'BONUS', description: '🎉 Streak Bonus: 10 Days!' },
       { userId: child.id, transactionType: 'SPEND', amount: -100, balanceAfter: 750, source: 'PURCHASE', description: 'Doter Skin: "Cosmic Blue"' },
       { userId: child.id, transactionType: 'EARN', amount: 300, balanceAfter: 1050, source: 'QUEST', description: 'Quest: Science Project Completed' },
-      { userId: child.id, transactionType: 'EARN', amount: 200, balanceAfter: 1250, source: 'MANUAL', description: 'Mom awarded: Helped with dishes all week ❤️' },
+      { userId: child.id, transactionType: 'EARN', amount: 200, balanceAfter: 1250, source: 'MANUAL_AWARD', description: 'Mom awarded: Helped with dishes all week ❤️' },
     ],
   });
 

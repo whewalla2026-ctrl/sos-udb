@@ -1,7 +1,7 @@
 'use client';
 
-import { ChildDashboard } from '@/components/ChildDashboard';
-import { ParentDashboard } from '@/components/ParentDashboard';
+import { ChildDashboard } from '../../components/ChildDashboard';
+import { ParentDashboard } from '../../components/ParentDashboard';
 
 // ── Seed/mock data mirroring the DB seed ──────────────────────────────────────
 const MOCK_CHILD_DATA = {
@@ -36,8 +36,8 @@ const MOCK_PARENT_DATA = {
 };
 
 export default function DashboardPage() {
-  // To test Parent Dashboard, change this role to 'PARENT'
-  const CURRENT_ROLE: 'CHILD' | 'PARENT' = 'CHILD'; 
+  const CURRENT_ROLE: 'CHILD' | 'PARENT' =
+    process.env.NEXT_PUBLIC_DASHBOARD_ROLE === 'PARENT' ? 'PARENT' : 'CHILD';
 
   if (CURRENT_ROLE === 'PARENT') {
     return <ParentDashboard data={MOCK_PARENT_DATA} />;

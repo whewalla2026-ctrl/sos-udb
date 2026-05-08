@@ -17,7 +17,7 @@ export class ActivitiesResolver {
 
   @Mutation(() => GraphQLJSON)
   @UseGuards(GqlAuthGuard)
-  async createActivity(@CurrentUser() user: any, @Args('title') title: string, @Args('startTime') startTime: string, @Args('endTime') endTime: string, @Args('pillar', { nullable: true }) pillar?: string) {
+  async createActivity(@CurrentUser() user: any, @Args('title') title: string, @Args('startTime') startTime: string, @Args('endTime') endTime: string, @Args('pillar', { nullable: true }) pillar?: string): Promise<unknown> {
     return this.activities.createActivity(user.id, { title, startTime: new Date(startTime), endTime: new Date(endTime), pillar: pillar as any });
   }
 }

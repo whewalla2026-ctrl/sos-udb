@@ -53,7 +53,7 @@ export default function Sidebar({ unreadCount = 0 }: { unreadCount?: number }) {
       <div style={{ background: 'var(--bg-glass)', border: '1px solid var(--bg-glass-border)', borderRadius: 'var(--radius-md)', padding: '12px 14px', marginBottom: 24, display: 'flex', alignItems: 'center', gap: 10 }}>
         <div style={{ width: 36, height: 36, borderRadius: '50%', background: 'var(--gradient-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1rem', flexShrink: 0 }}>👤</div>
         <div style={{ overflow: 'hidden' }}>
-          <div style={{ fontWeight: 600, fontSize: '0.875rem', truncate: true }}>Family Account</div>
+          <div style={{ fontWeight: 600, fontSize: '0.875rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>Family Account</div>
           <div style={{ color: 'var(--text-muted)', fontSize: '0.75rem' }}>Level 8 · 1,250 coins</div>
         </div>
       </div>
@@ -66,7 +66,7 @@ export default function Sidebar({ unreadCount = 0 }: { unreadCount?: number }) {
             {section.items.map(item => {
               const isActive = pathname === item.href;
               return (
-                <Link key={item.href} href={item.href} style={{ textDecoration: 'none' }}>
+                <Link key={item.href} href={item.href as any} style={{ textDecoration: 'none' }}>
                   <div id={`nav-${item.label.toLowerCase().replace(/\s+/g, '-')}`} className={`nav-item ${isActive ? 'active' : ''}`}>
                     <span style={{ fontSize: '1rem', width: 20, textAlign: 'center', flexShrink: 0 }}>{item.icon}</span>
                     <span>{item.label}</span>
