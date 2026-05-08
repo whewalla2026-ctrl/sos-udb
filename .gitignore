@@ -4,5 +4,11 @@ dist/
 .turbo/
 *.log
 .env
+.env.*
+!.env.example
 .env.local
+.env.*.local
+.env.production
+.env.test
+.env.development
 coverage/
