@@ -1,7 +1,11 @@
 const express = require('express');
 const http = require('http');
+const helmet = require('helmet');
+const cors = require('cors');
+const compression = require('compression');
 const { createLogger, correlationId } = require('./shared/logger');
 const { verifyToken, rateLimit, logAudit } = require('./shared/security');
+const { metricsMiddleware, metricsEndpoint } = require('./shared/prometheus');
 const eventBus = require('./shared/event-bus');
 const queueService = require('./shared/queue');
 
@@ -16,8 +20,33 @@ const SERVICES = {
   monitoring: { host: 'localhost', port: parseInt(process.env.MONITORING_SERVICE_PORT || '3004') },
 };
 
-app.use(express.json());
+// Security middleware
+app.use(helmet({
+  contentSecurityPolicy: { directives: { defaultSrc: ["'self'"], scriptSrc: ["'self'"], styleSrc: ["'self'"], imgSrc: ["'self'", "data:"] } },
+  hsts: { maxAge: 31536000, includeSubDomains: true, preload: true },
+  frameguard: { action: 'deny' },
+  referrerPolicy: { policy: 'same-origin' },
+}));
+app.use(cors({ origin: process.env.CORS_ORIGIN || 'http://localhost:3000', credentials: true, methods: ['GET', 'POST', 'PUT', 'DELETE'], allowedHeaders: ['Content-Type', 'Authorization', 'x-correlation-id'] }));
+app.use(compression());
+app.use(express.json({ limit: '100kb' }));
+app.use(express.urlencoded({ extended: true, limit: '100kb' }));
 app.use(correlationId);
+app.use(metricsMiddleware('api-gateway'));
+
+// Brute-force protection for auth routes
+const authIpTracker = new Map();
+function bruteForceProtect(req, res, next) {
+  const ip = req.ip;
+  const now = Date.now();
+  const minute = Math.floor(now / 60000);
+  const key = `${ip}:${minute}`;
+  const count = (authIpTracker.get(key) || 0) + 1;
+  authIpTracker.set(key, count);
+  if (count > 10) return res.status(429).json({ error: 'Too many attempts. Try again later.' });
+  setTimeout(() => authIpTracker.delete(key), 120000);
+  next();
+}
 
 const globalRateLimit = rateLimit({ windowMs: 60000, max: 200 });
 
@@ -41,6 +70,16 @@ function proxy(targetService) {
       proxyRes.on('end', () => {
         const duration = Date.now() - start;
         log.info('Request proxied', { method: req.method, path, statusCode: proxyRes.statusCode, duration_ms: duration });
+        // Secure cookies
+        const cookies = proxyRes.headers['set-cookie'];
+        if (cookies) {
+          proxyRes.headers['set-cookie'] = cookies.map(c => {
+            if (!c.includes('Secure')) c += '; Secure';
+            if (!c.includes('HttpOnly')) c += '; HttpOnly';
+            if (!c.includes('SameSite')) c += '; SameSite=Strict';
+            return c;
+          });
+        }
         res.status(proxyRes.statusCode).set(proxyRes.headers).send(body);
       });
     });
@@ -63,21 +102,11 @@ function requireAuth(req, res, next) {
   next();
 }
 
-function requireRole(...roles) {
-  return (req, res, next) => {
-    if (roles.length > 0 && !roles.some(r => {
-      const hierarchy = { ADMIN: 4, TEACHER: 3, PARENT: 2, CHILD: 1 };
-      return (hierarchy[req.user.role] || 0) >= (hierarchy[r] || 0);
-    })) return res.status(403).json({ error: 'Insufficient permissions' });
-    next();
-  };
-}
-
 // --- Routes ---
 
 // Auth routes (unauthenticated)
-app.post('/auth/register', globalRateLimit, proxy('auth'));
-app.post('/auth/login', globalRateLimit, proxy('auth'));
+app.post('/auth/register', bruteForceProtect, globalRateLimit, proxy('auth'));
+app.post('/auth/login', bruteForceProtect, globalRateLimit, proxy('auth'));
 app.post('/auth/refresh', proxy('auth'));
 app.post('/auth/validate', proxy('auth'));
 
@@ -103,23 +132,22 @@ app.get('/monitoring/events', requireAuth, proxy('monitoring'));
 app.post('/monitoring/signal', requireAuth, proxy('monitoring'));
 
 // Audit routes
-app.get('/audit/log', requireAuth, requireRole('ADMIN'), proxy('monitoring'));
+app.get('/audit/log', requireAuth, (req, res, next) => {
+  const { ROLES } = require('./shared/security');
+  const userRole = ROLES[req.user?.role];
+  if (!userRole || userRole < ROLES.ADMIN) return res.status(403).json({ error: 'Insufficient permissions' });
+  next();
+}, proxy('monitoring'));
 
-// Metrics
-app.get('/metrics', proxy('monitoring'));
-
-// Service health endpoints
-app.get('/auth/health', proxy('auth'));
-app.get('/planner/health', proxy('planner'));
-app.get('/ai/health', proxy('ai'));
-app.get('/monitoring/health', proxy('monitoring'));
+// Prometheus metrics
+app.get('/metrics', metricsEndpoint);
 
 // Gateway health
 app.get('/gateway/health', (req, res) => {
   return res.json({ service: 'api-gateway', status: 'healthy', uptime: process.uptime(), routes: Object.keys(SERVICES), timestamp: new Date().toISOString() });
 });
 
-// Gateway cache stats
+// Gateway routes
 app.get('/gateway/routes', (req, res) => {
   return res.json({ services: SERVICES, routes: ['/auth/*', '/planning/*', '/ai-lite/*', '/monitoring/*', '/audit/*', '/metrics', '/gateway/*'] });
 });
@@ -146,7 +174,7 @@ async function start() {
     log.info('Processing cleanup job', { jobId: job.id, name: job.name });
   }, { pollIntervalMs: 5000 });
 
-  // Set up event consumers
+  // Event consumers
   await eventBus.consume('user_created', async (event) => {
     log.info('Event: user_created', { userId: event.payload.userId });
     await queueService.enqueue('analytics', 'user_created_analytics', event.payload);

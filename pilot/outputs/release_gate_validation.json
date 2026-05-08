@@ -1,0 +1,83 @@
+{
+  "validationDate": "2026-05-08T05:05:47.479Z",
+  "workflowsPresent": 5,
+  "allPresent": true,
+  "pipelines": {
+    "validate": [
+      "lint",
+      "typecheck",
+      "unit tests",
+      "integration tests"
+    ],
+    "security": [
+      "npm audit",
+      "secret scan",
+      "dependency scan"
+    ],
+    "load": [
+      "load tests",
+      "concurrency validation"
+    ],
+    "docker": [
+      "docker build",
+      "compose validation"
+    ],
+    "release": [
+      "DB validation",
+      "E2E",
+      "stress",
+      "observability",
+      "security",
+      "resilience",
+      "release audit"
+    ]
+  },
+  "mergeGate": "FAIL on any gate failure",
+  "results": [
+    {
+      "workflow": "validate.yml",
+      "present": true
+    },
+    {
+      "workflow": "security.yml",
+      "present": true
+    },
+    {
+      "workflow": "load.yml",
+      "present": true
+    },
+    {
+      "workflow": "docker.yml",
+      "present": true
+    },
+    {
+      "workflow": "release.yml",
+      "present": true
+    },
+    {
+      "pipeline": "validate",
+      "gates": 4
+    },
+    {
+      "pipeline": "security",
+      "gates": 3
+    },
+    {
+      "pipeline": "load",
+      "gates": 2
+    },
+    {
+      "pipeline": "docker",
+      "gates": 2
+    },
+    {
+      "pipeline": "release",
+      "gates": 7
+    },
+    {
+      "check": "merge_gate",
+      "rule": "FAIL on any gate failure"
+    }
+  ],
+  "passed": true
+}

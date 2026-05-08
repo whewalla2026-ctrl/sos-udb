@@ -1,8 +1,11 @@
 const express = require('express');
+const helmet = require('helmet');
+const cors = require('cors');
 const { PrismaClient } = require('@prisma/client');
 const Redis = require('ioredis');
 const { createLogger, correlationId } = require('../shared/logger');
 const { createToken, verifyToken, blacklistToken, createRefreshToken, hashPassword, verifyPassword, ROLES, logAudit, rateLimit } = require('../shared/security');
+const { metricsMiddleware, trackAuthFailure, trackRedisLatency, trackDbPool } = require('../shared/prometheus');
 const eventBus = require('../shared/event-bus');
 
 const prisma = new PrismaClient();
@@ -14,30 +17,36 @@ const redis = new Redis(process.env.REDIS_URL || 'redis://localhost:6379', {
   maxRetriesPerRequest: 3, retryStrategy(t) { return t > 3 ? null : Math.min(t * 200, 2000); }, lazyConnect: true,
 });
 
-app.use(express.json());
+app.use(helmet({ contentSecurityPolicy: false }));
+app.use(cors({ origin: process.env.CORS_ORIGIN || 'http://localhost:3000', credentials: true }));
+app.use(express.json({ limit: '50kb' }));
 app.use(correlationId);
+app.use(metricsMiddleware('auth-service'));
 
 const authRateLimit = rateLimit({ windowMs: 60000, max: 30 });
 
-// POST /auth/register
 app.post('/auth/register', authRateLimit, async (req, res) => {
   try {
     const { email, password, displayName, role, age } = req.body;
     if (!email || !password || password.length < 8)
       return res.status(400).json({ error: 'Invalid email or password (min 8 chars)' });
+    if (typeof email !== 'string' || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
+      return res.status(400).json({ error: 'Invalid email format' });
     const existing = await prisma.user.findUnique({ where: { email } });
     if (existing) return res.status(409).json({ error: 'Email already exists' });
     const passwordHash = hashPassword(password);
     const user = await prisma.user.create({
       data: { firebaseUid: `auth-${Date.now()}`, email, displayName: displayName || email.split('@')[0], role: role || 'CHILD' }
     });
-    // Store credentials in Redis (Prisma schema has no passwordHash field)
+    const start = Date.now();
     await redis.hmset(`user:${user.id}`, 'passwordHash', passwordHash, 'email', email, 'role', user.role);
+    trackRedisLatency(Date.now() - start);
     const token = createToken({ userId: user.id, role: user.role, email: user.email });
     const refreshToken = createRefreshToken(user.id);
     await eventBus.publish('user_created', { userId: user.id, email: user.email, role: user.role });
     logAudit('AUTH_REGISTER', { userId: user.id, action: 'register', resource: 'user', ip: req.ip });
     log.info('User registered', { userId: user.id, email: user.email });
+    trackDbPool(1, 19, 0);
     return res.status(201).json({ userId: user.id, email: user.email, token, refreshToken, displayName: user.displayName, role: user.role });
   } catch (err) {
     log.error('Register failed', { error: err.message });
@@ -45,16 +54,26 @@ app.post('/auth/register', authRateLimit, async (req, res) => {
   }
 });
 
-// POST /auth/login
 app.post('/auth/login', authRateLimit, async (req, res) => {
   try {
     const { email, password } = req.body;
     if (!email || !password) return res.status(400).json({ error: 'Email and password required' });
+    if (typeof email !== 'string' || typeof password !== 'string')
+      return res.status(400).json({ error: 'Invalid input types' });
     const user = await prisma.user.findUnique({ where: { email } });
-    if (!user) return res.status(401).json({ error: 'Invalid credentials' });
+    if (!user) {
+      trackAuthFailure('user_not_found', 'auth-service');
+      return res.status(401).json({ error: 'Invalid credentials' });
+    }
+    const start = Date.now();
     const creds = await redis.hgetall(`user:${user.id}`);
-    if (!creds || !creds.passwordHash) return res.status(401).json({ error: 'No credentials stored. Register via this service first.' });
+    trackRedisLatency(Date.now() - start);
+    if (!creds || !creds.passwordHash) {
+      trackAuthFailure('no_stored_creds', 'auth-service');
+      return res.status(401).json({ error: 'No credentials stored. Register via this service first.' });
+    }
     if (!verifyPassword(password, creds.passwordHash)) {
+      trackAuthFailure('wrong_password', 'auth-service');
       logAudit('AUTH_LOGIN_FAIL', { userId: user.id, action: 'login_failed', resource: 'user', ip: req.ip });
       log.warn('Failed login', { email: user.email });
       return res.status(401).json({ error: 'Invalid credentials' });
@@ -71,7 +90,6 @@ app.post('/auth/login', authRateLimit, async (req, res) => {
   }
 });
 
-// POST /auth/refresh
 app.post('/auth/refresh', (req, res) => {
   const { refreshToken } = req.body;
   if (!refreshToken) return res.status(400).json({ error: 'refreshToken required' });
@@ -83,7 +101,6 @@ app.post('/auth/refresh', (req, res) => {
   return res.json({ token, refreshToken: newRefresh });
 });
 
-// POST /auth/validate
 app.post('/auth/validate', (req, res) => {
   const { token } = req.body;
   if (!token) return res.status(400).json({ error: 'token required' });
@@ -92,7 +109,6 @@ app.post('/auth/validate', (req, res) => {
   return res.json({ valid: true, userId: decoded.userId, role: decoded.role, email: decoded.email });
 });
 
-// GET /auth/health
 app.get('/auth/health', (req, res) => {
   return res.json({ service: 'auth-service', status: 'healthy', timestamp: new Date().toISOString() });
 });

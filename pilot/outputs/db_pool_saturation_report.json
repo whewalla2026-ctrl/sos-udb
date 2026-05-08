@@ -1,0 +1,30 @@
+[
+  {
+    "concurrentRequests": 10,
+    "durationMs": 13,
+    "successful": 10,
+    "failed": 0,
+    "avgLatencyMs": 9
+  },
+  {
+    "concurrentRequests": 25,
+    "durationMs": 20,
+    "successful": 25,
+    "failed": 0,
+    "avgLatencyMs": 12
+  },
+  {
+    "concurrentRequests": 50,
+    "durationMs": 33,
+    "successful": 50,
+    "failed": 0,
+    "avgLatencyMs": 19
+  },
+  {
+    "concurrentRequests": 100,
+    "durationMs": 73,
+    "successful": 100,
+    "failed": 0,
+    "avgLatencyMs": 35
+  }
+]

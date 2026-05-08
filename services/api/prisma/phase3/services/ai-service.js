@@ -1,5 +1,8 @@
 const express = require('express');
+const helmet = require('helmet');
+const cors = require('cors');
 const { createLogger, correlationId } = require('../shared/logger');
+const { metricsMiddleware, trackAiBudget } = require('../shared/prometheus');
 const eventBus = require('../shared/event-bus');
 const queueService = require('../shared/queue');
 
@@ -7,8 +10,11 @@ const app = express();
 const PORT = process.env.AI_SERVICE_PORT || 3003;
 const log = createLogger('ai-service');
 
-app.use(express.json());
+app.use(helmet({ contentSecurityPolicy: false }));
+app.use(cors({ origin: process.env.CORS_ORIGIN || 'http://localhost:3000', credentials: true }));
+app.use(express.json({ limit: '50kb' }));
 app.use(correlationId);
+app.use(metricsMiddleware('ai-service'));
 
 const COST_PER_HINT = parseFloat(process.env.AI_COST_PER_HINT || '0.0004');
 const MONTHLY_BUDGET = parseFloat(process.env.AI_BUDGET_PER_USER_MONTHLY || '0.50');
@@ -21,12 +27,11 @@ const hints = {
   default: 'Think about what you already know about this topic.',
 };
 
-// POST /ai-lite/hint
 app.post('/ai-lite/hint', async (req, res) => {
   const { userId, subject, question } = req.body;
   if (!userId) return res.status(400).json({ error: 'userId required' });
+  if (typeof userId !== 'string') return res.status(400).json({ error: 'Invalid userId type' });
 
-  // Budget check
   const spent = userSpend.get(userId) || 0;
   if (spent + COST_PER_HINT > MONTHLY_BUDGET) {
     log.warn('Budget exceeded', { userId, spent, budget: MONTHLY_BUDGET });
@@ -34,6 +39,7 @@ app.post('/ai-lite/hint', async (req, res) => {
     return res.status(402).json({ error: 'AI budget exceeded', spent, budget: MONTHLY_BUDGET, withinLimit: false });
   }
   userSpend.set(userId, spent + COST_PER_HINT);
+  trackAiBudget(userId, spent + COST_PER_HINT);
 
   const hint = hints[subject?.toLowerCase()] || hints.default;
   const response = { hint, subject: subject || 'general', confidence: 0.85, generatedAt: new Date().toISOString(), cost: COST_PER_HINT, budgetRemaining: MONTHLY_BUDGET - (spent + COST_PER_HINT) };
@@ -45,10 +51,10 @@ app.post('/ai-lite/hint', async (req, res) => {
   return res.json(response);
 });
 
-// POST /ai-lite/batch
 app.post('/ai-lite/batch', async (req, res) => {
   const { userId, subjects } = req.body;
   if (!userId || !subjects?.length) return res.status(400).json({ error: 'userId and subjects array required' });
+  if (typeof userId !== 'string') return res.status(400).json({ error: 'Invalid userId type' });
   const results = [];
   for (const subject of subjects.slice(0, 10)) {
     const spent = userSpend.get(userId) || 0;
@@ -61,13 +67,11 @@ app.post('/ai-lite/batch', async (req, res) => {
   return res.json({ hints: results, totalCost: results.length * COST_PER_HINT, budgetRemaining: MONTHLY_BUDGET - (userSpend.get(userId) || 0) });
 });
 
-// GET /ai-lite/budget/:userId
 app.get('/ai-lite/budget/:userId', (req, res) => {
   const spent = userSpend.get(req.params.userId) || 0;
   return res.json({ userId: req.params.userId, spent, budget: MONTHLY_BUDGET, remaining: MONTHLY_BUDGET - spent, costPerHint: COST_PER_HINT });
 });
 
-// GET /ai/health
 app.get('/ai/health', (req, res) => {
   return res.json({ service: 'ai-service', status: 'healthy', activeUsers: userSpend.size, timestamp: new Date().toISOString() });
 });

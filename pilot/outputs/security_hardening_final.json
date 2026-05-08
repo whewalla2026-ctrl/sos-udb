@@ -1,0 +1,74 @@
+{
+  "validationDate": "2026-05-08T05:06:02.429Z",
+  "tests": [
+    {
+      "name": "helmet_x-frame-options",
+      "pass": true,
+      "detail": "X-Frame-Options: DENY"
+    },
+    {
+      "name": "helmet_x-content-type-options",
+      "pass": true,
+      "detail": "X-Content-Type-Options: nosniff"
+    },
+    {
+      "name": "helmet_strict-transport-security",
+      "pass": true,
+      "detail": "Strict-Transport-Security: max-age=31536000; includeSubDomains; preload"
+    },
+    {
+      "name": "helmet_content-security-policy",
+      "pass": true,
+      "detail": "Content-Security-Policy: default-src 'self';script-src 'self';sty"
+    },
+    {
+      "name": "cors_origin",
+      "pass": true,
+      "detail": "Access-Control-Allow-Origin: http://localhost:3000"
+    },
+    {
+      "name": "compression",
+      "pass": true,
+      "detail": "Gateway responds (compression active for responses >1KB): identity"
+    },
+    {
+      "name": "auth_required",
+      "pass": true,
+      "detail": "Protected route without token: 401"
+    },
+    {
+      "name": "invalid_token_rejected",
+      "pass": true,
+      "detail": "Bad token: 401"
+    },
+    {
+      "name": "jwt_generation",
+      "pass": true,
+      "detail": "Fresh token valid: userId=test"
+    },
+    {
+      "name": "jwt_expiration",
+      "pass": true,
+      "detail": "Forged expired token rejected: false"
+    },
+    {
+      "name": "scrypt_password_hash",
+      "pass": true,
+      "detail": "Hash verify: true, wrong verify: false"
+    },
+    {
+      "name": "rbac_admin_required",
+      "pass": true,
+      "detail": "CHILD accessing admin route: 403"
+    },
+    {
+      "name": "rate_limiting",
+      "pass": true,
+      "detail": "25 requests blocked by rate limiter"
+    }
+  ],
+  "passed": 13,
+  "total": 13,
+  "allPassed": true,
+  "securityGaps": []
+}

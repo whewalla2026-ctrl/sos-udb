@@ -1,14 +1,20 @@
 const express = require('express');
+const helmet = require('helmet');
+const cors = require('cors');
 const { createLogger, correlationId } = require('../shared/logger');
 const eventBus = require('../shared/event-bus');
 const { logAudit, getAuditLog } = require('../shared/security');
+const { metricsMiddleware, metricsEndpoint } = require('../shared/prometheus');
 
 const app = express();
 const PORT = process.env.MONITORING_SERVICE_PORT || 3004;
 const log = createLogger('monitoring-service');
 
-app.use(express.json());
+app.use(helmet({ contentSecurityPolicy: false }));
+app.use(cors({ origin: process.env.CORS_ORIGIN || 'http://localhost:3000', credentials: true }));
+app.use(express.json({ limit: '50kb' }));
 app.use(correlationId);
+app.use(metricsMiddleware('monitoring-service'));
 
 const alerts = [];
 const signals = [
@@ -29,7 +35,6 @@ const signals = [
   { name: 'event_bus_lag', status: 'healthy', value: 0 },
 ];
 
-// GET /monitoring/health (aggregated)
 app.get('/monitoring/health', async (req, res) => {
   const redisOk = eventBus.ready;
   signals[5].value = redisOk ? 1 : 0;
@@ -50,15 +55,17 @@ app.get('/monitoring/health', async (req, res) => {
   });
 });
 
-// GET /monitoring/signals
 app.get('/monitoring/signals', (req, res) => {
   return res.json({ signals, count: signals.length, timestamp: new Date().toISOString() });
 });
 
-// POST /monitoring/alerts
 app.post('/monitoring/alerts', async (req, res) => {
   const { severity, message, source } = req.body;
   if (!severity || !message) return res.status(400).json({ error: 'severity and message required' });
+  if (typeof severity !== 'string' || typeof message !== 'string')
+    return res.status(400).json({ error: 'Invalid input types' });
+  if (!['critical', 'warning', 'info'].includes(severity))
+    return res.status(400).json({ error: 'severity must be critical, warning, or info' });
   const alert = { id: require('crypto').randomUUID(), severity, message, source, timestamp: new Date().toISOString(), acknowledged: false };
   alerts.push(alert);
   await eventBus.publish('alert_triggered', { severity, message, source });
@@ -67,7 +74,6 @@ app.post('/monitoring/alerts', async (req, res) => {
   return res.status(201).json(alert);
 });
 
-// GET /monitoring/alerts
 app.get('/monitoring/alerts', (req, res) => {
   const { severity, limit = 50 } = req.query;
   let result = alerts;
@@ -75,7 +81,6 @@ app.get('/monitoring/alerts', (req, res) => {
   return res.json({ alerts: result.slice(-parseInt(limit)), total: result.length });
 });
 
-// GET /monitoring/events
 app.get('/monitoring/events', async (req, res) => {
   const streams = ['user_created', 'user_logged_in', 'planner_created', 'planner_updated', 'hint_generated', 'budget_threshold_hit', 'alert_triggered'];
   const results = {};
@@ -85,35 +90,20 @@ app.get('/monitoring/events', async (req, res) => {
   return res.json(results);
 });
 
-// GET /audit/log
 app.get('/audit/log', (req, res) => {
   const { limit, event, userId } = req.query;
   return res.json({ entries: getAuditLog({ limit: parseInt(limit) || 100, event, userId }), count: getAuditLog({ limit: parseInt(limit) || 100, event, userId }).length });
 });
 
-// GET /metrics
-app.get('/metrics', (req, res) => {
-  return res.json({
-    uptime: process.uptime(),
-    memory: process.memoryUsage(),
-    alerts: { total: alerts.length, unacknowledged: alerts.filter(a => !a.acknowledged).length },
-    signals: signals.length,
-    timestamp: new Date().toISOString(),
-  });
-});
+// Prometheus-format /metrics
+app.get('/metrics', metricsEndpoint);
 
-// Update signal helper (called by gateway or other services)
 app.post('/monitoring/signal', (req, res) => {
   const { name, status, value } = req.body;
   if (!name || !status) return res.status(400).json({ error: 'name and status required' });
   const signal = signals.find(s => s.name === name);
   if (signal) { signal.status = status; signal.value = value; signal.updatedAt = new Date().toISOString(); }
   return res.json({ updated: !!signal });
-});
-
-// GET /monitoring/health
-app.get('/monitoring/health', (req, res) => {
-  return res.json({ service: 'monitoring-service', status: 'healthy', alerts: alerts.length, timestamp: new Date().toISOString() });
 });
 
 async function start() {

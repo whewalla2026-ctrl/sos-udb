@@ -1,0 +1,22 @@
+{
+  "validationDate": "2026-05-08T05:06:00.419Z",
+  "poolConfiguration": {
+    "maxConnections": 20,
+    "idleTimeout": 30000,
+    "connectTimeout": 10000,
+    "poolMode": "transaction",
+    "pgbouncerPort": 6432,
+    "pgbouncerConfigured": true
+  },
+  "poolStatus": {
+    "active": 0,
+    "idle": 20,
+    "waiting": 0,
+    "totalConnections": 20,
+    "maxConnections": 20,
+    "status": "healthy"
+  },
+  "pgBouncerConfigured": true,
+  "recommendation": "pgBouncer config ready. Deploy via Docker for production.",
+  "passed": true
+}

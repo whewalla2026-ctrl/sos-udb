@@ -1,0 +1,18 @@
+{
+  "validationDate": "2026-05-08T05:05:17.436Z",
+  "servicesChecked": 2,
+  "allPassed": true,
+  "metricsExpected": [
+    "udb_http_requests_total",
+    "udb_http_request_duration_seconds",
+    "udb_auth_failures_total",
+    "udb_queue_depth",
+    "udb_queue_failures_total",
+    "udb_redis_latency_seconds",
+    "udb_db_pool_usage",
+    "udb_ai_budget_usage",
+    "process_cpu_user_seconds_total",
+    "process_resident_memory_bytes"
+  ],
+  "details": "See prometheus_metrics_validation.json for full output"
+}

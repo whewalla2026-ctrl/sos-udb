@@ -20,15 +20,21 @@
     "test:e2e:phase2:graphql": "pnpm --filter @udb/api exec jest --config ./services/api/test/jest-e2e-phase2.json ./services/api/test/e2e-phase2-graphql.spec.ts"
   },
   "devDependencies": {
-    "turbo": "^2.0.0",
-    "typescript": "^5.4.0",
     "@types/node": "^20.0.0",
+    "eslint": "^8.57.0",
     "prettier": "^3.2.0",
-    "eslint": "^8.57.0"
+    "turbo": "^2.0.0",
+    "typescript": "^5.4.0"
   },
   "engines": {
     "node": ">=20.0.0",
     "pnpm": ">=9.0.0"
   },
-  "packageManager": "pnpm@9.15.9"
+  "packageManager": "pnpm@9.15.9",
+  "dependencies": {
+    "compression": "^1.8.1",
+    "cors": "^2.8.5",
+    "helmet": "^8.1.0",
+    "prom-client": "^15.1.3"
+  }
 }

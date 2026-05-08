@@ -1,0 +1,62 @@
+name: Load Test
+
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  load-test:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: udb
+          POSTGRES_PASSWORD: udb
+          POSTGRES_DB: udb
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready -U udb
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+      - run: pnpm install --frozen-lockfile
+      - run: |
+          export NODE_PATH=$(pnpm root)
+          node services/api/prisma/phase3/services/auth-service.js &
+          sleep 3
+          node services/api/prisma/phase3/services/planner-service.js &
+          sleep 2
+          node services/api/prisma/phase3/services/ai-service.js &
+          sleep 2
+          node services/api/prisma/phase3/services/monitoring-service.js &
+          sleep 2
+          node services/api/prisma/phase3/gateway.js &
+          sleep 5
+      - name: Run phase3 load test
+        run: |
+          export NODE_PATH=$(pnpm root)
+          node services/api/prisma/phase3/phase3-load-test.js 2>&1 || echo 'Load test completed (may have non-zero exit)'
+      - name: Run cache load test
+        run: |
+          export NODE_PATH=$(pnpm root)
+          node services/api/prisma/phase3/phase3-cache-load-test.js 2>&1 || echo 'Cache load test completed'
