@@ -1,0 +1,38 @@
+{
+  "report": "Phase 3 Observability Runtime Report",
+  "timestamp": "2026-05-08T04:40:00Z",
+  "status": "PASS",
+  "metrics": {
+    "endpoint": "GET /metrics",
+    "fields": ["uptime", "memory", "alerts", "signals"],
+    "status": "PASS"
+  },
+  "health_check": {
+    "endpoint": "GET /monitoring/health",
+    "aggregates": ["auth", "planner", "ai", "monitoring", "redis", "postgres"],
+    "status": "PASS"
+  },
+  "signals": {
+    "endpoint": "GET /monitoring/signals",
+    "count": 15,
+    "categories": ["service_status", "error_rate", "latency", "usage", "infrastructure"],
+    "status": "PASS"
+  },
+  "alerts": {
+    "endpoint": "POST/GET /monitoring/alerts",
+    "severity_levels": ["critical", "warning", "info"],
+    "status": "PASS"
+  },
+  "event_bus_monitoring": {
+    "endpoint": "GET /monitoring/events",
+    "tracks": ["user_created", "user_logged_in", "planner_created", "planner_updated", "hint_generated", "budget_threshold_hit", "alert_triggered"],
+    "dlq_tracking": true,
+    "status": "PASS"
+  },
+  "structured_logging": {
+    "format": "JSON",
+    "fields": ["timestamp", "severity", "service", "message", "correlationId"],
+    "correlation_ids": "x-correlation-id header propagated through gateway"
+  },
+  "verdict": "PASS"
+}

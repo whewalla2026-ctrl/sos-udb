@@ -1,0 +1,24 @@
+{
+  "report": "Phase 3 Interservice Latency Report",
+  "timestamp": "2026-05-08T04:40:00Z",
+  "status": "PASS",
+  "measurements": [
+    {"route": "gateway → auth (register)", "method": "POST", "latency_ms": 68, "status": "PASS"},
+    {"route": "gateway → auth (login)", "method": "POST", "latency_ms": 52, "status": "PASS"},
+    {"route": "gateway → planner (generate, uncached)", "method": "POST", "latency_ms": 3, "status": "PASS"},
+    {"route": "gateway → planner (generate, cached)", "method": "POST", "latency_ms": 1, "status": "PASS"},
+    {"route": "gateway → ai (hint)", "method": "POST", "latency_ms": 2, "status": "PASS"},
+    {"route": "gateway → monitoring (health)", "method": "GET", "latency_ms": 16, "status": "PASS"},
+    {"route": "gateway → monitoring (signals)", "method": "GET", "latency_ms": 5, "status": "PASS"},
+    {"route": "gateway → monitoring (alerts)", "method": "POST", "latency_ms": 4, "status": "PASS"},
+    {"route": "gateway → monitoring (events)", "method": "GET", "latency_ms": 12, "status": "PASS"}
+  ],
+  "stats": {
+    "min_ms": 1,
+    "max_ms": 68,
+    "avg_ms": 18.1,
+    "cached_avg_ms": 1,
+    "db_operation_avg_ms": 60
+  },
+  "verdict": "PASS"
+}
