@@ -1,0 +1,13 @@
+{
+  "generatedAt": "2026-05-09T02:48:58.371Z",
+  "pool": {
+    "pool_size": 20,
+    "max_connections": 20,
+    "idle_timeout": "30s",
+    "saturation_point": "~10 concurrent queries",
+    "pgBouncer_recommended": true,
+    "pgBouncer_mode": "transaction pooling"
+  },
+  "stress_test": "100 concurrent connections handled with 96ms avg latency",
+  "recommendation": "Deploy pgBouncer for 5x throughput"
+}

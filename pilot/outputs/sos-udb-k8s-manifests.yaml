@@ -1,0 +1,425 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: sos-udb
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gateway
+  namespace: sos-udb
+spec:
+  replicas: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+      maxSurge: 1
+  selector:
+    matchLabels:
+      app: gateway
+  template:
+    metadata:
+      labels:
+        app: gateway
+    spec:
+      containers:
+      - name: gateway
+        image: sos-udb/gateway:latest
+        ports:
+        - containerPort: 3000
+        envFrom:
+        - configMapRef:
+            name: sos-udb-config
+        - secretRef:
+            name: sos-udb-secrets
+        livenessProbe:
+          httpGet:
+            path: /gateway/health
+            port: 3000
+          initialDelaySeconds: 15
+          periodSeconds: 20
+        readinessProbe:
+          httpGet:
+            path: /gateway/health
+            port: 3000
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          limits:
+            cpu: 500m
+            memory: 256Mi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: auth
+  namespace: sos-udb
+spec:
+  replicas: 2
+  strategy:
+    type: RollingUpdate
+  selector:
+    matchLabels:
+      app: auth
+  template:
+    metadata:
+      labels:
+        app: auth
+    spec:
+      containers:
+      - name: auth
+        image: sos-udb/auth:latest
+        ports:
+        - containerPort: 3001
+        envFrom:
+        - configMapRef:
+            name: sos-udb-config
+        - secretRef:
+            name: sos-udb-secrets
+        livenessProbe:
+          httpGet:
+            path: /auth/health
+            port: 3001
+          initialDelaySeconds: 15
+          periodSeconds: 20
+        readinessProbe:
+          httpGet:
+            path: /auth/health
+            port: 3001
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          limits:
+            cpu: 500m
+            memory: 256Mi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: planner
+  namespace: sos-udb
+spec:
+  replicas: 2
+  strategy:
+    type: RollingUpdate
+  selector:
+    matchLabels:
+      app: planner
+  template:
+    metadata:
+      labels:
+        app: planner
+    spec:
+      containers:
+      - name: planner
+        image: sos-udb/planner:latest
+        ports:
+        - containerPort: 3002
+        envFrom:
+        - configMapRef:
+            name: sos-udb-config
+        - secretRef:
+            name: sos-udb-secrets
+        livenessProbe:
+          httpGet:
+            path: /planner/health
+            port: 3002
+          initialDelaySeconds: 15
+          periodSeconds: 20
+        readinessProbe:
+          httpGet:
+            path: /planner/health
+            port: 3002
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        resources:
+          requests:
+            cpu: 200m
+            memory: 256Mi
+          limits:
+            cpu: 1
+            memory: 512Mi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ai
+  namespace: sos-udb
+spec:
+  replicas: 3
+  strategy:
+    type: RollingUpdate
+  selector:
+    matchLabels:
+      app: ai
+  template:
+    metadata:
+      labels:
+        app: ai
+    spec:
+      containers:
+      - name: ai
+        image: sos-udb/ai:latest
+        ports:
+        - containerPort: 3003
+        envFrom:
+        - configMapRef:
+            name: sos-udb-config
+        - secretRef:
+            name: sos-udb-secrets
+        livenessProbe:
+          httpGet:
+            path: /ai/health
+            port: 3003
+          initialDelaySeconds: 15
+          periodSeconds: 20
+        readinessProbe:
+          httpGet:
+            path: /ai/health
+            port: 3003
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        resources:
+          requests:
+            cpu: 200m
+            memory: 256Mi
+          limits:
+            cpu: 1
+            memory: 512Mi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: monitoring
+  namespace: sos-udb
+spec:
+  replicas: 1
+  strategy:
+    type: RollingUpdate
+  selector:
+    matchLabels:
+      app: monitoring
+  template:
+    metadata:
+      labels:
+        app: monitoring
+    spec:
+      containers:
+      - name: monitoring
+        image: sos-udb/monitoring:latest
+        ports:
+        - containerPort: 3004
+        envFrom:
+        - configMapRef:
+            name: sos-udb-config
+        - secretRef:
+            name: sos-udb-secrets
+        livenessProbe:
+          httpGet:
+            path: /monitoring/health
+            port: 3004
+          initialDelaySeconds: 15
+          periodSeconds: 20
+        readinessProbe:
+          httpGet:
+            path: /monitoring/health
+            port: 3004
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          limits:
+            cpu: 300m
+            memory: 256Mi
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: gateway-hpa
+  namespace: sos-udb
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: gateway
+  minReplicas: 2
+  maxReplicas: 10
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 70
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: auth-hpa
+  namespace: sos-udb
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: auth
+  minReplicas: 2
+  maxReplicas: 8
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 70
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: planner-hpa
+  namespace: sos-udb
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: planner
+  minReplicas: 2
+  maxReplicas: 10
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 60
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: ai-hpa
+  namespace: sos-udb
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: ai
+  minReplicas: 3
+  maxReplicas: 20
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 50
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: gateway-svc
+  namespace: sos-udb
+spec:
+  selector:
+    app: gateway
+  ports:
+  - port: 80
+    targetPort: 3000
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: auth-svc
+  namespace: sos-udb
+spec:
+  selector:
+    app: auth
+  ports:
+  - port: 3001
+    targetPort: 3001
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: planner-svc
+  namespace: sos-udb
+spec:
+  selector:
+    app: planner
+  ports:
+  - port: 3002
+    targetPort: 3002
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ai-svc
+  namespace: sos-udb
+spec:
+  selector:
+    app: ai
+  ports:
+  - port: 3003
+    targetPort: 3003
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: monitoring-svc
+  namespace: sos-udb
+spec:
+  selector:
+    app: monitoring
+  ports:
+  - port: 3004
+    targetPort: 3004
+  type: ClusterIP
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: sos-udb-config
+  namespace: sos-udb
+data:
+  LOG_LEVEL: "INFO"
+  NODE_ENV: "production"
+  JWT_TOKEN_EXPIRY: "3600"
+  QUEUE_DEFAULT_RETRIES: "3"
+  QUEUE_DEFAULT_BACKOFF: "1000"
+  DB_POOL_MAX: "20"
+  DB_POOL_IDLE_TIMEOUT: "30000"
+  AI_COST_PER_HINT: "0.0004"
+  AI_BUDGET_PER_USER_MONTHLY: "0.50"
+  CORS_ORIGIN: "https://app.sos-udb.io"
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: sos-udb-ingress
+  namespace: sos-udb
+  annotations:
+    nginx.ingress.kubernetes.io/rate-limit: "100r/m"
+    nginx.ingress.kubernetes.io/proxy-body-size: "100k"
+spec:
+  rules:
+  - host: api.sos-udb.io
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: gateway-svc
+            port:
+              number: 80

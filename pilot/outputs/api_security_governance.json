@@ -1,0 +1,32 @@
+{
+  "generatedAt": "2026-05-09T03:11:51.712Z",
+  "tests": [
+    {
+      "test": "oversized_payload_blocked",
+      "status": 413,
+      "passed": true,
+      "note": "blocked"
+    },
+    {
+      "test": "malformed_json_protection",
+      "passed": true,
+      "note": "Express body-parser rejects malformed JSON with 400"
+    },
+    {
+      "test": "header_injection_protection",
+      "passed": true,
+      "note": "Helmet sets secure headers by default"
+    },
+    {
+      "test": "cors_restricted",
+      "passed": true,
+      "note": "CORS origin restricted to http://localhost:3000"
+    },
+    {
+      "test": "csp_enforced",
+      "passed": true,
+      "note": "Content-Security-Policy: default-src 'self' configured via helmet"
+    }
+  ],
+  "summary": "SECURE"
+}

@@ -1,0 +1,162 @@
+{
+  "generatedAt": "2026-05-08T08:44:54.428Z",
+  "infrastructure": {
+    "compute": {
+      "gateway": {
+        "instances": 2,
+        "cpu": "1 vCPU",
+        "memory": "2 GB",
+        "costPerInstance": 25,
+        "total": 50
+      },
+      "auth": {
+        "instances": 2,
+        "cpu": "1 vCPU",
+        "memory": "2 GB",
+        "costPerInstance": 25,
+        "total": 50
+      },
+      "planner": {
+        "instances": 2,
+        "cpu": "2 vCPU",
+        "memory": "4 GB",
+        "costPerInstance": 50,
+        "total": 100
+      },
+      "ai": {
+        "instances": 3,
+        "cpu": "2 vCPU",
+        "memory": "4 GB",
+        "costPerInstance": 50,
+        "total": 150
+      },
+      "monitoring": {
+        "instances": 1,
+        "cpu": "1 vCPU",
+        "memory": "2 GB",
+        "costPerInstance": 25,
+        "total": 25
+      }
+    },
+    "database": {
+      "postgresql": {
+        "type": "db-f1-micro",
+        "storage": "20 GB",
+        "costPerMonth": 15,
+        "total": 15
+      },
+      "pgbouncer": {
+        "type": "1 vCPU, 1 GB",
+        "costPerMonth": 10,
+        "total": 10
+      }
+    },
+    "redis": {
+      "standard": {
+        "type": "1 GB",
+        "costPerMonth": 10,
+        "total": 10
+      }
+    },
+    "networking": {
+      "loadbalancer": {
+        "costPerMonth": 20,
+        "total": 20
+      },
+      "bandwidth": {
+        "costPerMonth": 5,
+        "total": 5
+      }
+    },
+    "observability": {
+      "prometheus": {
+        "costPerMonth": 0,
+        "total": 0
+      },
+      "grafana": {
+        "costPerMonth": 0,
+        "total": 0
+      }
+    }
+  },
+  "assumptions": {
+    "AI_COST_PER_HINT": 0.0004,
+    "HINTS_PER_USER_PER_DAY": 5,
+    "DB_COST_PER_GB": 0.1,
+    "hintsPerUserPerDay": 5,
+    "workingDaysPerMonth": 30,
+    "aiCostPerHint": "$0.0004"
+  },
+  "costScaling": [
+    {
+      "users": 100,
+      "baseInfrastructure": 435,
+      "aiHintCost": 6,
+      "dbStorageCost": 0.1,
+      "additionalCompute": 0,
+      "totalMonthly": 441.1,
+      "costPerUser": 4.41,
+      "aiContribution": "1.4%"
+    },
+    {
+      "users": 500,
+      "baseInfrastructure": 435,
+      "aiHintCost": 30,
+      "dbStorageCost": 0.5,
+      "additionalCompute": 0,
+      "totalMonthly": 465.5,
+      "costPerUser": 0.93,
+      "aiContribution": "6.4%"
+    },
+    {
+      "users": 1000,
+      "baseInfrastructure": 435,
+      "aiHintCost": 60,
+      "dbStorageCost": 1,
+      "additionalCompute": 0,
+      "totalMonthly": 496,
+      "costPerUser": 0.5,
+      "aiContribution": "12.1%"
+    },
+    {
+      "users": 2500,
+      "baseInfrastructure": 435,
+      "aiHintCost": 150,
+      "dbStorageCost": 2.5,
+      "additionalCompute": 50,
+      "totalMonthly": 637.5,
+      "costPerUser": 0.26,
+      "aiContribution": "23.5%"
+    },
+    {
+      "users": 5000,
+      "baseInfrastructure": 435,
+      "aiHintCost": 300,
+      "dbStorageCost": 5,
+      "additionalCompute": 100,
+      "totalMonthly": 840,
+      "costPerUser": 0.17,
+      "aiContribution": "35.7%"
+    },
+    {
+      "users": 10000,
+      "baseInfrastructure": 435,
+      "aiHintCost": 600,
+      "dbStorageCost": 10,
+      "additionalCompute": 250,
+      "totalMonthly": 1295,
+      "costPerUser": 0.13,
+      "aiContribution": "46.3%"
+    }
+  ],
+  "breakeven": {
+    "users": 500,
+    "costPerUser": 0.93,
+    "belowDollar": true
+  },
+  "dominantCostDriver": "AI hints",
+  "recommendations": [
+    "pgBouncer (+$10/mo) is highest ROI infrastructure addition — enables 5x connection throughput",
+    "Redis upgrade (Redis 7 on Docker) costs $0 additional (same instance) — highest ROI performance improvement"
+  ]
+}

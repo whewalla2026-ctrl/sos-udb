@@ -1,0 +1,78 @@
+{
+  "generatedAt": "2026-05-09T03:32:53.584Z",
+  "scaling": {
+    "currentMaxUsers": 5000,
+    "serviceRecommendations": [
+      {
+        "service": "gateway",
+        "currentP95": 4,
+        "recommendMinReplicas": 2,
+        "recommendMaxReplicas": 5,
+        "cpuThreshold": 75,
+        "memoryThreshold": 85
+      },
+      {
+        "service": "auth",
+        "currentP95": 8,
+        "recommendMinReplicas": 2,
+        "recommendMaxReplicas": 5,
+        "cpuThreshold": 75,
+        "memoryThreshold": 85
+      },
+      {
+        "service": "planner",
+        "currentP95": 9,
+        "recommendMinReplicas": 2,
+        "recommendMaxReplicas": 5,
+        "cpuThreshold": 75,
+        "memoryThreshold": 85
+      },
+      {
+        "service": "ai",
+        "currentP95": 8,
+        "recommendMinReplicas": 2,
+        "recommendMaxReplicas": 5,
+        "cpuThreshold": 75,
+        "memoryThreshold": 85
+      },
+      {
+        "service": "monitoring",
+        "currentP95": 8,
+        "recommendMinReplicas": 2,
+        "recommendMaxReplicas": 5,
+        "cpuThreshold": 75,
+        "memoryThreshold": 85
+      }
+    ],
+    "hpaConfig": "HPA ready — requires K8s deployment"
+  },
+  "cacheTuning": {
+    "currentStrategy": "TTL-based eviction (10min-1hr)",
+    "recommendation": "Current strategy adequate",
+    "redisUpgradeNeeded": true,
+    "redisTargetVersion": "7.x with ACL and Streams",
+    "estimatedImprovement": "40-60% throughput increase"
+  },
+  "dbPoolOptimization": {
+    "currentPoolSize": 10,
+    "recommendedPoolSize": 15,
+    "pgBouncerDeployment": "IMMEDIATE for production",
+    "estimatedImprovement": "3x connection throughput"
+  },
+  "queueWorkers": {
+    "currentWorkers": [
+      "analytics:1",
+      "notifications:1",
+      "cleanup:1"
+    ],
+    "recommendation": "Current worker count adequate",
+    "concurrencySuggestion": "Maintain 1 per queue"
+  },
+  "infrastructureEfficiency": {
+    "totalServices": 5,
+    "containerization": "Dockerfiles ready for all services",
+    "orchestration": "K8s manifests generated",
+    "estimatedWaste": "15-20% CPU idle — right-size with HPA",
+    "monthlySavingsPotential": "$200-500 at 10k user scale"
+  }
+}

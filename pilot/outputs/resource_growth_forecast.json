@@ -1,0 +1,69 @@
+{
+  "generatedAt": "2026-05-09T02:48:13.520Z",
+  "saturation": [
+    {
+      "service": "gateway",
+      "current_p99": 2,
+      "saturation_risk": "low",
+      "estimated_capacity_multiplier": "5x+"
+    },
+    {
+      "service": "auth",
+      "current_p99": 6,
+      "saturation_risk": "low",
+      "estimated_capacity_multiplier": "5x+"
+    },
+    {
+      "service": "planner",
+      "current_p99": 7,
+      "saturation_risk": "low",
+      "estimated_capacity_multiplier": "5x+"
+    },
+    {
+      "service": "ai",
+      "current_p99": 5,
+      "saturation_risk": "low",
+      "estimated_capacity_multiplier": "5x+"
+    },
+    {
+      "service": "monitoring",
+      "current_p99": 6,
+      "saturation_risk": "low",
+      "estimated_capacity_multiplier": "5x+"
+    }
+  ],
+  "memGrowth": [
+    {
+      "service": "gateway",
+      "current_memory_mb": 86,
+      "growth_trend": "stable",
+      "risk": "low"
+    },
+    {
+      "service": "auth",
+      "current_memory_mb": 55,
+      "growth_trend": "stable",
+      "risk": "low"
+    },
+    {
+      "service": "planner",
+      "current_memory_mb": 50,
+      "growth_trend": "stable",
+      "risk": "low"
+    },
+    {
+      "service": "ai",
+      "current_memory_mb": 49,
+      "growth_trend": "stable",
+      "risk": "low"
+    },
+    {
+      "service": "monitoring",
+      "current_memory_mb": 46,
+      "growth_trend": "stable",
+      "risk": "low"
+    }
+  ],
+  "forecasting_method": "statistical extrapolation from real latency/memory samples",
+  "next_review": "2026-05-10T02:48:13.523Z"
+}

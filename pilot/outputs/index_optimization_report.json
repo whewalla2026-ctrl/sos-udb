@@ -1,0 +1,180 @@
+{
+  "timestamp": "2026-05-08T20:40:13.107Z",
+  "summary": "INDEX OPTIMIZATION COMPLETE — 17 MISSING INDEXES ADDED",
+  "totalIndexes": 28,
+  "primaryKeyIndexes": 25,
+  "nonPrimaryKeyIndexes": 28,
+  "indexesAdded": [
+    "quests_user_id_status_idx",
+    "quests_user_id_created_at_idx",
+    "points_ledger_user_id_created_at_idx",
+    "goals_user_id_status_idx",
+    "messages_sender_id_receiver_id_idx",
+    "messages_receiver_id_sender_id_idx",
+    "activities_user_id_start_time_idx",
+    "notifications_user_id_created_at_idx",
+    "evidence_items_user_id_idx",
+    "ventures_user_id_idx",
+    "escrows_seller_id_idx",
+    "tutoring_sessions_user_id_idx",
+    "lms_connections_user_id_idx",
+    "weekly_plans_user_id_idx",
+    "lms_assignments_connection_id_idx",
+    "simulation_runs_user_id_idx",
+    "skill_agents_user_id_idx"
+  ],
+  "coverage": [
+    {
+      "table": "users",
+      "indexes": [
+        "email",
+        "firebase_uid"
+      ],
+      "coverage": "COMPLETE"
+    },
+    {
+      "table": "quests",
+      "indexes": [
+        "user_id+status",
+        "user_id+created_at"
+      ],
+      "coverage": "COMPLETE"
+    },
+    {
+      "table": "points_ledger",
+      "indexes": [
+        "user_id+created_at"
+      ],
+      "coverage": "COMPLETE"
+    },
+    {
+      "table": "goals",
+      "indexes": [
+        "user_id+status"
+      ],
+      "coverage": "COMPLETE"
+    },
+    {
+      "table": "messages",
+      "indexes": [
+        "sender+receiver",
+        "receiver+sender"
+      ],
+      "coverage": "COMPLETE"
+    },
+    {
+      "table": "activities",
+      "indexes": [
+        "user_id+start_time"
+      ],
+      "coverage": "COMPLETE"
+    },
+    {
+      "table": "notifications",
+      "indexes": [
+        "user_id+created_at"
+      ],
+      "coverage": "COMPLETE"
+    },
+    {
+      "table": "evidence_items",
+      "indexes": [
+        "user_id"
+      ],
+      "coverage": "COMPLETE"
+    },
+    {
+      "table": "ventures",
+      "indexes": [
+        "user_id"
+      ],
+      "coverage": "COMPLETE"
+    },
+    {
+      "table": "escrows",
+      "indexes": [
+        "seller_id"
+      ],
+      "coverage": "COMPLETE"
+    },
+    {
+      "table": "tutoring_sessions",
+      "indexes": [
+        "user_id"
+      ],
+      "coverage": "COMPLETE"
+    },
+    {
+      "table": "lms_connections",
+      "indexes": [
+        "user_id"
+      ],
+      "coverage": "COMPLETE"
+    },
+    {
+      "table": "lms_assignments",
+      "indexes": [
+        "connection_id"
+      ],
+      "coverage": "COMPLETE"
+    },
+    {
+      "table": "weekly_plans",
+      "indexes": [
+        "user_id"
+      ],
+      "coverage": "COMPLETE"
+    },
+    {
+      "table": "biometric_logs",
+      "indexes": [
+        "user_id+logged_at"
+      ],
+      "coverage": "COMPLETE"
+    },
+    {
+      "table": "safety_scores",
+      "indexes": [
+        "user_id+recorded_at"
+      ],
+      "coverage": "COMPLETE"
+    },
+    {
+      "table": "audit_logs",
+      "indexes": [
+        "actor_id+created_at",
+        "action+created_at"
+      ],
+      "coverage": "COMPLETE"
+    },
+    {
+      "table": "streaks",
+      "indexes": [
+        "user_id+pillar"
+      ],
+      "coverage": "COMPLETE"
+    },
+    {
+      "table": "skill_gaps",
+      "indexes": [
+        "user_id+subject"
+      ],
+      "coverage": "COMPLETE"
+    },
+    {
+      "table": "simulation_runs",
+      "indexes": [
+        "user_id+run_date",
+        "user_id"
+      ],
+      "coverage": "COMPLETE"
+    },
+    {
+      "table": "skill_agents",
+      "indexes": [
+        "user_id"
+      ],
+      "coverage": "COMPLETE"
+    }
+  ]
+}

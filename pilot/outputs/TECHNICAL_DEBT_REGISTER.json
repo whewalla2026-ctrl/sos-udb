@@ -1,0 +1,62 @@
+{
+  "report": "Technical Debt Register - Independent Assessment",
+  "timestamp": "2026-05-09T08:45:00Z",
+  "items": [
+    {
+      "id": "TD-001",
+      "severity": "CRITICAL",
+      "title": "Insufficient test coverage",
+      "detail": "Only 2 test files for the entire NestJS API. No unit tests for Phase 3 services.",
+      "effort": "2-4 weeks",
+      "priority": "P0"
+    },
+    {
+      "id": "TD-002",
+      "severity": "HIGH",
+      "title": "In-memory state prevents horizontal scaling",
+      "detail": "userSpend, authIpTracker, spendTtl, blacklistedTokens are all in-memory Maps. Restart = data loss. Cannot run >1 instance.",
+      "effort": "1 week",
+      "priority": "P0"
+    },
+    {
+      "id": "TD-003",
+      "severity": "MEDIUM",
+      "title": "Custom JWT implementation vs standard library",
+      "detail": "HMAC-SHA256 JWT created manually in shared/security.js. Works but lacks standard features (kid, jwk, expiration validation robustness).",
+      "effort": "2-3 days",
+      "priority": "P1"
+    },
+    {
+      "id": "TD-004",
+      "severity": "MEDIUM",
+      "title": "Hardcoded localhost service addresses",
+      "detail": "SERVICES config in gateway.js has hardcoded localhost:3001-3004. Should be environment-configurable.",
+      "effort": "1 day",
+      "priority": "P1"
+    },
+    {
+      "id": "TD-005",
+      "severity": "LOW",
+      "title": "No request validation library",
+      "detail": "Manual validation in each route handler. No class-validator or Joi for request schemas.",
+      "effort": "3-5 days",
+      "priority": "P2"
+    },
+    {
+      "id": "TD-006",
+      "severity": "LOW",
+      "title": "Magic number timeouts",
+      "detail": "6 instances of hardcoded timeout values (10000ms, 30000ms, etc.) in service code.",
+      "effort": "1 day",
+      "priority": "P2"
+    },
+    {
+      "id": "TD-007",
+      "severity": "LOW",
+      "title": "No TypeScript in Phase 3 services",
+      "detail": "Phase 3 services are plain JavaScript. No type safety, harder to refactor.",
+      "effort": "1-2 weeks",
+      "priority": "P3"
+    }
+  ]
+}

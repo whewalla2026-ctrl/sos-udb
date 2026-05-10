@@ -1,0 +1,17 @@
+{
+  "report": "Go-to-Market Readiness Score",
+  "timestamp": "2026-05-09T08:45:00Z",
+  "scores": {
+    "product_ready": 7.0,
+    "onboarding_flow": 7.5,
+    "support_readiness": 4.0,
+    "documentation": 3.0,
+    "monetization": 3.0,
+    "legal_compliance": 5.0,
+    "marketing_site": 4.0,
+    "analytics_tracking": 6.0
+  },
+  "weighted_score": 4.9,
+  "verdict": "BETA/EA ACCESS READY. NOT GA READY.",
+  "recommendation": "Launch as beta/early access. Announce known limitations. 30-day controlled rollout before GA."
+}

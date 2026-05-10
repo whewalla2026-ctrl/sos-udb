@@ -1,0 +1,111 @@
+{
+  "generatedAt": "2026-05-08T08:44:56.406Z",
+  "systemState": "Production Pilot — Post Phase 3 hardening",
+  "measuredBaselines": {
+    "gateway": {
+      "p50": 367,
+      "p95": 593,
+      "p99": 607,
+      "throughput": 1585
+    },
+    "planner": {
+      "p50": 212,
+      "p95": 253,
+      "p99": 258,
+      "throughput": 769
+    },
+    "ai": {
+      "p50": 183,
+      "p95": 235,
+      "p99": 240,
+      "throughput": 806
+    }
+  },
+  "bottlenecks": [
+    {
+      "component": "Database Connection Pool",
+      "severity": "CRITICAL",
+      "description": "Prisma pool max 20 connections limits concurrent DB operations",
+      "evidence": "DB stress test: 300/500 errors at 100 concurrent, 0 errors at 10 concurrent",
+      "currentPerformance": "~87 ops/s at 10 concurrent, degrades to 93 ops/s at 100 concurrent with high error rate",
+      "optimization": "Deploy pgBouncer (transaction pooling, max 25 connections in pool)",
+      "estimatedImprovement": "5x throughput for concurrent DB operations, 0 errors at 500 concurrent",
+      "cost": "$10/mo additional"
+    },
+    {
+      "component": "Redis Queue Polling",
+      "severity": "HIGH",
+      "description": "Redis 3.0 lacks Streams — List-based queues poll at 500ms-5s intervals",
+      "evidence": "Queue throughput benchmarked at ~1000 ops/s LPUSH + RPOP. BRPOP eliminates polling wait",
+      "currentPerformance": "Poll intervals introduce up to 5s latency for infrequent queues",
+      "optimization": "Switch all workers to BRPOP (blocking pop) instead of polling LPOP. Batch dequeue with RPOPLPUSH for atomicity.",
+      "estimatedImprovement": "Sub-ms queue delivery latency instead of poll-interval bound. 500ms → 1-2ms",
+      "cost": "$0 (code change only)"
+    },
+    {
+      "component": "In-Memory Caches",
+      "severity": "MEDIUM",
+      "description": "Service-side Maps (plans, userSpend) grow unbounded with no eviction",
+      "evidence": "80.4% cache hit rate measured but no TTL or LRU eviction — memory leak risk at scale",
+      "currentPerformance": "Cache hit rate good but memory grows linearly with active users",
+      "optimization": "Add TTL-based eviction (Map with 10min TTL), move shared state to Redis",
+      "estimatedImprovement": "50% reduction in per-service memory, consistent cache across restarts",
+      "cost": "$0 (code change)"
+    },
+    {
+      "component": "Event Loop Saturation",
+      "severity": "LOW",
+      "description": "Single-threaded Node.js event loop well within limits at current scale",
+      "evidence": "2,375 req/s sustained at 300 concurrent, 1,585 at 1000 concurrent with 0 errors",
+      "currentPerformance": "Event loop lag < 10ms at all tested levels",
+      "optimization": "Cluster mode (fork per CPU core) for CPU-bound routes. Not yet needed.",
+      "estimatedImprovement": "2-4x throughput on multi-core systems. Defer until 5000+ concurrent users.",
+      "cost": "Code change + additional memory per worker"
+    }
+  ],
+  "optimizationApplyNow": [
+    {
+      "name": "Queue: BRPOP instead of polling",
+      "code": "Replace `LPOP` with `BRPOP` in queue.js worker loop",
+      "impact": "Sub-ms latency, zero idle CPU during poll waits",
+      "effort": "10 lines change",
+      "risk": "Low"
+    },
+    {
+      "name": "Cache: TTL-based eviction",
+      "code": "Add `createdAt` timestamp + `setInterval` cleanup every 60s to service-level Maps",
+      "impact": "Prevents memory leak, consistent state",
+      "effort": "20 lines change per service",
+      "risk": "Low"
+    },
+    {
+      "name": "DB: pgBouncer deployment",
+      "code": "`docker run -d --name pgbouncer -p 6432:6432 edoburu/pgbouncer` + config file",
+      "impact": "5x DB throughput, 0 connection errors at 500 concurrent",
+      "effort": "Config file exists at pgbouncer/pgbouncer.ini",
+      "risk": "Low (transaction pooling is safe)"
+    }
+  ],
+  "deferredOptimizations": [
+    {
+      "name": "Cluster mode",
+      "threshold": "5000 concurrent users",
+      "impact": "2-4x throughput"
+    },
+    {
+      "name": "Redis 7 upgrade",
+      "threshold": "As soon as admin rights available",
+      "impact": "Streams, consumer groups, 10x event reliability"
+    },
+    {
+      "name": "Distributed caching (Redis-based)",
+      "threshold": "2500+ active users",
+      "impact": "Eliminates per-service memory growth, shared cache across instances"
+    },
+    {
+      "name": "Read replicas for PostgreSQL",
+      "threshold": "5000+ concurrent users",
+      "impact": "Offload read queries from primary DB"
+    }
+  ]
+}

@@ -1,0 +1,119 @@
+{
+  "counters": [
+    {
+      "name": "http_requests_total",
+      "labels": [
+        "method",
+        "path",
+        "status",
+        "service"
+      ],
+      "type": "counter",
+      "help": "Total HTTP requests"
+    },
+    {
+      "name": "auth_failures_total",
+      "labels": [
+        "reason",
+        "service"
+      ],
+      "type": "counter",
+      "help": "Auth failures by reason"
+    },
+    {
+      "name": "queue_failures_total",
+      "labels": [
+        "queue",
+        "service"
+      ],
+      "type": "counter",
+      "help": "Queue processing failures"
+    },
+    {
+      "name": "ai_hints_generated_total",
+      "labels": [
+        "subject",
+        "service"
+      ],
+      "type": "counter",
+      "help": "Total AI hints generated"
+    },
+    {
+      "name": "error_budget_burn",
+      "labels": [
+        "slo",
+        "service"
+      ],
+      "type": "counter",
+      "help": "Error budget burn units"
+    }
+  ],
+  "histograms": [
+    {
+      "name": "request_duration_seconds",
+      "labels": [
+        "method",
+        "path",
+        "service"
+      ],
+      "type": "histogram",
+      "help": "Request latency distribution",
+      "buckets": [
+        0.01,
+        0.025,
+        0.05,
+        0.1,
+        0.25,
+        0.5,
+        1,
+        2.5,
+        5,
+        10
+      ]
+    }
+  ],
+  "gauges": [
+    {
+      "name": "db_pool_usage",
+      "labels": [
+        "service"
+      ],
+      "type": "gauge",
+      "help": "Current DB pool connections in use"
+    },
+    {
+      "name": "db_pool_max",
+      "labels": [
+        "service"
+      ],
+      "type": "gauge",
+      "help": "Max DB pool connections"
+    },
+    {
+      "name": "redis_latency",
+      "labels": [
+        "service"
+      ],
+      "type": "gauge",
+      "help": "Redis operation latency in ms"
+    },
+    {
+      "name": "queue_depth",
+      "labels": [
+        "queue",
+        "service"
+      ],
+      "type": "gauge",
+      "help": "Current queue depth"
+    },
+    {
+      "name": "ai_budget_usage",
+      "labels": [
+        "userId",
+        "service"
+      ],
+      "type": "gauge",
+      "help": "AI budget used in $"
+    }
+  ]
+}

@@ -1,0 +1,55 @@
+{
+  "report": "Business Risk Register",
+  "timestamp": "2026-05-09T08:45:00Z",
+  "risks": [
+    {
+      "id": "BR-001",
+      "severity": "HIGH",
+      "title": "No password reset flow",
+      "impact": "Users locked out with no recovery path. Support burden.",
+      "likelihood": "VERY HIGH",
+      "mitigation": "Implement password reset before GA. Estimated 1-2 days."
+    },
+    {
+      "id": "BR-002",
+      "severity": "HIGH",
+      "title": "No email verification",
+      "impact": "Fake accounts, spam, no user identity validation",
+      "likelihood": "HIGH",
+      "mitigation": "Add email verification step in registration"
+    },
+    {
+      "id": "BR-003",
+      "severity": "MEDIUM",
+      "title": "No subscription billing active",
+      "impact": "Cannot monetize. Stripe configured but no tier enforcement.",
+      "likelihood": "CERTAIN",
+      "mitigation": "Implement Stripe webhook integration and tier gating"
+    },
+    {
+      "id": "BR-004",
+      "severity": "MEDIUM",
+      "title": "No user documentation",
+      "impact": "High support volume, poor user experience",
+      "likelihood": "HIGH",
+      "mitigation": "Create FAQ, user guide, and help center"
+    },
+    {
+      "id": "BR-005",
+      "severity": "MEDIUM",
+      "title": "English-only interface",
+      "impact": "Limits global market reach",
+      "likelihood": "CERTAIN",
+      "mitigation": "Add i18n framework and translations"
+    },
+    {
+      "id": "BR-006",
+      "severity": "LOW",
+      "title": "No analytics/reports for users",
+      "impact": "Users cannot see their own usage data or progress reports",
+      "likelihood": "HIGH",
+      "mitigation": "Add dashboard reports and export functionality"
+    }
+  ],
+  "overall_business_risk": "MEDIUM"
+}

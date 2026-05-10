@@ -56,48 +56,56 @@ class QueueService {
 
   async createWorker(queueName, handler, options = {}) {
     const pollInterval = options.pollIntervalMs || 500;
-    const worker = setInterval(async () => {
-      if (!this.ready) return;
+    const useBlocking = options.useBlocking !== false;
+    let stopped = false;
+    const poll = async () => {
+      if (!this.ready || stopped) { if (!stopped) setTimeout(poll, pollInterval); return; }
       try {
         const key = `queue:${queueName}`;
-        const jobStr = await this.client.lpop(key);
-        if (!jobStr) return;
-        const job = JSON.parse(jobStr);
-        try {
-          const start = Date.now();
-          await handler(job);
-          const s = this.stats.get(queueName);
-          if (s) { s.completed++; s.lastLatencyMs = Date.now() - start; s.lastSuccess = new Date().toISOString(); }
-        } catch (err) {
-          job.attempts++;
-          const s = this.stats.get(queueName);
-          if (s) { s.failed++; s.lastError = err.message; }
-          if (job.attempts < job.maxAttempts) {
-            // Exponential backoff
-            const backoff = (options.backoff || DEFAULT_BACKOFF_MS) * Math.pow(2, job.attempts - 1);
-            setTimeout(() => {
-              this.client.rpush(key, JSON.stringify(job)).catch(() => {});
-            }, backoff);
-            const s2 = this.stats.get(queueName);
-            if (s2) s2.retries++;
-          } else {
-            // Move to dead letter
-            const dlqKey = `dlq:${queueName}`;
-            await this.client.lpush(dlqKey, JSON.stringify({ ...job, failedAt: Date.now(), error: err.message }));
-            await this.client.ltrim(dlqKey, 0, 999);
+        let jobStr;
+        if (useBlocking) {
+          const result = await this.client.brpop(key, Math.max(1, Math.floor(pollInterval / 1000)));
+          jobStr = result ? result[1] : null;
+        } else {
+          jobStr = await this.client.lpop(key);
+        }
+        if (jobStr) {
+          const job = JSON.parse(jobStr);
+          try {
+            const start = Date.now();
+            await handler(job);
+            const s = this.stats.get(queueName);
+            if (s) { s.completed++; s.lastLatencyMs = Date.now() - start; s.lastSuccess = new Date().toISOString(); }
+          } catch (err) {
+            job.attempts++;
+            const s = this.stats.get(queueName);
+            if (s) { s.failed++; s.lastError = err.message; }
+            if (job.attempts < job.maxAttempts) {
+              const backoff = (options.backoff || DEFAULT_BACKOFF_MS) * Math.pow(2, job.attempts - 1);
+              setTimeout(() => { this.client.rpush(key, JSON.stringify(job)).catch(() => {}); }, backoff);
+              const s2 = this.stats.get(queueName);
+              if (s2) s2.retries++;
+            } else {
+              const dlqKey = `dlq:${queueName}`;
+              await this.client.lpush(dlqKey, JSON.stringify({ ...job, failedAt: Date.now(), error: err.message }));
+              await this.client.ltrim(dlqKey, 0, 999);
+            }
           }
         }
       } catch (err) {
         console.error(`Queue worker error (${queueName}):`, err.message);
       }
-    }, pollInterval);
+      if (!stopped) setTimeout(poll, 10);
+    };
+    poll();
+    const worker = { stop: () => { stopped = true; } };
     this.workers.set(queueName, worker);
     return worker;
   }
 
   async stopWorker(queueName) {
     const worker = this.workers.get(queueName);
-    if (worker) { clearInterval(worker); this.workers.delete(queueName); }
+    if (worker) { if (worker.stop) worker.stop(); this.workers.delete(queueName); }
   }
 
   async getQueueMetrics(name) {

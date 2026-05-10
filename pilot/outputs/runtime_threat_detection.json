@@ -1,0 +1,42 @@
+{
+  "generatedAt": "2026-05-09T02:49:33.004Z",
+  "runtimeThreats": [
+    {
+      "test": "brute_force_escalation",
+      "blocked": true,
+      "blocked_count": 13,
+      "severity": "critical",
+      "detected": true
+    },
+    {
+      "test": "credential_stuffing",
+      "blocked": true,
+      "blocked_count": 5,
+      "severity": "critical",
+      "detected": true
+    },
+    {
+      "test": "queue_poisoning",
+      "protection": "Payload size bounded (50-100kb), DLQ with 1000 cap",
+      "severity": "low",
+      "detected": true
+    },
+    {
+      "test": "redis_abuse",
+      "protection": "maxRetriesPerRequest: 3, lazyConnect: true, retryStrategy capped",
+      "severity": "low",
+      "detected": true
+    },
+    {
+      "test": "malformed_payload_bursts",
+      "blocked": true,
+      "severity": "low",
+      "detected": true
+    }
+  ],
+  "summary": {
+    "total_tests": 5,
+    "threats_detected": 5,
+    "overall_severity": "critical"
+  }
+}

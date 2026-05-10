@@ -1,0 +1,61 @@
+{
+  "generatedAt": "2026-05-09T03:40:10.634Z",
+  "currentGrossMargin": "N/A (pre-revenue)",
+  "projectedGrossMargins": [
+    {
+      "scale": "10,000 users",
+      "grossMargin": "92.7%",
+      "operatingMargin": "62.7%"
+    },
+    {
+      "scale": "50,000 users",
+      "grossMargin": "93.2%",
+      "operatingMargin": "80.2%"
+    },
+    {
+      "scale": "100,000 users",
+      "grossMargin": "92.9%",
+      "operatingMargin": "81.9%"
+    }
+  ],
+  "operatingMargin": {
+    "at10k": "62.7%",
+    "at50k": "80.2%",
+    "at100k": "81.9%"
+  },
+  "aiMarginImpact": {
+    "at10k": "83% of infra costs",
+    "at100k": "85% of infra costs",
+    "recommendation": "Invest in caching and batch processing to reduce AI cost impact"
+  },
+  "infraEfficiencyRatio": {
+    "at10k": "0.073",
+    "at100k": "0.071",
+    "benchmark": "Good (<0.10 = efficient)"
+  },
+  "breakEvenAnalysis": [
+    {
+      "scale": "10,000 users",
+      "breakEvenUsers": 3729,
+      "breakEvenMonths": 11187
+    },
+    {
+      "scale": "50,000 users",
+      "breakEvenUsers": 9921,
+      "breakEvenMonths": 5953
+    },
+    {
+      "scale": "100,000 users",
+      "breakEvenUsers": 18068,
+      "breakEvenMonths": 5421
+    }
+  ],
+  "keyInsights": [
+    "Gross margins remain above 92% across all scales — strong unit economics",
+    "AI hint generation is the dominant cost driver (46-65% of infrastructure costs)",
+    "Operating margins improve from 62.7% at 10k to 81.9% at 100k due to staffing leverage",
+    "Cost per user remains under $1.00 even at 100k scale",
+    "Break-even achieved at ~3,729 paid users (Starter tier)",
+    "Primary risk: AI API cost increases from provider"
+  ]
+}

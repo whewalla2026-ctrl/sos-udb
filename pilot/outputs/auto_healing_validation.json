@@ -1,0 +1,36 @@
+{
+  "generatedAt": "2026-05-08T09:51:21.176Z",
+  "tests": [
+    {
+      "service": "planner",
+      "killed": true,
+      "autoHealed": true,
+      "recoveryTime": "~3s (detection: 1s, restart: 2s)",
+      "verdict": "PASS"
+    },
+    {
+      "service": "queue",
+      "backlogCreated": true,
+      "backlogDrained": true,
+      "verdict": "PASS"
+    },
+    {
+      "service": "planner",
+      "memoryPressureTest": true,
+      "stable": true,
+      "verdict": "PASS"
+    }
+  ],
+  "summary": {
+    "total": 3,
+    "passed": 3,
+    "warning": 0,
+    "failed": 0
+  },
+  "degradedMode": {
+    "description": "When a service is down, gateway returns 502 for affected routes. Other services continue.",
+    "activation": "Manual — no automated degraded mode triggers exist",
+    "recommendation": "Add circuit breaker pattern for automatic degraded mode when failure rate > 50%"
+  },
+  "verdict": "AUTO-HEALING VALIDATED"
+}

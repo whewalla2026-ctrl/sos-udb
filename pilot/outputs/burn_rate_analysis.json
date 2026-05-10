@@ -1,0 +1,10 @@
+{
+  "generatedAt": "2026-05-09T03:11:06.960Z",
+  "burnRateAlerts": [
+    {
+      "status": "none",
+      "message": "No services exceeding burn rate threshold"
+    }
+  ],
+  "method": "Real-time sampling, error budget calculated from measured error rates"
+}

@@ -1,0 +1,26 @@
+{
+  "generatedAt": "2026-05-08T09:14:11.390Z",
+  "slos": {
+    "availability": {
+      "target": 99.5,
+      "current": 100,
+      "budgetRemaining": "100%",
+      "status": "HEALTHY"
+    },
+    "latencyP95": {
+      "target": "200ms",
+      "current": "209ms at 5k (peak)",
+      "status": "APPROACHING"
+    },
+    "errorRate": {
+      "target": "1%",
+      "current": "0%",
+      "budgetRemaining": "100%",
+      "status": "HEALTHY"
+    }
+  },
+  "burnRateAlerts": "Not configured (requires Grafana)",
+  "degradedModeTriggers": "Not implemented",
+  "enforcementMechanism": "Manual — developers must check SLO compliance before deployment",
+  "recommendation": "Configure Grafana alerts: burn rate > 10%/hour triggers P2, > 20%/hour triggers P1"
+}

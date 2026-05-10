@@ -1,0 +1,76 @@
+{
+  "generatedAt": "2026-05-08T08:44:54.429Z",
+  "model": "Per-user unit economics for SOS-UDB production",
+  "metrics": [
+    {
+      "userScale": 100,
+      "monthlyCost": 441.1,
+      "costPerUser": 4.41,
+      "breakdown": {
+        "infrastructure": 435,
+        "aiHints": 6,
+        "dbStorage": 0.1,
+        "computeScale": 0
+      }
+    },
+    {
+      "userScale": 500,
+      "monthlyCost": 465.5,
+      "costPerUser": 0.93,
+      "breakdown": {
+        "infrastructure": 435,
+        "aiHints": 30,
+        "dbStorage": 0.5,
+        "computeScale": 0
+      }
+    },
+    {
+      "userScale": 1000,
+      "monthlyCost": 496,
+      "costPerUser": 0.5,
+      "breakdown": {
+        "infrastructure": 435,
+        "aiHints": 60,
+        "dbStorage": 1,
+        "computeScale": 0
+      }
+    },
+    {
+      "userScale": 2500,
+      "monthlyCost": 637.5,
+      "costPerUser": 0.26,
+      "breakdown": {
+        "infrastructure": 435,
+        "aiHints": 150,
+        "dbStorage": 2.5,
+        "computeScale": 50
+      }
+    },
+    {
+      "userScale": 5000,
+      "monthlyCost": 840,
+      "costPerUser": 0.17,
+      "breakdown": {
+        "infrastructure": 435,
+        "aiHints": 300,
+        "dbStorage": 5,
+        "computeScale": 100
+      }
+    },
+    {
+      "userScale": 10000,
+      "monthlyCost": 1295,
+      "costPerUser": 0.13,
+      "breakdown": {
+        "infrastructure": 435,
+        "aiHints": 600,
+        "dbStorage": 10,
+        "computeScale": 250
+      }
+    }
+  ],
+  "unitCostAt100": 4.41,
+  "unitCostAt1000": 0.5,
+  "unitCostAt10000": 0.13,
+  "efficiencyGain": "97% reduction from 100 to 10k users"
+}

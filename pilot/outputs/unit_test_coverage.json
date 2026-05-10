@@ -1,0 +1,182 @@
+{
+  "generatedAt": "2026-05-08T10:53:55.811Z",
+  "tests": [
+    {
+      "name": "Gateway health endpoint",
+      "category": "unit",
+      "status": "PASS",
+      "detail": "200, service=api-gateway",
+      "timestamp": "2026-05-08T10:53:55.383Z"
+    },
+    {
+      "name": "User registration",
+      "category": "unit",
+      "status": "PASS",
+      "detail": "201, token=true",
+      "timestamp": "2026-05-08T10:53:55.578Z"
+    },
+    {
+      "name": "Auth validate token",
+      "category": "unit",
+      "status": "PASS",
+      "detail": "200, user data returned",
+      "timestamp": "2026-05-08T10:53:55.581Z"
+    },
+    {
+      "name": "Auth required (no token)",
+      "category": "unit",
+      "status": "PASS",
+      "detail": "401",
+      "timestamp": "2026-05-08T10:53:55.584Z"
+    },
+    {
+      "name": "Auth reject bad token",
+      "category": "unit",
+      "status": "PASS",
+      "detail": "401",
+      "timestamp": "2026-05-08T10:53:55.586Z"
+    }
+  ],
+  "coverage": {
+    "generatedAt": "2026-05-08T10:53:55.810Z",
+    "services": [
+      "gateway",
+      "auth",
+      "planner",
+      "ai",
+      "monitoring"
+    ],
+    "totalTests": 16,
+    "passed": 15,
+    "failed": 0,
+    "skipped": 1,
+    "categories": {
+      "unit": [
+        {
+          "name": "Gateway health endpoint",
+          "category": "unit",
+          "status": "PASS",
+          "detail": "200, service=api-gateway",
+          "timestamp": "2026-05-08T10:53:55.383Z"
+        },
+        {
+          "name": "User registration",
+          "category": "unit",
+          "status": "PASS",
+          "detail": "201, token=true",
+          "timestamp": "2026-05-08T10:53:55.578Z"
+        },
+        {
+          "name": "Auth validate token",
+          "category": "unit",
+          "status": "PASS",
+          "detail": "200, user data returned",
+          "timestamp": "2026-05-08T10:53:55.581Z"
+        },
+        {
+          "name": "Auth required (no token)",
+          "category": "unit",
+          "status": "PASS",
+          "detail": "401",
+          "timestamp": "2026-05-08T10:53:55.584Z"
+        },
+        {
+          "name": "Auth reject bad token",
+          "category": "unit",
+          "status": "PASS",
+          "detail": "401",
+          "timestamp": "2026-05-08T10:53:55.586Z"
+        }
+      ],
+      "integration": [
+        {
+          "name": "Plan generation + DB integration",
+          "category": "integration",
+          "status": "PASS",
+          "detail": "200, 4 activities, cached=false",
+          "timestamp": "2026-05-08T10:53:55.611Z"
+        },
+        {
+          "name": "Plan cache hit (TTL)",
+          "category": "integration",
+          "status": "PASS",
+          "detail": "cached=true",
+          "timestamp": "2026-05-08T10:53:55.617Z"
+        },
+        {
+          "name": "AI hint generation + budget",
+          "category": "integration",
+          "status": "PASS",
+          "detail": "200, cost=0.0004, budget_remaining=0.4996",
+          "timestamp": "2026-05-08T10:53:55.649Z"
+        },
+        {
+          "name": "AI budget enforcement",
+          "category": "integration",
+          "status": "INFO",
+          "detail": "200 — budget may not be exhausted",
+          "timestamp": "2026-05-08T10:53:55.702Z"
+        },
+        {
+          "name": "Monitoring service health",
+          "category": "integration",
+          "status": "PASS",
+          "detail": "200",
+          "timestamp": "2026-05-08T10:53:55.709Z"
+        }
+      ],
+      "e2e": [
+        {
+          "name": "E2E Step 1: Auth",
+          "category": "e2e",
+          "status": "PASS",
+          "detail": "200",
+          "timestamp": "2026-05-08T10:53:55.784Z"
+        },
+        {
+          "name": "E2E Step 2: Plan",
+          "category": "e2e",
+          "status": "PASS",
+          "detail": "200, 4 activities",
+          "timestamp": "2026-05-08T10:53:55.793Z"
+        },
+        {
+          "name": "E2E Step 3: AI hint",
+          "category": "e2e",
+          "status": "PASS",
+          "detail": "200, subject=reading",
+          "timestamp": "2026-05-08T10:53:55.800Z"
+        },
+        {
+          "name": "E2E Step 4: Budget",
+          "category": "e2e",
+          "status": "PASS",
+          "detail": "200, spent=0.0004",
+          "timestamp": "2026-05-08T10:53:55.805Z"
+        },
+        {
+          "name": "E2E Step 5: Monitoring",
+          "category": "e2e",
+          "status": "PASS",
+          "detail": "200",
+          "timestamp": "2026-05-08T10:53:55.809Z"
+        },
+        {
+          "name": "E2E Step 6: Gateway health",
+          "category": "e2e",
+          "status": "PASS",
+          "detail": "200",
+          "timestamp": "2026-05-08T10:53:55.810Z"
+        }
+      ]
+    },
+    "coverageByService": {
+      "gateway": 3,
+      "auth": 4,
+      "planner": 3,
+      "ai": 4,
+      "monitoring": 2
+    },
+    "overallResult": "ALL TESTS PASSED"
+  }
+}

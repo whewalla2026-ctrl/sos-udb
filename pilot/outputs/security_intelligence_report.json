@@ -1,0 +1,43 @@
+{
+  "generatedAt": "2026-05-09T02:49:32.918Z",
+  "suspiciousPatterns": [
+    {
+      "test": "SQL injection attempt",
+      "status": 401,
+      "blocked": true,
+      "score": 10
+    },
+    {
+      "test": "XSS attempt",
+      "status": 400,
+      "blocked": true,
+      "score": 10
+    },
+    {
+      "test": "No auth token on protected route",
+      "status": 401,
+      "blocked": true,
+      "score": 10
+    },
+    {
+      "test": "Auth bypass attempt",
+      "status": 400,
+      "blocked": 10,
+      "score": 10
+    }
+  ],
+  "intelligenceScore": 10,
+  "overallThreatLevel": "low",
+  "authAnomalyDetection": {
+    "brute_force_protection": "10/min/IP rate limit active",
+    "credential_stuffing": "rate limiting + 401 on invalid credentials",
+    "token_replay": "SHA-256 hashed tokens in Redis + rotation",
+    "geo_anomaly": "not implemented (requires IP geolocation)"
+  },
+  "attackPatterns": {
+    "sql_injection": "protected via Prisma parameterized queries",
+    "xss": "protected via Helmet CSP headers",
+    "token_forgery": "protected via HMAC-SHA256",
+    "rate_limiting_bypass": "protected via multi-level rate limit"
+  }
+}

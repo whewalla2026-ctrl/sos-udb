@@ -1,0 +1,17 @@
+{
+    "phase2_burst_login":  {
+                               "p99Ms":  249,
+                               "avgMs":  180.5,
+                               "total":  100,
+                               "failures":  0
+                           },
+    "timestamp":  "2026-05-09T22:45:26.0543344+03:00",
+    "phase1_registration":  {
+                                "avgMs":  160.2,
+                                "total":  10,
+                                "failures":  0
+                            },
+    "phase3_validation":  {
+                              "failures":  0
+                          }
+}

@@ -1,0 +1,40 @@
+{
+  "generatedAt": "2026-05-08T08:41:55.995Z",
+  "scenarios": [
+    {
+      "name": "PostgreSQL connection flood",
+      "recoveryTimeMs": 2138,
+      "recoveryType": "AUTO-RECOVERED",
+      "rto": "2.1s",
+      "rpo": "0 (no data loss)"
+    },
+    {
+      "name": "Redis queue depth stress",
+      "recoveryTimeMs": 3000,
+      "recoveryType": "AUTO-RECOVERED",
+      "rto": "3.0s",
+      "rpo": "0 (no data loss)"
+    },
+    {
+      "name": "Brute-force protection under load",
+      "recoveryTimeMs": "N/A",
+      "recoveryType": "N/A",
+      "rto": "N/A",
+      "rpo": "0 (no data loss)"
+    },
+    {
+      "name": "Payload attack surface",
+      "recoveryTimeMs": "N/A",
+      "recoveryType": "N/A",
+      "rto": "N/A",
+      "rpo": "Unknown"
+    },
+    {
+      "name": "Post-failure recovery verification",
+      "recoveryTimeMs": "N/A",
+      "recoveryType": "N/A",
+      "rto": "N/A",
+      "rpo": "0 (no data loss)"
+    }
+  ]
+}

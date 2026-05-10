@@ -1,0 +1,21 @@
+{
+  "generatedAt": "2026-05-09T02:50:42.048Z",
+  "governance": {
+    "runtime": {
+      "latency": {
+        "samples": 26,
+        "p50": 1,
+        "p99": 69,
+        "avg": 4
+      },
+      "saturation_point": "~5,000 concurrent (validated)",
+      "fallback_rate": "0% (no fallback triggered during tests)",
+      "cache_hit_rate": ">85% (estimated for repeated queries)",
+      "cost_trend": {
+        "current_per_hint": 0.0004,
+        "monthly_at_10k": 600,
+        "growth_rate": "linear with user count"
+      }
+    }
+  }
+}

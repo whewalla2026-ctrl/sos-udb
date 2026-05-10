@@ -1,0 +1,31 @@
+{
+  "generatedAt": "2026-05-08T09:14:11.391Z",
+  "alertRules": [
+    {
+      "name": "HighErrorRate",
+      "condition": "error_rate > 1% for 5m",
+      "severity": "P1",
+      "action": "Page SRE"
+    },
+    {
+      "name": "HighLatency",
+      "condition": "p95_latency > 500ms for 5m",
+      "severity": "P2",
+      "action": "Notify team"
+    },
+    {
+      "name": "DBPoolSaturation",
+      "condition": "db_pool_usage == db_pool_max for 1m",
+      "severity": "P2",
+      "action": "Add pgBouncer"
+    },
+    {
+      "name": "QueueBacklog",
+      "condition": "queue_depth > 500",
+      "severity": "P3",
+      "action": "Investigate worker"
+    }
+  ],
+  "configuredIn": "Not yet implemented — requires Grafana alerting",
+  "recommendation": "Import dashboard_definition.json into Grafana and configure alerts"
+}

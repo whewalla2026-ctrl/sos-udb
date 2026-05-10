@@ -1,0 +1,15 @@
+{
+  "generatedAt": "2026-05-09T02:50:42.053Z",
+  "quality": {
+    "recommendation_effectiveness": {
+      "avg_confidence": 0.85,
+      "response_time": 4,
+      "cost_per_recommendation": 0.0004
+    },
+    "latency_vs_quality": {
+      "current": "good at current load (<100ms p99 at 5k concurrent)",
+      "tradeoff": "caching improves latency at minor quality cost"
+    },
+    "engagement_impact": "Not measured (requires user interaction analytics)"
+  }
+}

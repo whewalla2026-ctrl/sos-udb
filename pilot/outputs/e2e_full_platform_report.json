@@ -1,0 +1,52 @@
+{
+  "generatedAt": "2026-05-08T10:53:55.812Z",
+  "testRun": "e2e-1778237635344",
+  "flow": [
+    "Auth → Plan → AI Hint → Budget → Monitoring → Gateway"
+  ],
+  "testResults": [
+    {
+      "name": "E2E Step 1: Auth",
+      "category": "e2e",
+      "status": "PASS",
+      "detail": "200",
+      "timestamp": "2026-05-08T10:53:55.784Z"
+    },
+    {
+      "name": "E2E Step 2: Plan",
+      "category": "e2e",
+      "status": "PASS",
+      "detail": "200, 4 activities",
+      "timestamp": "2026-05-08T10:53:55.793Z"
+    },
+    {
+      "name": "E2E Step 3: AI hint",
+      "category": "e2e",
+      "status": "PASS",
+      "detail": "200, subject=reading",
+      "timestamp": "2026-05-08T10:53:55.800Z"
+    },
+    {
+      "name": "E2E Step 4: Budget",
+      "category": "e2e",
+      "status": "PASS",
+      "detail": "200, spent=0.0004",
+      "timestamp": "2026-05-08T10:53:55.805Z"
+    },
+    {
+      "name": "E2E Step 5: Monitoring",
+      "category": "e2e",
+      "status": "PASS",
+      "detail": "200",
+      "timestamp": "2026-05-08T10:53:55.809Z"
+    },
+    {
+      "name": "E2E Step 6: Gateway health",
+      "category": "e2e",
+      "status": "PASS",
+      "detail": "200",
+      "timestamp": "2026-05-08T10:53:55.810Z"
+    }
+  ],
+  "fullFlowPassed": true
+}

@@ -1,0 +1,79 @@
+{
+  "generatedAt": "2026-05-09T03:13:13.226Z",
+  "checks": [
+    {
+      "check": "app_directory_exists",
+      "passed": true,
+      "entries": 5
+    },
+    {
+      "check": "dashboard_route_exists",
+      "passed": true
+    },
+    {
+      "check": "dashboard_subpages",
+      "count": 18,
+      "passed": true
+    },
+    {
+      "check": "auth_route_exists",
+      "passed": true
+    },
+    {
+      "check": "auth_subpages",
+      "count": 2,
+      "passed": true
+    },
+    {
+      "check": "total_dashboard_pages",
+      "count": 18,
+      "pages": [
+        "dashboard/academic",
+        "dashboard/bank",
+        "dashboard/biometric",
+        "dashboard/doter",
+        "dashboard/evidence",
+        "dashboard/family",
+        "dashboard/future-self",
+        "dashboard/goals",
+        "dashboard/joon-world",
+        "dashboard/messages",
+        "dashboard/notifications",
+        "dashboard/quests",
+        "dashboard/safety",
+        "dashboard/tutor",
+        "dashboard/ventures",
+        "dashboard/weekly-plan",
+        "auth/login",
+        "auth/register"
+      ],
+      "passed": true
+    },
+    {
+      "check": "dashboard_layout",
+      "passed": true
+    }
+  ],
+  "framework": "Next.js 14.2.3",
+  "auth": "Firebase",
+  "pages": [
+    "dashboard/academic",
+    "dashboard/bank",
+    "dashboard/biometric",
+    "dashboard/doter",
+    "dashboard/evidence",
+    "dashboard/family",
+    "dashboard/future-self",
+    "dashboard/goals",
+    "dashboard/joon-world",
+    "dashboard/messages",
+    "dashboard/notifications",
+    "dashboard/quests",
+    "dashboard/safety",
+    "dashboard/tutor",
+    "dashboard/ventures",
+    "dashboard/weekly-plan",
+    "auth/login",
+    "auth/register"
+  ]
+}

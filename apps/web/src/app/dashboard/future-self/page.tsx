@@ -1,17 +1,10 @@
 'use client';
-import { useState } from 'react';
+import { useLazyQuery } from '@apollo/client';
+import { FUTURE_SELF_NARRATIVE } from '../../../lib/queries';
 
 export default function FutureSelfPage() {
-  const [isGenerating, setIsGenerating] = useState(false);
-  const [narrative, setNarrative] = useState('');
-
-  const generate = () => {
-    setIsGenerating(true);
-    setTimeout(() => {
-      setNarrative("You wake up at 6:30 AM feeling completely rested, a habit you locked in years ago. Checking your portfolio, you see the software agency you started at 19 just cleared its first $100k month — a direct result of those early 'Lemonade Stand' lessons in unit economics. Because you mastered deep work scheduling in high school, you finish your core tasks by noon. You spend the afternoon mentoring young founders, your stress levels practically zero. You built this life one quest at a time.");
-      setIsGenerating(false);
-    }, 2500);
-  };
+  var [getNarrative, { data, loading }] = useLazyQuery(FUTURE_SELF_NARRATIVE, { fetchPolicy: 'network-only' });
+  var narrative = data?.futureSelfNarrative || '';
 
   return (
     <div className="fade-in auth-layout" style={{ minHeight: 'calc(100vh - 64px)', borderRadius: 'var(--radius-lg)' }}>
@@ -25,8 +18,8 @@ export default function FutureSelfPage() {
         </p>
 
         {!narrative ? (
-          <button id="simulate-future-btn" className="btn btn-primary btn-lg" onClick={generate} disabled={isGenerating}>
-            {isGenerating ? (
+          <button id="simulate-future-btn" className="btn btn-primary btn-lg" onClick={() => getNarrative()} disabled={loading}>
+            {loading ? (
               <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                 <span style={{ display: 'inline-block', width: 16, height: 16, border: '2px solid rgba(255,255,255,0.3)', borderTopColor: 'white', borderRadius: '50%', animation: 'spin 1s linear infinite' }} />
                 Simulating Timelines...
@@ -42,7 +35,7 @@ export default function FutureSelfPage() {
               {narrative}
             </p>
             <div style={{ marginTop: 24, borderTop: '1px solid var(--bg-glass-border)', paddingTop: 16, display: 'flex', justifyContent: 'center' }}>
-              <button className="btn btn-secondary" onClick={() => setNarrative('')}>Reset Simulator</button>
+              <button className="btn btn-secondary" onClick={() => getNarrative()}>Regenerate</button>
             </div>
           </div>
         )}

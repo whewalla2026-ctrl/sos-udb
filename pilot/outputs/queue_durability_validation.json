@@ -1,0 +1,31 @@
+{
+  "timestamp": "2026-05-08T12:02:40.384Z",
+  "tests": [
+    {
+      "test": "Enqueue 1000 jobs",
+      "durationMs": 2351,
+      "success": 1000,
+      "errors": 0,
+      "passed": true
+    },
+    {
+      "test": "Queue metrics visible",
+      "hintGeneratedCount": 4012,
+      "passed": true
+    },
+    {
+      "test": "Prometheus queue depth metric",
+      "hasQueueDepth": true,
+      "passed": true
+    },
+    {
+      "test": "Event bus (Redis) healthy",
+      "redisHealthy": true,
+      "passed": true
+    }
+  ],
+  "summary": {
+    "passed": 4,
+    "failed": 0
+  }
+}

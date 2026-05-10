@@ -1,0 +1,44 @@
+{
+  "generatedAt": "2026-05-08T09:14:11.391Z",
+  "saturationPoints": {
+    "dbPool": "20 connections — saturated at 10+ concurrent operations",
+    "healthEndpoint": "2.3s p99 at 5,000 concurrent (expected — proxies all services)",
+    "userEndpoints": "No saturation detected within tested range (5,000 concurrent)"
+  },
+  "recoveryThresholds": {
+    "postgresql": {
+      "rto": "2s",
+      "rpo": "0"
+    },
+    "redis": {
+      "rto": "2s",
+      "rpo": "60s (RDB save interval)"
+    },
+    "queue": {
+      "rto": "<1s",
+      "rpo": "0 (in-flight lost on crash)"
+    },
+    "service": {
+      "rto": "30s (manual)",
+      "rpo": "Full in-memory state loss"
+    }
+  },
+  "failureCascadeConditions": [
+    {
+      "trigger": "DB connection pool exhausted",
+      "effect": "Auth service returns 502",
+      "cascade": "Gateway returns 502 for auth routes"
+    },
+    {
+      "trigger": "Redis down",
+      "effect": "Queue fallback (in-memory)",
+      "cascade": "No queue processing. Event bus silent."
+    },
+    {
+      "trigger": "Gateway crash",
+      "effect": "All endpoints unreachable",
+      "cascade": "Total API outage"
+    }
+  ],
+  "noFailureCascadeDetected": "Service failures are properly isolated (502 → no cascading)"
+}

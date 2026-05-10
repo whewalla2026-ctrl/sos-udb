@@ -1,0 +1,59 @@
+{
+  "timestamp": "2026-05-08T12:11:03.986Z",
+  "testSuite": "C1 - Token Security Validation",
+  "phase": "phase7",
+  "testUser": {
+    "email": "token-test-1778242263911@test.com"
+  },
+  "metrics": {
+    "refreshReplayRejections": 1,
+    "tokenRotationSuccess": 1,
+    "tokenRotationFailures": 0,
+    "expiredTokenAttempts": 1
+  },
+  "results": [
+    {
+      "test": "Login unknown user returns 401",
+      "status": 401,
+      "passed": true
+    },
+    {
+      "test": "Register user obtains tokens",
+      "status": 201,
+      "hasTokens": true,
+      "passed": true
+    },
+    {
+      "test": "Token rotation returns new refresh token",
+      "status": 200,
+      "rotated": true,
+      "passed": true
+    },
+    {
+      "test": "Replay old refresh token rejected",
+      "status": 401,
+      "passed": true
+    },
+    {
+      "test": "Expired refresh token rejected",
+      "status": 401,
+      "passed": true
+    },
+    {
+      "test": "Parallel refresh - at most one succeeds",
+      "successCount": 1,
+      "rejectedCount": 2,
+      "statuses": [
+        200,
+        401,
+        401
+      ],
+      "passed": true
+    }
+  ],
+  "summary": {
+    "total": 6,
+    "passed": 6,
+    "failed": 0
+  }
+}

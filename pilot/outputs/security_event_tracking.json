@@ -1,0 +1,34 @@
+{
+  "generatedAt": "2026-05-08T09:14:11.389Z",
+  "trackedEvents": [
+    {
+      "event": "user.login",
+      "dataCollected": "email, timestamp, ip (via proxy)",
+      "sensitivity": "HIGH"
+    },
+    {
+      "event": "user.register",
+      "dataCollected": "email, role, timestamp",
+      "sensitivity": "HIGH"
+    },
+    {
+      "event": "auth.failure",
+      "dataCollected": "email, reason, ip, timestamp",
+      "sensitivity": "HIGH"
+    },
+    {
+      "event": "rate.limit.hit",
+      "dataCollected": "ip, endpoint, timestamp",
+      "sensitivity": "MEDIUM"
+    },
+    {
+      "event": "budget.threshold",
+      "dataCollected": "userId, spent, budget",
+      "sensitivity": "MEDIUM"
+    }
+  ],
+  "correlationMechanism": "x-correlation-id header propagated across all services",
+  "securityMonitoring": "Prometheus metrics track auth_failures_total, http_requests_total (by status code)",
+  "alerting": "No automated security alerting (requires Grafana)",
+  "recommendation": "Configure Grafana alerts for auth_failure spikes, rate limit events"
+}

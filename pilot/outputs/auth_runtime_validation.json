@@ -1,0 +1,67 @@
+{
+  "service": "auth-service",
+  "timestamp": "2026-05-09T18:15:00Z",
+  "status": "healthy",
+  "container": "udb-auth",
+  "image": "sos-udb-auth-service",
+  "base": "node:20-slim",
+  "prisma_version": "5.22.0",
+  "database": {
+    "host": "pgbouncer",
+    "port": 6432,
+    "db": "udb",
+    "connected": true,
+    "tables_synced": true
+  },
+  "redis": {
+    "url": "redis://redis:6379",
+    "connected": true
+  },
+  "auth_flows": {
+    "register": {
+      "status": "PASS",
+      "endpoint": "POST /auth/register",
+      "response": "201 with userId, token, refreshToken, role: CHILD"
+    },
+    "login": {
+      "status": "PASS",
+      "endpoint": "POST /auth/login",
+      "response": "200 with token, refreshToken, role"
+    },
+    "refresh_token_rotation": {
+      "status": "PASS",
+      "endpoint": "POST /auth/refresh",
+      "response": "200 with new token pair, old token invalidated"
+    },
+    "forgot_password": {
+      "status": "PASS",
+      "endpoint": "POST /auth/forgot-password",
+      "response": "200 with message (email enumeration prevented)"
+    },
+    "reset_password": {
+      "status": "PASS",
+      "endpoint": "POST /auth/reset-password",
+      "response": "200, password changed, refresh tokens revoked: 6"
+    },
+    "change_password": {
+      "status": "PASS",
+      "endpoint": "POST /auth/change-password",
+      "response": "200, password changed, old password rejected, new password works"
+    },
+    "token_validation": {
+      "status": "PASS",
+      "endpoint": "POST /auth/validate",
+      "response": "200 with valid:true"
+    },
+    "password_security": {
+      "old_password_after_change": "rejected with 401 Invalid credentials",
+      "new_password_after_change": "accepted with 200 and token"
+    }
+  },
+  "rbac": {
+    "default_role": "CHILD",
+    "mass_assignment_protection": true,
+    "role_enforcement": "Valid"
+  },
+  "certification": "PASS — 100% auth healthy"
+}

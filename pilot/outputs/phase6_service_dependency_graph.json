@@ -1,0 +1,62 @@
+{
+  "generatedAt": "2026-05-08T10:53:53.908Z",
+  "graph": [
+    {
+      "service": "gateway",
+      "dependsOn": [
+        "auth",
+        "planner",
+        "ai",
+        "monitoring",
+        "redis"
+      ],
+      "allDepsAlive": true
+    },
+    {
+      "service": "auth",
+      "dependsOn": [
+        "postgresql",
+        "redis"
+      ],
+      "allDepsAlive": true
+    },
+    {
+      "service": "planner",
+      "dependsOn": [
+        "redis"
+      ],
+      "allDepsAlive": true
+    },
+    {
+      "service": "ai",
+      "dependsOn": [
+        "redis",
+        "postgresql"
+      ],
+      "allDepsAlive": true
+    },
+    {
+      "service": "monitoring",
+      "dependsOn": [
+        "redis",
+        "postgresql"
+      ],
+      "allDepsAlive": true
+    }
+  ],
+  "startupOrder": [
+    "postgresql",
+    "redis",
+    "auth",
+    "planner",
+    "ai",
+    "monitoring",
+    "gateway"
+  ],
+  "parallelStartup": [
+    "planner",
+    "ai",
+    "monitoring"
+  ],
+  "criticalPath": "postgresql → auth → gateway"
+}

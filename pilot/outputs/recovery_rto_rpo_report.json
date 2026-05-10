@@ -1,0 +1,37 @@
+{
+  "generatedAt": "2026-05-08T09:52:32.785Z",
+  "services": {
+    "gateway": {
+      "rto": "1.5s",
+      "rpo": "None (stateless proxy)"
+    },
+    "auth": {
+      "rto": "1.5s",
+      "rpo": "None (stateless, DB-backed)"
+    },
+    "planner": {
+      "rto": "1s",
+      "rpo": "Full in-memory cache loss (plans Map)"
+    },
+    "ai": {
+      "rto": "1s",
+      "rpo": "Full in-memory budget loss (userSpend Map)"
+    },
+    "monitoring": {
+      "rto": "1s",
+      "rpo": "None (DB-backed)"
+    }
+  },
+  "infrastructure": {
+    "postgresql": {
+      "rto": "2s (if process running)",
+      "rpo": "0 (WAL)"
+    },
+    "redis": {
+      "rto": "2s (RDB reload)",
+      "rpo": "Up to 60s (RDB interval) / ~1s (with AOF)"
+    }
+  },
+  "totalSystemRto": "~6s (sequential startup)",
+  "totalSystemRpo": "Full in-memory state loss. DB-backed data preserved."
+}

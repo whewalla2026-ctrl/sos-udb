@@ -1,0 +1,33 @@
+{
+  "generatedAt": "2026-05-08T09:56:30.940Z",
+  "tiers": [
+    {
+      "users": 10000,
+      "compute": "10 instances (2/service)",
+      "db": "50 GB + pgBouncer",
+      "redis": "2 GB (single)",
+      "monthly": 1295
+    },
+    {
+      "users": 50000,
+      "compute": "15 instances (3/service)",
+      "db": "200 GB + read replicas",
+      "redis": "8 GB (cluster)",
+      "monthly": 4500
+    },
+    {
+      "users": 100000,
+      "compute": "25 instances (5/service)",
+      "db": "500 GB + sharding",
+      "redis": "16 GB (cluster)",
+      "monthly": 12000
+    }
+  ],
+  "growthMultiplier": {
+    "compute": "2.5x",
+    "db": "10x",
+    "redis": "8x",
+    "cost": "9.3x"
+  },
+  "recommendation": "Invest in Redis 7 + pgBouncer early — they unblock the 10k–50k growth range at minimal cost."
+}

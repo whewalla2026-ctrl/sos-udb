@@ -1,0 +1,8 @@
+{
+  "timestamp": "2026-05-08T20:41:11.677Z",
+  "summary": "CLEANUP GOVERNANCE VALIDATED",
+  "automaticCleanups": 8,
+  "manualCleanupsRequired": 0,
+  "coverage": "ALL runtime resources have automatic TTL or capped-size cleanup",
+  "recommendation": "For PostgreSQL, add age-based partitioning on audit_logs and points_ledger at >100M rows"
+}

@@ -1,0 +1,164 @@
+{
+  "timestamp": "2026-05-09T02:27:48.336Z",
+  "total": 31,
+  "passed": 10,
+  "failed": 21,
+  "results": [
+    {
+      "name": "auth/register returns 201",
+      "pass": false,
+      "detail": "status=429"
+    },
+    {
+      "name": "auth/register returns userId",
+      "pass": false,
+      "detail": "userId=undefined"
+    },
+    {
+      "name": "auth/register returns token",
+      "pass": false,
+      "detail": "has token"
+    },
+    {
+      "name": "auth/register returns refreshToken",
+      "pass": false,
+      "detail": "has refresh"
+    },
+    {
+      "name": "auth/validate returns valid",
+      "pass": false,
+      "detail": "status=400"
+    },
+    {
+      "name": "auth/login returns 200",
+      "pass": false,
+      "detail": "status=429"
+    },
+    {
+      "name": "auth/login returns token",
+      "pass": false,
+      "detail": "has token"
+    },
+    {
+      "name": "auth/refresh returns 200",
+      "pass": false,
+      "detail": "status=400"
+    },
+    {
+      "name": "auth/health proxied returns 200",
+      "pass": true,
+      "detail": "status=200"
+    },
+    {
+      "name": "planning/generate returns 200/201",
+      "pass": false,
+      "detail": "status=401"
+    },
+    {
+      "name": "planning/generate returns plan",
+      "pass": false,
+      "detail": "planId=undefined"
+    },
+    {
+      "name": "planning/:userId returns 200",
+      "pass": false,
+      "detail": "status=401"
+    },
+    {
+      "name": "planner/health proxied returns 200",
+      "pass": true,
+      "detail": "status=200"
+    },
+    {
+      "name": "ai-lite/hint returns 200",
+      "pass": false,
+      "detail": "status=401"
+    },
+    {
+      "name": "ai-lite/hint returns hint text",
+      "pass": false,
+      "detail": "hint=undefined"
+    },
+    {
+      "name": "ai-lite/budget returns 200",
+      "pass": false,
+      "detail": "status=401"
+    },
+    {
+      "name": "ai/health proxied returns 200",
+      "pass": true,
+      "detail": "status=200"
+    },
+    {
+      "name": "monitoring/health returns 200",
+      "pass": true,
+      "detail": "status=200"
+    },
+    {
+      "name": "monitoring/health has status field",
+      "pass": true,
+      "detail": "status=healthy"
+    },
+    {
+      "name": "monitoring/signals returns 200",
+      "pass": false,
+      "detail": "status=401"
+    },
+    {
+      "name": "monitoring/alerts create returns 201",
+      "pass": false,
+      "detail": "status=401"
+    },
+    {
+      "name": "register rejects short password",
+      "pass": false,
+      "detail": "status=429"
+    },
+    {
+      "name": "register rejects empty body",
+      "pass": false,
+      "detail": "status=429"
+    },
+    {
+      "name": "refresh rejects invalid token",
+      "pass": true,
+      "detail": "status=401"
+    },
+    {
+      "name": "planner rejects empty generate",
+      "pass": false,
+      "detail": "status=401"
+    },
+    {
+      "name": "AI rejects empty hint",
+      "pass": false,
+      "detail": "status=401"
+    },
+    {
+      "name": "alerts rejects invalid severity",
+      "pass": false,
+      "detail": "status=401"
+    },
+    {
+      "name": "gateway rejects malformed JSON",
+      "pass": true,
+      "detail": "status=400"
+    },
+    {
+      "name": "gateway rejects missing auth",
+      "pass": true,
+      "detail": "status=401"
+    },
+    {
+      "name": "gateway accepts custom correlation ID",
+      "pass": true,
+      "detail": "status=200"
+    },
+    {
+      "name": "gateway proxy timeout configured",
+      "pass": true,
+      "detail": "10s timeout on proxy()"
+    }
+  ],
+  "summary": "SOME CONTRACTS FAILING"
+}

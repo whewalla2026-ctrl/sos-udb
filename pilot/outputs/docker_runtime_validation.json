@@ -1,44 +1,27 @@
-{
-  "validationDate": "2026-05-08T05:05:46.594Z",
-  "checks": [
-    {
-      "check": "dockerfile_gateway",
-      "pass": true
-    },
-    {
-      "check": "dockerfile_auth-service",
-      "pass": true
-    },
-    {
-      "check": "dockerfile_planner-service",
-      "pass": true
-    },
-    {
-      "check": "dockerfile_ai-service",
-      "pass": true
-    },
-    {
-      "check": "dockerfile_monitoring-service",
-      "pass": true
-    },
-    {
-      "check": "docker_compose",
-      "pass": true
-    },
-    {
-      "check": "compose_config_valid",
-      "pass": true
-    },
-    {
-      "check": "health_endpoints",
-      "pass": true,
-      "endpoints": 5
-    },
-    {
-      "check": "startup_order",
-      "pass": true
-    }
-  ],
-  "allPassed": true,
-  "note": "Dockerfiles and compose config validated. Run docker compose up to deploy."
+﻿{
+    "docker_engine":  "29.4.1",
+    "timestamp":  "2026-05-09T18:14:45.0523775+03:00",
+    "build_success":  true,
+    "hyperv_present":  true,
+    "wsl_status":  [
+                       " \u0000 \u0000N\u0000A\u0000M\u0000E\u0000 \u0000 \u0000 \u0000 \u0000 \u0000 \u0000 \u0000 \u0000 \u0000 \u0000 \u0000 \u0000 \u0000 \u0000S\u0000T\u0000A\u0000T\u0000E\u0000 \u0000 \u0000 \u0000 \u0000 \u0000 \u0000 \u0000 \u0000 \u0000 \u0000 \u0000V\u0000E\u0000R\u0000S\u0000I\u0000O\u0000N\u0000",
+                       "\u0000",
+                       "\u0000*\u0000 \u0000U\u0000b\u0000u\u0000n\u0000t\u0000u\u0000 \u0000 \u0000 \u0000 \u0000 \u0000 \u0000 \u0000 \u0000 \u0000 \u0000 \u0000 \u0000R\u0000u\u0000n\u0000n\u0000i\u0000n\u0000g\u0000 \u0000 \u0000 \u0000 \u0000 \u0000 \u0000 \u0000 \u0000 \u00002\u0000",
+                       "\u0000",
+                       "\u0000 \u0000 \u0000d\u0000o\u0000c\u0000k\u0000e\u0000r\u0000-\u0000d\u0000e\u0000s\u0000k\u0000t\u0000o\u0000p\u0000 \u0000 \u0000 \u0000 \u0000R\u0000u\u0000n\u0000n\u0000i\u0000n\u0000g\u0000 \u0000 \u0000 \u0000 \u0000 \u0000 \u0000 \u0000 \u0000 \u00002\u0000",
+                       "\u0000",
+                       "\u0000"
+                   ],
+    "images":  [
+                   "sos-udb-gateway:latest",
+                   "sos-udb-ai-service:latest",
+                   "sos-udb-auth-service:latest",
+                   "sos-udb-planner-service:latest",
+                   "sos-udb-monitoring-service:latest",
+                   "ai-company-os-frontend:latest",
+                   "ai-company-os-backend:latest",
+                   "postgres:16",
+                   "qdrant/qdrant:latest",
+                   "langfuse/langfuse:latest"
+               ]
 }

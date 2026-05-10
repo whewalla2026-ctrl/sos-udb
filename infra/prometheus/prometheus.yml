@@ -1,0 +1,35 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+scrape_configs:
+  - job_name: 'udb-gateway'
+    static_configs:
+      - targets: ['gateway:3000']
+        labels:
+          service: 'api-gateway'
+  - job_name: 'udb-auth'
+    static_configs:
+      - targets: ['auth-service:3001']
+        labels:
+          service: 'auth-service'
+  - job_name: 'udb-planner'
+    static_configs:
+      - targets: ['planner-service:3002']
+        labels:
+          service: 'planner-service'
+  - job_name: 'udb-ai'
+    static_configs:
+      - targets: ['ai-service:3003']
+        labels:
+          service: 'ai-service'
+  - job_name: 'udb-monitoring'
+    static_configs:
+      - targets: ['monitoring-service:3004']
+        labels:
+          service: 'monitoring-service'
+  - job_name: 'udb-nestjs'
+    static_configs:
+      - targets: ['nestjs-graphql:4000']
+        labels:
+          service: 'nestjs-graphql'

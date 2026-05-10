@@ -1,0 +1,40 @@
+{
+  "generatedAt": "2026-05-08T08:37:13.714Z",
+  "maxTested": 100,
+  "totalOperations": 1100,
+  "totalErrors": 559,
+  "levels": [
+    {
+      "concurrency": 10,
+      "operations": 100,
+      "success": 95,
+      "errors": 5,
+      "duration_ms": 1151,
+      "clientsUsed": 10
+    },
+    {
+      "concurrency": 20,
+      "operations": 200,
+      "success": 97,
+      "errors": 103,
+      "duration_ms": 4240,
+      "clientsUsed": 20
+    },
+    {
+      "concurrency": 50,
+      "operations": 300,
+      "success": 149,
+      "errors": 151,
+      "duration_ms": 5203,
+      "clientsUsed": 20
+    },
+    {
+      "concurrency": 100,
+      "operations": 500,
+      "success": 200,
+      "errors": 300,
+      "duration_ms": 5375,
+      "clientsUsed": 20
+    }
+  ]
+}

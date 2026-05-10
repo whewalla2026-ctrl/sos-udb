@@ -1,0 +1,40 @@
+{
+  "generatedAt": "2026-05-09T03:34:25.499Z",
+  "dimensions": {
+    "selfHealing": {
+      "score": 100,
+      "max": 100
+    },
+    "alertGovernance": {
+      "score": 50,
+      "max": 100,
+      "note": "Alertmanager not deployed — manual correlation"
+    },
+    "errorBudget": {
+      "score": 0,
+      "max": 100
+    },
+    "incidentResponse": {
+      "score": 60,
+      "max": 100,
+      "note": "Manual escalation — no pager integration"
+    },
+    "automation": {
+      "score": 70,
+      "max": 100,
+      "note": "Circuit breakers automated, rest manual"
+    }
+  },
+  "overallSreScore": 56,
+  "classification": "OPERATIONAL — manual intervention needed for some scenarios",
+  "criticalGaps": [
+    "Centralized alerting",
+    "Automated rollback",
+    "Pager integration"
+  ],
+  "nextMilestones": [
+    "Deploy Alertmanager",
+    "Implement auto-rollback",
+    "Integrate PagerDuty/Opsgenie"
+  ]
+}

@@ -1,0 +1,178 @@
+{
+  "generatedAt": "2026-05-09T02:48:13.520Z",
+  "serviceLatencySamples": [
+    {
+      "service": "gateway",
+      "port": 3000,
+      "samples": 50,
+      "stats": {
+        "min": 1,
+        "p50": 1,
+        "p95": 3,
+        "p99": 37,
+        "max": 37,
+        "avg": 2
+      }
+    },
+    {
+      "service": "auth",
+      "port": 3001,
+      "samples": 50,
+      "stats": {
+        "min": 1,
+        "p50": 2,
+        "p95": 5,
+        "p99": 6,
+        "max": 6,
+        "avg": 3
+      }
+    },
+    {
+      "service": "planner",
+      "port": 3002,
+      "samples": 50,
+      "stats": {
+        "min": 1,
+        "p50": 2,
+        "p95": 6,
+        "p99": 8,
+        "max": 8,
+        "avg": 3
+      }
+    },
+    {
+      "service": "ai",
+      "port": 3003,
+      "samples": 50,
+      "stats": {
+        "min": 1,
+        "p50": 2,
+        "p95": 5,
+        "p99": 5,
+        "max": 5,
+        "avg": 2
+      }
+    },
+    {
+      "service": "monitoring",
+      "port": 3004,
+      "samples": 50,
+      "stats": {
+        "min": 1,
+        "p50": 2,
+        "p95": 5,
+        "p99": 6,
+        "max": 6,
+        "avg": 2
+      }
+    }
+  ],
+  "anomalies": [
+    {
+      "status": "no_anomalies",
+      "message": "All services within baseline thresholds"
+    }
+  ],
+  "trendAnalysis": [
+    {
+      "service": "gateway",
+      "first_avg": 1,
+      "second_avg": 1,
+      "trend": "stable"
+    },
+    {
+      "service": "auth",
+      "first_avg": 3,
+      "second_avg": 2,
+      "trend": "decreasing"
+    },
+    {
+      "service": "planner",
+      "first_avg": 2,
+      "second_avg": 2,
+      "trend": "stable"
+    },
+    {
+      "service": "ai",
+      "first_avg": 3,
+      "second_avg": 3,
+      "trend": "stable"
+    },
+    {
+      "service": "monitoring",
+      "first_avg": 2,
+      "second_avg": 3,
+      "trend": "increasing"
+    }
+  ],
+  "saturationForecast": [
+    {
+      "service": "gateway",
+      "current_p99": 2,
+      "saturation_risk": "low",
+      "estimated_capacity_multiplier": "5x+"
+    },
+    {
+      "service": "auth",
+      "current_p99": 6,
+      "saturation_risk": "low",
+      "estimated_capacity_multiplier": "5x+"
+    },
+    {
+      "service": "planner",
+      "current_p99": 7,
+      "saturation_risk": "low",
+      "estimated_capacity_multiplier": "5x+"
+    },
+    {
+      "service": "ai",
+      "current_p99": 5,
+      "saturation_risk": "low",
+      "estimated_capacity_multiplier": "5x+"
+    },
+    {
+      "service": "monitoring",
+      "current_p99": 6,
+      "saturation_risk": "low",
+      "estimated_capacity_multiplier": "5x+"
+    }
+  ],
+  "memoryAnalysis": [
+    {
+      "service": "gateway",
+      "current_memory_mb": 86,
+      "growth_trend": "stable",
+      "risk": "low"
+    },
+    {
+      "service": "auth",
+      "current_memory_mb": 55,
+      "growth_trend": "stable",
+      "risk": "low"
+    },
+    {
+      "service": "planner",
+      "current_memory_mb": 50,
+      "growth_trend": "stable",
+      "risk": "low"
+    },
+    {
+      "service": "ai",
+      "current_memory_mb": 49,
+      "growth_trend": "stable",
+      "risk": "low"
+    },
+    {
+      "service": "monitoring",
+      "current_memory_mb": 46,
+      "growth_trend": "stable",
+      "risk": "low"
+    }
+  ],
+  "summary": {
+    "totalServices": 5,
+    "servicesWithAnomalies": 0,
+    "saturationRisks": 0,
+    "overallHealth": "healthy"
+  }
+}

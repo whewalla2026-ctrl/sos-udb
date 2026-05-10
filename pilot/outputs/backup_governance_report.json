@@ -1,0 +1,38 @@
+{
+  "generatedAt": "2026-05-09T03:16:48.812Z",
+  "backupTests": [
+    {
+      "test": "schema_backup",
+      "passed": true,
+      "file": "D:\\SOS-UDB\\pilot\\outputs\\udb_schema_maturity_1778296608306.sql",
+      "size": "41123 bytes",
+      "type": "pg_dump --schema-only"
+    },
+    {
+      "test": "backup_contains_tables",
+      "passed": true,
+      "tablesInBackup": 25
+    },
+    {
+      "test": "backup_history",
+      "passed": true,
+      "backupCount": 2
+    },
+    {
+      "test": "restore_procedure_documented",
+      "passed": true,
+      "note": "Restore: pg_restore -U udb -d udb latest_dump"
+    },
+    {
+      "test": "encryption",
+      "passed": false,
+      "note": "pg_dump does not encrypt by default. Recommend pg_dump --encrypt or GPG post-processing for production."
+    }
+  ],
+  "schedule": {
+    "recommended": "nightly at 02:00 UTC",
+    "type": "full + WAL archiving",
+    "retention": "30 days"
+  },
+  "summary": "BACKUP ISSUES FOUND"
+}

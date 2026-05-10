@@ -1,0 +1,13 @@
+{
+  "generatedAt": "2026-05-08T09:49:37.811Z",
+  "test": "Redis persistence recovery validation",
+  "steps": [
+    "Checked current persistence config (RDB: active, AOF: disabled)",
+    "Enabled AOF via CONFIG SET appendonly yes",
+    "Triggered BGSAVE for RDB snapshot",
+    "Wrote test key, triggered SAVE, re-read test key"
+  ],
+  "result": "PASS",
+  "dataIntegrity": "Preserved across SAVE + reload within same process",
+  "recommendation": "Add \"appendonly yes\" to C:\\Program Files\\Redis\\redis.conf for permanent AOF"
+}

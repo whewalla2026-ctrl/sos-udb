@@ -1,0 +1,17 @@
+{
+  "generatedAt": "2026-05-09T02:48:13.576Z",
+  "safety": {
+    "service_startup_order": "postgres → redis → auth → planner → ai → monitoring → gateway",
+    "startup_timeout": "30s per service",
+    "health_check_required": true,
+    "rollback_capability": "documented 6-step procedure",
+    "safety_score": 8.5,
+    "max_score": 10,
+    "risk_factors": [
+      "manual restart required",
+      "no zero-downtime deployment",
+      "no K8s auto-heal"
+    ]
+  },
+  "scoring_method": "Based on startup ordering, health checks, rollback capability, and risk factors"
+}

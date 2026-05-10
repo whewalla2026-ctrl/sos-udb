@@ -1,0 +1,49 @@
+{
+  "report": "Security Risk Register",
+  "timestamp": "2026-05-09T08:45:00Z",
+  "risks": [
+    {
+      "id": "RISK-001",
+      "severity": "LOW",
+      "title": "Rate limit bypass via IP spoofing",
+      "likelihood": "LOW",
+      "impact": "HIGH",
+      "detail": "X-Forwarded-For header spoofing can bypass brute force protection. Requires attacker to be on same network or control proxy.",
+      "mitigation": "Use req.connection.remoteAddress for rate limiting",
+      "status": "ACCEPTED"
+    },
+    {
+      "id": "RISK-002",
+      "severity": "LOW",
+      "title": "GraphQL stack traces in development",
+      "likelihood": "LOW",
+      "impact": "LOW",
+      "detail": "NestJS returns stack traces in error responses when NODE_ENV is not 'production'",
+      "mitigation": "Set NODE_ENV=production in production deployment",
+      "status": "MITIGATED_BY_CONFIG"
+    },
+    {
+      "id": "RISK-003",
+      "severity": "LOW",
+      "title": "JWT tokens stored in Redis without encryption",
+      "likelihood": "LOW",
+      "impact": "MEDIUM",
+      "detail": "Refresh token hashes stored in Redis. If Redis is compromised, tokens could be used.",
+      "mitigation": "Redis should be on isolated network with AUTH",
+      "status": "ACCEPTED"
+    },
+    {
+      "id": "RISK-004",
+      "severity": "LOW",
+      "title": "No request size limits on GraphQL endpoint",
+      "likelihood": "LOW",
+      "impact": "MEDIUM",
+      "detail": "GraphQL endpoint may accept large queries without depth limiting",
+      "mitigation": "Add GraphQL query depth and cost limiting",
+      "status": "ACCEPTED"
+    }
+  ],
+  "residual_risk_score": "LOW",
+  "critical_risks_remaining": 0,
+  "high_risks_remaining": 0
+}

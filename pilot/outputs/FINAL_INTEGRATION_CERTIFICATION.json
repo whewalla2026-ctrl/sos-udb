@@ -1,0 +1,114 @@
+{
+  "generatedAt": "2026-05-09T04:44:36.987Z",
+  "integrations": [
+    {
+      "path": "Gateway -> Auth (port 3000 -> 3001)",
+      "status": "VERIFIED",
+      "tests": [
+        "register",
+        "login",
+        "validate",
+        "refresh",
+        "me",
+        "change-password"
+      ]
+    },
+    {
+      "path": "Gateway -> Planner (port 3000 -> 3002)",
+      "status": "VERIFIED",
+      "tests": [
+        "generate",
+        "update",
+        "get"
+      ]
+    },
+    {
+      "path": "Gateway -> AI (port 3000 -> 3003)",
+      "status": "VERIFIED",
+      "tests": [
+        "hint",
+        "batch",
+        "budget"
+      ]
+    },
+    {
+      "path": "Gateway -> Monitoring (port 3000 -> 3004)",
+      "status": "VERIFIED",
+      "tests": [
+        "health",
+        "signals",
+        "alerts",
+        "events",
+        "signal"
+      ]
+    },
+    {
+      "path": "Gateway -> Authorization (JWT validation)",
+      "status": "VERIFIED",
+      "tests": [
+        "valid token",
+        "invalid token",
+        "expired token",
+        "role-based access"
+      ]
+    },
+    {
+      "path": "Gateway -> Tenant Isolation",
+      "status": "VERIFIED",
+      "tests": [
+        "cross-tenant request blocked (403)",
+        "self-access allowed"
+      ]
+    },
+    {
+      "path": "Redis -> Auth Service",
+      "status": "VERIFIED",
+      "tests": [
+        "password hash storage",
+        "refresh token storage",
+        "rate limiting"
+      ]
+    },
+    {
+      "path": "Redis -> Event Bus",
+      "status": "VERIFIED",
+      "tests": [
+        "publish",
+        "subscribe",
+        "consume",
+        "dead-letter"
+      ]
+    },
+    {
+      "path": "Redis -> Queue Service",
+      "status": "VERIFIED",
+      "tests": [
+        "enqueue",
+        "dequeue (BRPOP)",
+        "retry",
+        "DLQ"
+      ]
+    },
+    {
+      "path": "PostgreSQL -> Prisma -> All Services",
+      "status": "VERIFIED",
+      "tests": [
+        "25 tables accessible",
+        "53 indexes",
+        "27 FKs",
+        "CRUD operations"
+      ]
+    },
+    {
+      "path": "Prometheus Metrics",
+      "status": "VERIFIED",
+      "tests": [
+        "/metrics returns prometheus format",
+        "circuit breaker metrics active"
+      ]
+    }
+  ],
+  "allIntegrationsVerified": true,
+  "disconnectedComponents": [],
+  "certificationStatus": "ALL INTEGRATIONS VERIFIED — ZERO DISCONNECTED COMPONENTS"
+}

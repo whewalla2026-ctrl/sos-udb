@@ -1,0 +1,6 @@
+{
+  "timestamp": "2026-05-08T12:06:01.089Z",
+  "mechanism": "SIGTERM -> server.close() -> drain active requests -> quit Redis -> 10s force exit",
+  "gatewayProxyDrain": "server.close() stops accepting new connections, existing ones complete",
+  "allServicesUpdated": true
+}

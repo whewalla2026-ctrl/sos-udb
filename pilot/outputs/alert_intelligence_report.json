@@ -1,0 +1,27 @@
+{
+  "generatedAt": "2026-05-09T02:51:15.833Z",
+  "intelligence": {
+    "deduplication": {
+      "strategy": "group by service + error type",
+      "window": "5min cooldown",
+      "implemented": false
+    },
+    "suppressionWindows": {
+      "maintenance": "scheduled",
+      "known_issues": "manual",
+      "implemented": false
+    },
+    "burnRateAlerts": {
+      "slo_target": "99.5%",
+      "burn_rate_window": "1hr",
+      "alert_at": ">2% error rate",
+      "implemented": false
+    },
+    "escalationIntelligence": {
+      "p0_escalation": "<5min to on-call",
+      "p1_escalation": "<15min to team lead",
+      "p2_escalation": "<1hr to team",
+      "auto_remediation": "circuit breaker automatically reduces load on failing services"
+    }
+  }
+}

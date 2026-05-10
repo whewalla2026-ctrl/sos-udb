@@ -1,0 +1,30 @@
+{
+  "generatedAt": "2026-05-09T02:51:15.831Z",
+  "saturation": [
+    {
+      "service": "gateway",
+      "estimatedCapacity": ">2x",
+      "risk": "low"
+    },
+    {
+      "service": "auth",
+      "estimatedCapacity": ">2x",
+      "risk": "low"
+    },
+    {
+      "service": "planner",
+      "estimatedCapacity": ">2x",
+      "risk": "low"
+    },
+    {
+      "service": "ai",
+      "estimatedCapacity": ">2x",
+      "risk": "low"
+    },
+    {
+      "service": "monitoring",
+      "estimatedCapacity": ">5x",
+      "risk": "low"
+    }
+  ]
+}

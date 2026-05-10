@@ -1,0 +1,155 @@
+{
+  "generatedAt": "2026-05-08T05:49:02.687Z",
+  "systemStatus": {
+    "gateway": {
+      "healthy": false,
+      "statusCode": 404
+    },
+    "auth": {
+      "healthy": false,
+      "statusCode": 404
+    },
+    "planner": {
+      "healthy": false,
+      "statusCode": 404
+    },
+    "ai": {
+      "healthy": false,
+      "statusCode": 404
+    },
+    "monitoring": {
+      "healthy": false,
+      "statusCode": 404
+    }
+  },
+  "allServicesHealthy": false,
+  "overallScore": 6,
+  "overallPercent": 60,
+  "classification": "⚠️ LIMITED PRODUCTION READY",
+  "dimensions": [
+    {
+      "name": "Performance",
+      "weight": 15,
+      "score": 7,
+      "maxScore": 10,
+      "evidence": "p99=126ms at 300 concurrent, max throughput 3,571 req/s at 10 users",
+      "gaps": [
+        "Latency degrades linearly with concurrency",
+        "No connection pooling for DB"
+      ]
+    },
+    {
+      "name": "Reliability",
+      "weight": 15,
+      "score": 6,
+      "maxScore": 10,
+      "evidence": "0 error rate across all load tests. Graceful fallback for Redis. Event bus DLQ operational.",
+      "gaps": [
+        "No auto-healing (no K8s)",
+        "No health-check-based auto-restart",
+        "Manual recovery from failure"
+      ]
+    },
+    {
+      "name": "Scalability",
+      "weight": 20,
+      "score": 5,
+      "maxScore": 10,
+      "evidence": "Tested to 300 concurrent users with no errors. Throughput flat at ~2,300 req/s above 50 users.",
+      "gaps": [
+        "No pgBouncer — Prisma pool limited to 20 connections",
+        "No horizontal scaling mechanism",
+        "Redis 3.0 limits queue throughput"
+      ]
+    },
+    {
+      "name": "Security",
+      "weight": 15,
+      "score": 7,
+      "maxScore": 10,
+      "evidence": "JWT HMAC-SHA256, scrypt hashing, RBAC, Helmet headers, CORS, brute-force protection. 13/13 tests pass.",
+      "gaps": [
+        "No secrets manager (env vars)",
+        "No network policy/isolation",
+        "No audit for all admin operations"
+      ]
+    },
+    {
+      "name": "Observability",
+      "weight": 15,
+      "score": 6,
+      "maxScore": 10,
+      "evidence": "15 signals, Prometheus /metrics, structured logging, audit ring buffer, health matrix.",
+      "gaps": [
+        "No Prometheus retention",
+        "No Grafana",
+        "No tracing",
+        "No log aggregation"
+      ]
+    },
+    {
+      "name": "Operability",
+      "weight": 10,
+      "score": 4,
+      "maxScore": 10,
+      "evidence": "CI/CD pipelines configured, Docker ready, backup scripts available.",
+      "gaps": [
+        "Manual deployment process",
+        "No blue-green or canary deploy",
+        "No runbooks",
+        "Windows-dependent scripting"
+      ]
+    },
+    {
+      "name": "Cost Efficiency",
+      "weight": 10,
+      "score": 7,
+      "maxScore": 10,
+      "evidence": "Cost model built from real metrics. AI budget cap ($0.50/user/mo) prevents runaway costs.",
+      "gaps": [
+        "AI hints dominate cost at scale",
+        "No auto-scaling for cost optimization"
+      ]
+    }
+  ],
+  "weightedScore": 60,
+  "maxWeightedScore": 100,
+  "recommendations": [
+    {
+      "priority": "P0",
+      "action": "Deploy pgBouncer for DB connection pooling",
+      "effort": "1 day",
+      "impact": "Eliminates primary bottleneck"
+    },
+    {
+      "priority": "P0",
+      "action": "Add Prometheus/Grafana for metric retention",
+      "effort": "2 days",
+      "impact": "Enables production observability"
+    },
+    {
+      "priority": "P1",
+      "action": "Upgrade Redis to 5.0+ for Streams",
+      "effort": "2 hours",
+      "impact": "Enables event-driven queues"
+    },
+    {
+      "priority": "P1",
+      "action": "Add auto-scaling (docker compose scale or K8s)",
+      "effort": "3 days",
+      "impact": "Enables horizontal scaling"
+    },
+    {
+      "priority": "P2",
+      "action": "Implement OpenTelemetry tracing",
+      "effort": "3 days",
+      "impact": "End-to-end visibility"
+    },
+    {
+      "priority": "P2",
+      "action": "Add blue-green deployment strategy",
+      "effort": "2 days",
+      "impact": "Zero-downtime deploys"
+    }
+  ]
+}

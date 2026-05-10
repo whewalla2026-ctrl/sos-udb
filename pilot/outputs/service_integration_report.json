@@ -1,0 +1,44 @@
+{
+  "generatedAt": "2026-05-09T04:02:21.765Z",
+  "tests": [
+    {
+      "test": "Gateway->Auth registration",
+      "status": "PASS",
+      "detail": "201 created"
+    },
+    {
+      "test": "Gateway->Planner generate",
+      "status": "PASS",
+      "detail": "200 OK"
+    },
+    {
+      "test": "Gateway->AI hint",
+      "status": "PASS",
+      "detail": "200 with hint"
+    },
+    {
+      "test": "Gateway->Monitoring signals",
+      "status": "PASS",
+      "detail": "200 OK"
+    },
+    {
+      "test": "Event bus accessible",
+      "status": "PASS",
+      "detail": "{\"user_created\":{\"count\":63,\"dlq\":4},\"user_logged_in\":{\"count\":51,\"dlq\":0},\"planner_created\":{\"count"
+    },
+    {
+      "test": "Queue/circuit-breaker system",
+      "status": "PASS",
+      "detail": "All CLOSED"
+    },
+    {
+      "test": "Correlation ID via /gateway/health",
+      "status": "PASS",
+      "detail": "200 OK"
+    }
+  ],
+  "summary": {
+    "total": 8,
+    "passed": 8
+  }
+}

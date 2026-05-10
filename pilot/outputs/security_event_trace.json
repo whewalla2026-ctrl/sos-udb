@@ -1,0 +1,40 @@
+{
+  "timestamp": "2026-05-08T12:00:24.064Z",
+  "auditedEvents": [
+    {
+      "event": "ALERT_CREATED",
+      "action": "alert_created",
+      "timestamp": "2026-05-08T11:51:30.877Z",
+      "userId": "anonymous"
+    },
+    {
+      "event": "ALERT_CREATED",
+      "action": "alert_created",
+      "timestamp": "2026-05-08T11:51:30.889Z",
+      "userId": "anonymous"
+    },
+    {
+      "event": "ALERT_CREATED",
+      "action": "alert_created",
+      "timestamp": "2026-05-08T11:53:09.963Z",
+      "userId": "anonymous"
+    },
+    {
+      "event": "ALERT_CREATED",
+      "action": "alert_created",
+      "timestamp": "2026-05-08T11:53:09.970Z",
+      "userId": "anonymous"
+    },
+    {
+      "event": "ALERT_CREATED",
+      "action": "alert_created",
+      "timestamp": "2026-05-08T12:00:24.058Z",
+      "userId": "anonymous"
+    }
+  ],
+  "eventTypes": [
+    "ALERT_CREATED"
+  ],
+  "totalEntries": 5,
+  "integrityCheck": "FAIL"
+}

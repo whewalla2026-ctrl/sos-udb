@@ -1,0 +1,48 @@
+{
+  "generatedAt": "2026-05-08T08:38:23.195Z",
+  "systemState": "Production Pilot",
+  "slos": {
+    "availability": {
+      "slo": {
+        "target": 99.5,
+        "window": "30d",
+        "measurement": "http_requests_total",
+        "goodCondition": "status < 500"
+      },
+      "totalRequests": 15000,
+      "allowedErrors": 75,
+      "actualErrors": 0,
+      "budgetRemaining": 75,
+      "burnRate": "0.0000%",
+      "estimatedHoursToBudgetDepletion": "Never",
+      "status": "HEALTHY"
+    },
+    "latency_p95": {
+      "slo": {
+        "target": 200,
+        "unit": "ms",
+        "window": "30d",
+        "measurement": "request_duration_seconds"
+      },
+      "measuredP95": 593,
+      "withinSLO": false,
+      "status": "BREACHED",
+      "margin": "-393ms"
+    },
+    "error_rate": {
+      "slo": {
+        "target": 1,
+        "unit": "%",
+        "window": "30d",
+        "measurement": "http_requests_total",
+        "goodCondition": "status < 500"
+      },
+      "measuredErrorRate": "0.0000%",
+      "withinSLO": true,
+      "status": "HEALTHY",
+      "margin": "1.0000%"
+    }
+  },
+  "overallCompliance": "NON-COMPLIANT",
+  "errorBudgetStatus": "HEALTHY"
+}

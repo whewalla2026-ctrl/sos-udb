@@ -12,16 +12,23 @@ export class EscrowService {
     private prisma: PrismaService,
     private configService: ConfigService
   ) {
-    this.stripe = new Stripe(this.configService.get<string>('STRIPE_SECRET_KEY') || 'sk_test_mock', {
+    var stripeKey = this.configService.get<string>('STRIPE_SECRET_KEY');
+    if (!stripeKey || stripeKey === 'sk_test_mock') {
+      this.logger.warn('STRIPE_SECRET_KEY not set. Escrow operations will fail.');
+    }
+    this.stripe = new Stripe(stripeKey || 'sk_test_placeholder', {
       apiVersion: '2024-04-10' as any,
     });
   }
 
   async createEscrow(ventureId: string, sellerId: string, buyerEmail: string, amountUsd: number) {
-    this.logger.log(`💰 Creating escrow for venture ${ventureId}, amount $${amountUsd}`);
-    
-    // Create Stripe PaymentIntent
-    const paymentIntent = await this.stripe.paymentIntents.create({
+    this.logger.log('Creating escrow for venture ' + ventureId + ', amount $' + amountUsd);
+
+    if (!this.configService.get<string>('STRIPE_SECRET_KEY') || this.configService.get<string>('STRIPE_SECRET_KEY') === 'sk_test_mock') {
+      throw new Error('Stripe not configured. Set STRIPE_SECRET_KEY environment variable.');
+    }
+
+    var paymentIntent = await this.stripe.paymentIntents.create({
       amount: Math.round(amountUsd * 100),
       currency: 'usd',
       payment_method_types: ['card'],

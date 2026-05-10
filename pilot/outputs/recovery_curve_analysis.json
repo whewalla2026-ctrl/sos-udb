@@ -1,0 +1,73 @@
+{
+  "timestamp": "2026-05-08T12:04:47.135Z",
+  "target": "http://127.0.0.1:3000/gateway/health",
+  "saturationThreshold": {
+    "concurrentUsers": null,
+    "rpsAtSaturation": null,
+    "errorRateAtSaturation": null,
+    "p95AtSaturation": null
+  },
+  "recoveryCurve": null,
+  "rampSummary": [
+    {
+      "concurrentUsers": 10,
+      "rps": 1826.6693322670933,
+      "errorRate": 0,
+      "p95Latency": 10
+    },
+    {
+      "concurrentUsers": 20,
+      "rps": 2146.8119128522885,
+      "errorRate": 0,
+      "p95Latency": 15
+    },
+    {
+      "concurrentUsers": 30,
+      "rps": 2351.9128958146043,
+      "errorRate": 0,
+      "p95Latency": 19
+    },
+    {
+      "concurrentUsers": 40,
+      "rps": 2197.06498951782,
+      "errorRate": 0,
+      "p95Latency": 27
+    },
+    {
+      "concurrentUsers": 50,
+      "rps": 2010.7816711590297,
+      "errorRate": 0,
+      "p95Latency": 38
+    },
+    {
+      "concurrentUsers": 60,
+      "rps": 2282.6217079010376,
+      "errorRate": 0,
+      "p95Latency": 37
+    },
+    {
+      "concurrentUsers": 70,
+      "rps": 2196.9681858980753,
+      "errorRate": 0,
+      "p95Latency": 42
+    },
+    {
+      "concurrentUsers": 80,
+      "rps": 2176.9629334396172,
+      "errorRate": 0,
+      "p95Latency": 50
+    },
+    {
+      "concurrentUsers": 90,
+      "rps": 2226.8698336819043,
+      "errorRate": 0,
+      "p95Latency": 52
+    },
+    {
+      "concurrentUsers": 100,
+      "rps": 2235.3643966547193,
+      "errorRate": 0,
+      "p95Latency": 64
+    }
+  ]
+}

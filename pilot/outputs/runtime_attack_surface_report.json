@@ -1,0 +1,125 @@
+{
+  "timestamp": "2026-05-09T02:27:42.204Z",
+  "summary": "ALL ATTACK SURFACE TESTS PASSED",
+  "total": 21,
+  "passed": 21,
+  "failed": 0,
+  "results": [
+    {
+      "name": "brute force rate limit returns 429",
+      "pass": true,
+      "detail": "429 seen: true"
+    },
+    {
+      "name": "tampered JWT rejected",
+      "pass": true,
+      "detail": "status=401"
+    },
+    {
+      "name": "forged JWT signature rejected",
+      "pass": true,
+      "detail": "status=401"
+    },
+    {
+      "name": "large payload handled gracefully",
+      "pass": true,
+      "detail": "status=429"
+    },
+    {
+      "name": "object-type injection rejected",
+      "pass": true,
+      "detail": "status=400"
+    },
+    {
+      "name": "Redis connections bounded",
+      "pass": true,
+      "detail": "maxRetriesPerRequest: 3"
+    },
+    {
+      "name": "Redis retryStrategy capped",
+      "pass": true,
+      "detail": "null after 3 failures"
+    },
+    {
+      "name": "Redis lazyConnect prevents crash",
+      "pass": true,
+      "detail": "lazyConnect: true in all services"
+    },
+    {
+      "name": "Queue payload size bounded",
+      "pass": true,
+      "detail": "Express json limit: 50-100kb"
+    },
+    {
+      "name": "Queue DLQ isolates poison messages",
+      "pass": true,
+      "detail": "dlq: prefix with 1000 cap"
+    },
+    {
+      "name": "Queue retries bounded",
+      "pass": true,
+      "detail": "maxAttempts: 3 default"
+    },
+    {
+      "name": "refresh token replay rejected",
+      "pass": true,
+      "detail": "status=401"
+    },
+    {
+      "name": "refresh token rotates (first works)",
+      "pass": true,
+      "detail": "status=200"
+    },
+    {
+      "name": "auth rate limit: 30/min",
+      "pass": true,
+      "detail": "configured in auth-service"
+    },
+    {
+      "name": "gateway global: 200/min",
+      "pass": true,
+      "detail": "configured in gateway"
+    },
+    {
+      "name": "gateway API: 100/min",
+      "pass": true,
+      "detail": "configured in gateway"
+    },
+    {
+      "name": "brute force: 10/min per IP",
+      "pass": true,
+      "detail": "configured in gateway bruteForceProtect"
+    },
+    {
+      "name": "null email rejected",
+      "pass": true,
+      "detail": "400+"
+    },
+    {
+      "name": "null password rejected",
+      "pass": true,
+      "detail": "400+"
+    },
+    {
+      "name": "invalid email format rejected",
+      "pass": true,
+      "detail": "400+"
+    },
+    {
+      "name": "short password rejected",
+      "pass": true,
+      "detail": "400+"
+    }
+  ],
+  "attackSurfaceCoverage": {
+    "bruteForce": "Protected — IP-based rate limit at gateway + 30/min auth endpoint",
+    "jwtTampering": "Protected — HMAC-SHA256 signature verification",
+    "payloadFlooding": "Protected — Express body limit 50-100kb",
+    "injectionAttacks": "Protected — Type validation on all inputs",
+    "redisAbuse": "Protected — Bounded retries + lazyConnect",
+    "queuePoisoning": "Protected — DLQ isolation + bounded retries",
+    "replayAttacks": "Protected — Refresh token SHA-256 rotation",
+    "rateLimiting": "Protected — 3-tier: IP → Global → API rate limits",
+    "inputValidation": "Protected — Type + format + length checks"
+  }
+}

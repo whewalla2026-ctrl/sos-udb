@@ -1,0 +1,14 @@
+{
+  "generatedAt": "2026-05-09T02:49:32.918Z",
+  "patterns": {
+    "sql_injection": "protected via Prisma parameterized queries",
+    "xss": "protected via Helmet CSP headers",
+    "token_forgery": "protected via HMAC-SHA256",
+    "rate_limiting_bypass": "protected via multi-level rate limit"
+  },
+  "coverage": "8/10 attack vectors protected",
+  "gaps": [
+    "Token rotation not fully implemented",
+    "No geo-anomaly detection"
+  ]
+}

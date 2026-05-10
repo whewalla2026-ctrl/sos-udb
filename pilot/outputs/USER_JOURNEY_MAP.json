@@ -1,0 +1,257 @@
+{
+  "version": "1.0.0",
+  "roles": ["CHILD", "PARENT", "ADMIN"],
+  "journeys": {
+    "new_user_signup": {
+      "id": "new_user_signup",
+      "name": "New User Signup & Onboarding",
+      "roles": ["PARENT", "CHILD"],
+      "steps": [
+        { "order": 1, "page": "/", "action": "Visit landing page", "description": "User sees hero section, 4 pillars (Academic, Biometric, Gamification, Entrepreneurship), and CTA buttons. Stats bar shows '110+ Use Cases, 6-23 Ages, 4 AI Pillars, ∞ Growth'." },
+        { "order": 2, "page": "/auth/register", "action": "Click 'Get Started'", "description": "Role selection screen: Parent/Guardian or Student (13+). Three-step wizard begins: Account info (name, email, password), Family setup with COPPA consent, and launch confirmation." },
+        { "order": 3, "page": "/auth/register", "action": "Enter account details", "description": "User provides displayName, email, password (min 12 chars, mixed case). Form validates email format and password strength client-side before proceeding." },
+        { "order": 4, "page": "/auth/register", "action": "Family setup with COPPA", "description": "Parent enters child name, DOB, selects consent method (Credit Card $0.01 hold or Government ID upload). COPPA banner explains consent requirement for under-13." },
+        { "order": 5, "page": "/auth/register", "action": "Review & confirm", "description": "Summary screen shows account details, child info, consent method. Doter egg preview appears: 'Meet [Child]'s Doter!'. User clicks 'Launch UDB!'" },
+        { "order": 6, "page": "/auth/register", "action": "Account created", "description": "POST /auth/register or Firebase token exchange. AuthService in services/api/src/auth/auth.service.ts upserts UserMaster/UserRel records. DoterProfile created for child role." },
+        { "order": 7, "page": "/dashboard", "action": "First dashboard visit", "description": "JWT stored, redirect to /dashboard. User role detected: child sees ChildDashboard, parent sees ParentDashboard (apps/web/src/app/dashboard/page.tsx:49-53)." },
+        { "order": 8, "page": "/dashboard/doter", "action": "Doter naming ceremony", "description": "If Doter name is default/empty, prompt user to name their Doter via nameMyDoter mutation. See services/api/src/schema.gql:89 and doter.service.ts." },
+        { "order": 9, "page": "/dashboard/quests", "action": "First quest assigned", "description": "System auto-assigns onboarding quest: 'Complete Your Profile' or 'Take the Baseline Assessment'. Quests page shows first quest card with XP/coin rewards." },
+        { "order": 10, "page": "/dashboard/settings", "action": "Complete profile", "description": "User prompted to fill missing fields (timezone, avatarUrl, accessibilitySettings). Profile completion % shown in sidebar." }
+      ]
+    },
+    "child_dashboard": {
+      "id": "child_dashboard",
+      "name": "Child Dashboard — Daily Hub",
+      "roles": ["CHILD"],
+      "steps": [
+        { "order": 1, "page": "/dashboard", "action": "View daily snapshot", "description": "Time-based greeting ('Good morning/afternoon/evening'), Doter card (avatar, name, state, level, XP bar), stats grid (sleep, focus, stress, steps) from apps/web/src/components/ChildDashboard.tsx:8-73." },
+        { "order": 2, "page": "/dashboard", "action": "Check active quests", "description": "Active quests panel shows in-progress quests with pillar tags, XP/coin rewards, and progress bars. Click 'View all' to go to full quest list." },
+        { "order": 3, "page": "/dashboard", "action": "Review goal progress", "description": "Goal progress cards show mastery percentage, critical skill gap alerts (e.g., 'Fractions 22%'). Color-coded by pillar." },
+        { "order": 4, "page": "/dashboard", "action": "View notifications", "description": "Recent notifications panel lists unread alerts with blue dot indicator. Sidebar badge shows unread count from Sidebar.tsx:82-84." },
+        { "order": 5, "page": "/dashboard", "action": "Use quick actions", "description": "6 quick action buttons: Ask AI Tutor, Plan My Week, New Quest, Log Evidence, Log Health, Future Self. Each links to corresponding dashboard route." },
+        { "order": 6, "page": "/dashboard/doter", "action": "Interact with Doter", "description": "Full Doter profile page: evolution state (EGG → BABY → TEEN → ADULT → LEGEND), stat modifiers (energetic/sluggy), coin balance, level history." },
+        { "order": 7, "page": "/dashboard/notifications", "action": "Manage notifications", "description": "Full notification list with mark-as-read, clear-all actions. Notifications for quest completion, level up, messages, safety alerts." }
+      ]
+    },
+    "parent_dashboard": {
+      "id": "parent_dashboard",
+      "name": "Parent Dashboard — Family Oversight",
+      "roles": ["PARENT"],
+      "steps": [
+        { "order": 1, "page": "/dashboard", "action": "View family overview", "description": "ParentDashboard component (apps/web/src/components/ParentDashboard.tsx) shows all linked children with summary cards (name, Doter level, safety score, active quests)." },
+        { "order": 2, "page": "/dashboard/family", "action": "Manage family hub", "description": "Family Hub page shows linked parents/children. Can invite additional family members via email. Pending approvals listed." },
+        { "order": 3, "page": "/dashboard/safety", "action": "Review safety dashboard", "description": "Safety Score (0-100) per child, message screening reports, flagged content alerts. AI-scan summary of all child communications." },
+        { "order": 4, "page": "/dashboard/messages", "action": "View family messages", "description": "In-app messaging system. Parent can message children directly. All messages AI-scanned for safety threshold (score < 70 triggers alert)." },
+        { "order": 5, "page": "/dashboard/evidence", "action": "Review evidence gallery", "description": "Child-uploaded quest evidence (photos, videos). Parent can review, approve, or request resubmission. COPPA-compliant storage." },
+        { "order": 6, "page": "/dashboard/settings", "action": "Manage settings", "description": "Profile settings, notification preferences, subscription management (plan view/upgrade link to Stripe Checkout), child account controls." },
+        { "order": 7, "page": "/dashboard/bank", "action": "Review family finances", "description": "View child venture escrow accounts, approve/release funds, transaction history via myLedger query. Stripe Connect escrow for student ventures." }
+      ]
+    },
+    "admin_console": {
+      "id": "admin_console",
+      "name": "Admin Console — Platform Management",
+      "roles": ["ADMIN"],
+      "steps": [
+        { "order": 1, "page": "/dashboard/admin", "action": "Access admin console", "description": "Admin-only route protected by RolesGuard (services/api/src/auth/guards/roles.guard.ts). Shows platform-wide metrics: total users, active tenants, revenue, system health." },
+        { "order": 2, "page": "/dashboard/admin", "action": "View tenant management", "description": "List of all tenants/families with status, plan tier, usage metrics. Search, filter, sort by plan type, creation date, activity." },
+        { "order": 3, "page": "/dashboard/admin", "action": "Audit log viewer", "description": "Immutable audit chain viewer. Query auditLog with limit parameter. Tamper-evident hash chain displayed per entry. See AuditLog model in prisma/schema.prisma:68-76." },
+        { "order": 4, "page": "/dashboard/admin", "action": "Platform billing dashboard", "description": "Revenue reports, MRR/ARR calculations, churn analysis, pending invoices. Plan change interface to override tenant subscription." },
+        { "order": 5, "page": "/dashboard/admin", "action": "Content moderation", "description": "Flagged messages, evidence review queue, AI tutor conversation audit. Safety score trends per user/tenant." },
+        { "order": 6, "page": "/dashboard/admin", "action": "System health monitoring", "description": "Redis cluster status, PostgreSQL connection pool, queue backpressure, AI service latency. Integration with prom-client metrics at services/api/src/shared/metrics.controller.ts." },
+        { "order": 7, "page": "/dashboard/admin", "action": "Feature flags & config", "description": "Toggle feature flags per tenant or globally. Environment configuration management. Scheduled maintenance announcements." }
+      ]
+    },
+    "quest_completion": {
+      "id": "quest_completion",
+      "name": "Quest Lifecycle — Accept to Complete",
+      "roles": ["CHILD"],
+      "steps": [
+        { "order": 1, "page": "/dashboard/quests", "action": "Browse available quests", "description": "Quest list filtered by pillar (Academic, Biometric, Gamification, Entrepreneurship). Each quest shows title, description, XP/coin rewards, estimated duration, and prerequisites." },
+        { "order": 2, "page": "/dashboard/quests", "action": "Accept a quest", "description": "Click quest card to view details, then 'Accept Quest'. Quest status changes to IN_PROGRESS. API mutation updates Task model with userId, title, status='IN_PROGRESS'." },
+        { "order": 3, "page": "/dashboard/quests", "action": "Work through quest steps", "description": "Quest detail page shows step-by-step instructions. May include sub-tasks with individual progress tracking. Each step completed updates progress percentage." },
+        { "order": 4, "page": "/dashboard/evidence", "action": "Submit evidence", "description": "For evidence-based quests, child uploads photo/video via addEvidence mutation (schema.gql:77). Evidence stored with type, URL, questId linkage." },
+        { "order": 5, "page": "/dashboard/quests", "action": "Mark quest complete", "description": "Child clicks 'Complete Quest'. If evidence required, parent must approve first. XP and coins awarded via addDoterXP mutation (schema.gql:76)." },
+        { "order": 6, "page": "/dashboard/doter", "action": "See Doter evolution", "description": "XP gain may trigger level-up. Doter evolves at thresholds: Egg→Baby (1000 XP), Baby→Teen (5000 XP), Teen→Adult (15000 XP), Adult→Legend (50000 XP). Visual transition with animation." },
+        { "order": 7, "page": "/dashboard/achievements", "action": "Unlock achievements", "description": "Quest completion may trigger achievement unlock. Achievements page shows recently earned badges, milestone progress, and rarity tiers." }
+      ]
+    },
+    "goal_tracking": {
+      "id": "goal_tracking",
+      "name": "Goal Management — Set to Mastery",
+      "roles": ["CHILD", "PARENT"],
+      "steps": [
+        { "order": 1, "page": "/dashboard/goals", "action": "View current goals", "description": "Goal list shows all active goals with pillar color coding, target/current weight, and mastery percentage. Critical skill gaps highlighted with warning badges." },
+        { "order": 2, "page": "/dashboard/goals", "action": "Create new goal", "description": "User clicks 'New Goal', opens form with title, pillar selection (ACADEMIC, BIOMETRIC, GAMIFICATION, ENTREPRENEURSHIP), target value, and optional due date. Calls createGoal mutation." },
+        { "order": 3, "page": "/dashboard/goals", "action": "Track goal progress", "description": "Progress tracked via goalProgress query. Manual updates or automatic sync from quest completions, biometric logs, and academic assessments." },
+        { "order": 4, "page": "/dashboard/dashboard", "action": "See goal on home", "description": "Dashboard goal progress panel reflects latest data. Parent dashboard shows aggregated goal progress across all children." },
+        { "order": 5, "page": "/dashboard/goals", "action": "Goal completion", "description": "When currentWeight >= targetWeight, goal marked COMPLETED. XP and coins awarded. New goal auto-suggested based on skill gap analysis from AI Tutor sessions." }
+      ]
+    },
+    "billing_subscription": {
+      "id": "billing_subscription",
+      "name": "Subscription & Billing Management",
+      "roles": ["PARENT", "ADMIN"],
+      "steps": [
+        { "order": 1, "page": "/dashboard/settings", "action": "Navigate to billing", "description": "Settings page has 'Subscription' section showing current plan (Free/Pro/Enterprise), usage bars for AI hints, storage, and requests. Quota warning if nearing limits." },
+        { "order": 2, "page": "/dashboard/settings", "action": "View plan comparison", "description": "Plan comparison table shows Free ($0), Pro ($29/mo), Enterprise ($299/mo). Feature matrix with checkmarks for each tier including AI hints/day, storage, family members, biometric history." },
+        { "order": 3, "page": "/dashboard/settings", "action": "Initiate upgrade", "description": "User clicks 'Upgrade to Pro'. Backend creates Stripe Checkout Session (via Stripe SDK ^15.5.0). Session includes price ID, customer email, success/cancel URLs." },
+        { "order": 4, "page": "checkout.stripe.com", "action": "Complete Stripe payment", "description": "User redirected to Stripe hosted checkout page. Enters payment details. On success, Stripe redirects to success URL with session_id." },
+        { "order": 5, "page": "/api/stripe/webhook", "action": "Stripe webhook processed", "description": "checkout.session.completed webhook received. Stripe module updates tenant plan in Redis (tenant:{id}:plan). Usage counters reset via keys usage:{tenantId}:* pattern DEL." },
+        { "order": 6, "page": "/dashboard/settings", "action": "Return to dashboard", "description": "Success page shows 'You're now on Pro!' confirmation. Usage bars reflect new limits. Pro-only features (expanded marketplace, AI tutor sessions, biometric history) become accessible." },
+        { "order": 7, "page": "/dashboard/settings", "action": "Manage subscription", "description": "Settings now show 'Manage Subscription' button linking to Stripe Customer Portal for plan changes, payment method updates, and cancellation." }
+      ]
+    },
+    "profile_settings": {
+      "id": "profile_settings",
+      "name": "Profile & Settings Management",
+      "roles": ["CHILD", "PARENT", "ADMIN"],
+      "steps": [
+        { "order": 1, "page": "/dashboard/settings", "action": "View profile settings", "description": "Settings page shows user profile card: displayName, avatarUrl, email (read-only), timezone, createdAt date. editProfile section with inline editable fields." },
+        { "order": 2, "page": "/dashboard/settings", "action": "Update display info", "description": "User updates displayName or avatarUrl via updateProfile mutation (schema.gql:93). Avatar upload processed, stored, URL returned. Changes reflected immediately in sidebar." },
+        { "order": 3, "page": "/dashboard/settings", "action": "Configure accessibility", "description": "Accessibility settings toggles: dyslexiaMode (font), highContrast, text-to-speech, fontSize selector (small/medium/large). Stored in user.accessibilitySettings JSON field." },
+        { "order": 4, "page": "/dashboard/settings", "action": "Manage notifications", "description": "Notification preference toggles per category: quest reminders, weekly plan prompts, safety alerts, marketing. Changes saved to user preferences." },
+        { "order": 5, "page": "/dashboard/settings", "action": "View account security", "description": "Password change option, recent login history, connected accounts. Firebase auth integration for Google SSO linking." }
+      ]
+    },
+    "password_reset": {
+      "id": "password_reset",
+      "name": "Password Reset Flow",
+      "roles": ["CHILD", "PARENT", "ADMIN"],
+      "steps": [
+        { "order": 1, "page": "/auth/login", "action": "Click 'Forgot password?'", "description": "On login page, user clicks forgot password link. Redirected to /auth/forgot-password." },
+        { "order": 2, "page": "/auth/forgot-password", "action": "Enter email", "description": "User enters registered email address. Form validates email format. Submit triggers password reset request via Firebase Admin SDK or custom email service." },
+        { "order": 3, "page": "/auth/forgot-password", "action": "Confirmation screen", "description": "Success message displayed: 'If an account exists, a reset link has been sent'. No email enumeration — same message for found/not-found emails (security best practice)." },
+        { "order": 4, "page": "email", "action": "Check email for reset link", "description": "User receives password reset email with time-limited link (1 hour expiry). Link contains secure token." },
+        { "order": 5, "page": "/auth/reset-password", "action": "Set new password", "description": "User clicks link → /auth/reset-password?token=xxx. New password form with strength requirements (min 12 chars, mixed case, symbols). Confirm password field." },
+        { "order": 6, "page": "/auth/login", "action": "Redirect to login", "description": "Password reset successful. User redirected to /auth/login with success toast. New password accepted on next login attempt." }
+      ]
+    },
+    "weekly_planning": {
+      "id": "weekly_planning",
+      "name": "Weekly Planning Ritual",
+      "roles": ["CHILD"],
+      "steps": [
+        { "order": 1, "page": "/dashboard/weekly-plan", "action": "Initiate weekly plan", "description": "User navigates to weekly plan page. If no plan exists for current week, 'Generate Weekly Plan' CTA appears. Sunday AI ritual described." },
+        { "order": 2, "page": "/dashboard/weekly-plan", "action": "Generate AI plan", "description": "Click 'Generate' calls generateWeeklyPlan mutation (schema.gql:83). AI considers skill gaps, calendar events, past performance, biometric data from UUP sync engine." },
+        { "order": 3, "page": "/dashboard/weekly-plan", "action": "Review & customize", "description": "Generated plan shows 7-day view with assigned quests, study blocks, physical activity, and free time. User can drag-reorder, add custom activities, or regenerate." },
+        { "order": 4, "page": "/dashboard/calendar", "action": "View in calendar", "description": "Weekly plan synced to calendar view. Color-coded by pillar. myCalendar query (schema.gql:111) with from/to date range." },
+        { "order": 5, "page": "/dashboard/weekly-plan", "action": "Track weekly progress", "description": "Throughout the week, plan marks tasks as completed. Progress bar shows % of weekly plan achieved. End-of-week summary compares planned vs actual." }
+      ]
+    },
+    "ai_tutoring": {
+      "id": "ai_tutoring",
+      "name": "AI Tutor Session",
+      "roles": ["CHILD"],
+      "steps": [
+        { "order": 1, "page": "/dashboard/tutor", "action": "Start tutoring session", "description": "User selects subject (Math, Science, ELA, Social Studies). Click 'Start Session' calls startTutoringSession mutation (schema.gql:92). Session context initialized with student's skill gaps." },
+        { "order": 2, "page": "/dashboard/tutor", "action": "Ask a question", "description": "User types question or uploads problem image. askTutor mutation (schema.gql:78) sends input + sessionId + subject to AI service." },
+        { "order": 3, "page": "/dashboard/tutor", "action": "Receive Socratic response", "description": "AI responds with scaffolding questions (never direct answers). SocraticResponse type returns intent + response fields. AI hint counter tracked via billing quota." },
+        { "order": 4, "page": "/dashboard/tutor", "action": "Continue dialogue", "description": "Multi-turn conversation maintained within session. Session history preserved for review. Skill gap analysis updated after each session." },
+        { "order": 5, "page": "/dashboard/tutor", "action": "End session", "description": "User ends session. Summary generated: topics covered, time spent, estimated skill gap improvement. Data synced to UUP." }
+      ]
+    },
+    "biometric_logging": {
+      "id": "biometric_logging",
+      "name": "Biometric Health Logging",
+      "roles": ["CHILD"],
+      "steps": [
+        { "order": 1, "page": "/dashboard/biometric", "action": "Navigate to health page", "description": "Health dashboard shows today's metrics: sleep, HRV, stress, focus. Historical charts (7-day for Free, 90-day for Pro, unlimited for Enterprise)." },
+        { "order": 2, "page": "/dashboard/biometric", "action": "Log biometric data", "description": "User clicks 'Log Today' opens form. Fields: sleep hours, stress level (1-10), focus rating. Alternatively, data can auto-sync from wearable via API." },
+        { "order": 3, "page": "/dashboard/biometric", "action": "Submit biometric log", "description": "logBiometric mutation (schema.gql:85) stores data in BiometricLog model. UUP sync triggered — biometric data affects Doter state (sleep deficit → sluggy modifier)." },
+        { "order": 4, "page": "/dashboard/biometric", "action": "View insights", "description": "AI-generated coaching insights from coachingInsight query. Focus peak analysis (focusPeak query) identifies optimal study times based on chronotype." },
+        { "order": 5, "page": "/dashboard/doter", "action": "See Doter impact", "description": "Doter reflects biometric data: good sleep → energetic modifier, poor sleep → sluggy modifier. Visual indicators on Doter card." }
+      ]
+    },
+    "marketplace_venture": {
+      "id": "marketplace_venture",
+      "name": "Marketplace & Venture Creation",
+      "roles": ["CHILD", "PARENT"],
+      "steps": [
+        { "order": 1, "page": "/dashboard/marketplace", "action": "Browse marketplace", "description": "Marketplace shows items for purchase with in-app coins. Categories: avatar accessories, Doter cosmetics, power-ups, learning tools. marketplaceItems query returns items with cost, category, icon." },
+        { "order": 2, "page": "/dashboard/marketplace", "action": "Purchase an item", "description": "User clicks 'Buy' on item. myBalance query checked for sufficient coins. LedgerEntry created with transactionType='PURCHASE', status='COMPLETED'. Item applied to user/Doter." },
+        { "order": 3, "page": "/dashboard/ventures", "action": "Create a venture", "description": "User clicks 'New Venture'. Form: venture name, problem statement, solution, target market, pricing model. createVenture mutation (schema.gql:81)." },
+        { "order": 4, "page": "/dashboard/ventures", "action": "Generate business plan", "description": "generateBusinessPlan mutation (schema.gql:82) uses AI to create executive summary, validation notes, and feasibility assessment based on BusinessPlanInput." },
+        { "order": 5, "page": "/dashboard/bank", "action": "Manage escrow", "description": "If venture involves real money, parent-supervised Stripe Connect escrow account created. releaseFunds mutation (schema.gql:90) releases escrow to student wallet." },
+        { "order": 6, "page": "/dashboard/bank", "action": "View ledger", "description": "myLedger query (schema.gql:116) shows paginated transaction history: purchases, coin earnings, escrow movements, XP rewards." }
+      ]
+    },
+    "future_self_simulation": {
+      "id": "future_self_simulation",
+      "name": "Future Self Simulation",
+      "roles": ["CHILD"],
+      "steps": [
+        { "order": 1, "page": "/dashboard/future-self", "action": "Access future self", "description": "Future Self page shows narrative story 'A Day in the Life at Age 30' generated by Monte Carlo + Gemini simulation based on current habits and data." },
+        { "order": 2, "page": "/dashboard/future-self", "action": "Read current narrative", "description": "Full narrative displayed with scenario branches. Shows projected outcomes: career path, health metrics, financial status, relationships based on current trajectory." },
+        { "order": 3, "page": "/dashboard/future-self", "action": "Explore 'what-if' scenarios", "description": "User adjusts parameters (study more, sleep better, save coins) to see alternative futures. Simulation recalculates and shows visual comparison." },
+        { "order": 4, "page": "/dashboard/goals", "action": "Set goals from insights", "description": "Future self insights can be converted into actionable goals. 'Create Goal from Simulation' button populates goal form with AI-suggested targets." }
+      ]
+    },
+    "messaging_safety": {
+      "id": "messaging_safety",
+      "name": "Messaging & Safety Center",
+      "roles": ["CHILD", "PARENT"],
+      "steps": [
+        { "order": 1, "page": "/dashboard/messages", "action": "View conversations", "description": "Inbox with conversation threads. Each thread shows last message, timestamp, unread count. sendMessage mutation (schema.gql:91) with receiverId and content." },
+        { "order": 2, "page": "/dashboard/messages", "action": "Send a message", "description": "User selects conversation or starts new one. Message content AI-scanned in real-time. Safety Score computed — if below 70, parent alerted." },
+        { "order": 3, "page": "/dashboard/safety", "action": "Parent reviews safety", "description": "Safety dashboard: per-child safety score gauge, flagged messages list, recent alerts. mySafetyScore query returns AI-scan results." },
+        { "order": 4, "page": "/dashboard/safety", "action": "Configure safety settings", "description": "Parent sets safety thresholds, content filters, message monitoring level. Alert preferences for when safety score drops below threshold." }
+      ]
+    },
+    "academic_management": {
+      "id": "academic_management",
+      "name": "Academic Management & LMS Sync",
+      "roles": ["CHILD", "PARENT"],
+      "steps": [
+        { "order": 1, "page": "/dashboard/academic", "action": "View academic dashboard", "description": "Shows LMS sync status, RIT scores (math, reading), skill gap analysis by subject. Weekly workload prediction based on upcoming assignments." },
+        { "order": 2, "page": "/dashboard/academic", "action": "Review skill gaps", "description": "mySkillGaps query returns per-subject gap scores. Critical gaps (< 30%) highlighted red. AI recommends quests to address gaps." },
+        { "order": 3, "page": "/dashboard/academic", "action": "Update skill gaps", "description": "After AI tutor session or assessment, updateSkillGap mutation (schema.gql:94) adjusts gap scores. Proficiency tracked over time." },
+        { "order": 4, "page": "/dashboard/tutor", "action": "Start targeted tutoring", "description": "From skill gap card, user clicks 'Tutor Me' to start AI tutor session pre-loaded with the gap subject. Seamless cross-page navigation." }
+      ]
+    },
+    "weekly_planning": {
+      "id": "weekly_planning",
+      "name": "Weekly Planning Ritual",
+      "roles": ["CHILD"],
+      "steps": [
+        { "order": 1, "page": "/dashboard/weekly-plan", "action": "Access weekly planner", "description": "Weekly Plan page shows current week view or 'Generate' CTA if no plan. Sunday AI ritual context explained." },
+        { "order": 2, "page": "/dashboard/weekly-plan", "action": "Generate AI plan", "description": "generateWeeklyPlan mutation creates balanced week based on skill gaps, calendar, past performance, biometric data." },
+        { "order": 3, "page": "/dashboard/weekly-plan", "action": "Customize plan", "description": "Drag-reorder tasks, add custom activities, adjust time blocks. Plan saved to Planner model with weekStart date and JSON data." },
+        { "order": 4, "page": "/dashboard/calendar", "action": "View in calendar", "description": "Plan synced to calendar with pillar color coding. myCalendar query with from/to range." },
+        { "order": 5, "page": "/dashboard/weekly-plan", "action": "Track execution", "description": "Throughout week, plan acts as checklist. End-of-week completion summary." }
+      ]
+    },
+    "family_management": {
+      "id": "family_management",
+      "name": "Family Hub Management",
+      "roles": ["PARENT"],
+      "steps": [
+        { "order": 1, "page": "/dashboard/family", "action": "View family hub", "description": "Family Hub shows all linked family members. myFamily query returns full family tree. Parent sees all children, their Doter states, and activity summaries." },
+        { "order": 2, "page": "/dashboard/family", "action": "Add family member", "description": "Parent can add spouse/co-parent or additional children. For new child, COPPA consent flow re-triggered." },
+        { "order": 3, "page": "/dashboard/family", "action": "Link child account", "description": "linkChild mutation (schema.gql:84) takes childId and consentMethod. FamilyLink record created connecting parentId to childId." },
+        { "order": 4, "page": "/dashboard/family", "action": "Manage permissions", "description": "Per-child permission settings: quest approval required, spending limits, messaging filters, screen time schedules." }
+      ]
+    },
+    "achievements_badges": {
+      "id": "achievements_badges",
+      "name": "Achievements & Badge System",
+      "roles": ["CHILD"],
+      "steps": [
+        { "order": 1, "page": "/dashboard/achievements", "action": "View achievement wall", "description": "Grid of earned and locked achievements. Rarity tiers: Common, Rare, Epic, Legendary. Progress bars for in-progress achievements." },
+        { "order": 2, "page": "/dashboard/achievements", "action": "View achievement detail", "description": "Click achievement card shows unlock criteria, progress details, and unlock date if earned. XP and coin rewards listed." },
+        { "order": 3, "page": "/dashboard/achievements", "action": "Share achievement", "description": "Earned achievements can be shared to family feed or external (parent-approved). Potential future NFT minting for Legendary achievements." },
+        { "order": 4, "page": "/dashboard/doter", "action": "Doter shows achievements", "description": "Doter profile displays achievement count and highest rarity badge. Cosmetic rewards (Doter accessories) from achievements appear on avatar." }
+      ]
+    },
+    "joon_world": {
+      "id": "joon_world",
+      "name": "Joon World — Social & Exploration",
+      "roles": ["CHILD"],
+      "steps": [
+        { "order": 1, "page": "/dashboard/joon-world", "action": "Enter Joon World", "description": "Immersive social/exploration space. Child's Doter avatar navigates a virtual world. Gamified environment for peer interaction and discovery." },
+        { "order": 2, "page": "/dashboard/joon-world", "action": "Explore areas", "description": "Themed zones: Learning Commons, Adventure Park, Creator Studio, Social Square. Each zone offers different interaction types." },
+        { "order": 3, "page": "/dashboard/joon-world", "action": "Social interactions", "description": "Age-appropriate social features: friend requests, group quests, shared achievements. All interactions AI-safety moderated." },
+        { "order": 4, "page": "/dashboard/joon-world", "action": "Earn world rewards", "description": "Joon World activities earn separate in-world currency and cosmetics that sync back to main Doter profile." }
+      ]
+    }
+  }
+}

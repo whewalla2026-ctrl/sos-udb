@@ -1,0 +1,10 @@
+{
+  "generatedAt": "2026-05-09T02:51:15.834Z",
+  "burnRate": {
+    "slo_target": "99.5%",
+    "burn_rate_window": "1hr",
+    "alert_at": ">2% error rate",
+    "implemented": false
+  },
+  "recommendation": "Implement burn-rate alerting via Prometheus recording rules"
+}

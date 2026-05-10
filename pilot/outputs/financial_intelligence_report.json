@@ -1,0 +1,118 @@
+{
+  "generatedAt": "2026-05-09T03:38:03.879Z",
+  "currentInfrastructureCost": {
+    "compute": {
+      "monthly": 300,
+      "note": "5 microservices, 1 vCPU each"
+    },
+    "database": {
+      "monthly": 100,
+      "note": "PostgreSQL 16, 2GB RAM, 50GB storage"
+    },
+    "redis": {
+      "monthly": 35,
+      "note": "Redis 3.0.504, 1GB RAM"
+    },
+    "networking": {
+      "monthly": 50,
+      "note": "Load balancer + DNS + CDN"
+    },
+    "monitoring": {
+      "monthly": 50,
+      "note": "Logging + metrics infrastructure"
+    },
+    "totalMonthlyBase": 535
+  },
+  "costPerTenant": {
+    "current": "178.33",
+    "at10k": "0.70",
+    "at100k": "0.69"
+  },
+  "grossMarginProjections": [
+    {
+      "tenantCount": 100,
+      "monthlyRevenue": 999,
+      "monthlyCost": 495,
+      "grossMargin": "50.5%",
+      "costPerTenant": "4.95",
+      "aiCostPercentage": "12%",
+      "dominantCost": "Compute"
+    },
+    {
+      "tenantCount": 1000,
+      "monthlyRevenue": 9990,
+      "monthlyCost": 1035,
+      "grossMargin": "89.6%",
+      "costPerTenant": "1.03",
+      "aiCostPercentage": "58%",
+      "dominantCost": "AI hint generation"
+    },
+    {
+      "tenantCount": 10000,
+      "monthlyRevenue": 99900,
+      "monthlyCost": 7050,
+      "grossMargin": "92.9%",
+      "costPerTenant": "0.70",
+      "aiCostPercentage": "85%",
+      "dominantCost": "AI hint generation"
+    },
+    {
+      "tenantCount": 50000,
+      "monthlyRevenue": 499500,
+      "monthlyCost": 33500,
+      "grossMargin": "93.3%",
+      "costPerTenant": "0.67",
+      "aiCostPercentage": "90%",
+      "dominantCost": "AI hint generation"
+    },
+    {
+      "tenantCount": 100000,
+      "monthlyRevenue": 999000,
+      "monthlyCost": 69500,
+      "grossMargin": "93%",
+      "costPerTenant": "0.69",
+      "aiCostPercentage": "86%",
+      "dominantCost": "AI hint generation"
+    }
+  ],
+  "infrastructureEfficiency": {
+    "computeUtilization": "Low — services idle most of the time",
+    "wasteEstimate": "15-20% CPU idle",
+    "optimizationPotential": "$80-100/month savings with right-sizing",
+    "recommendation": "HPA with min=1, max=5 replicas per service"
+  },
+  "scalingEconomics": {
+    "tenK": {
+      "status": "HEALTHY",
+      "margin": "92.9%",
+      "risk": "Low"
+    },
+    "fiftyK": {
+      "status": "NEEDS OPTIMIZATION",
+      "margin": "93.3%",
+      "risk": "Medium — AI costs dominate"
+    },
+    "hundredK": {
+      "status": "PLANNED",
+      "margin": "93%",
+      "risk": "High — need Redis Cluster + read replicas"
+    }
+  },
+  "operationalWaste": [
+    {
+      "item": "Idle service instances",
+      "waste": "$50-80/month",
+      "fix": "HPA with scale-to-zero during off-hours"
+    },
+    {
+      "item": "Unoptimized AI caching",
+      "waste": "$20-40/month",
+      "fix": "Increase cache TTL, batch similar requests"
+    },
+    {
+      "item": "Single Redis instance",
+      "waste": "$10-20/month",
+      "fix": "Upgrade to Redis 7 with Cluster for efficiency"
+    }
+  ]
+}

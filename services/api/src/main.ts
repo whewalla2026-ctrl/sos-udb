@@ -2,8 +2,10 @@ import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 import { AppModule } from './app.module';
 import { RedactingLogger } from './shared/redacting-logger';
+import { initNestTracing } from './tracing';
 
 async function bootstrap() {
+  initNestTracing();
   const logger = new RedactingLogger('UDB-API');
   const app = await NestFactory.create(AppModule, {
     logger,

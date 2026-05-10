@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-08T05:05:58.913Z",
+  "generatedAt": "2026-05-09T15:02:52.861Z",
   "recoveryCapabilities": {
     "gracefulDegradation": true,
     "noSinglePointOfFailure": true,
@@ -17,7 +17,7 @@
       "port": 3000,
       "status": "reachable",
       "statusCode": 200,
-      "latencyMs": 50
+      "latencyMs": 39
     },
     {
       "name": "auth-service",
@@ -31,7 +31,7 @@
       "port": 3002,
       "status": "reachable",
       "statusCode": 200,
-      "latencyMs": 16
+      "latencyMs": 15
     },
     {
       "name": "ai-service",

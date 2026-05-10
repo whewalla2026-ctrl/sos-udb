@@ -1,0 +1,37 @@
+{
+  "generatedAt": "2026-05-09T03:36:56.472Z",
+  "samples": 15,
+  "responseConsistency": {
+    "successfulHints": 15,
+    "totalRequests": 15,
+    "successRate": "100.0%",
+    "status": "GOOD"
+  },
+  "hintDeterminism": {
+    "sameInputsProduceHints": true,
+    "determinismScore": "HIGH (same topic + grade returns hint)",
+    "variance": "NATURAL — AI model generates varied responses"
+  },
+  "latencyStability": {
+    "stats": {
+      "min": 5,
+      "p50": 6,
+      "p95": 11,
+      "p99": 11,
+      "max": 11,
+      "avg": 7
+    },
+    "stability": "STABLE",
+    "degradedBehavior": "NORMAL"
+  },
+  "degradedBehavior": {
+    "detected": false,
+    "degradedRequests": 0,
+    "errorReasons": []
+  },
+  "fallbackActivation": {
+    "active": false,
+    "note": "No fallback mechanism implemented — AI service returns error directly",
+    "recommendation": "Implement fallback to cached responses or simpler model"
+  }
+}

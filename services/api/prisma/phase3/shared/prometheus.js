@@ -51,6 +51,46 @@ const aiBudgetUsage = new promClient.Gauge({
   labelNames: ['userId'],
 });
 
+const queueLagSeconds = new promClient.Gauge({
+  name: 'udb_queue_lag_seconds',
+  help: 'Queue processing lag in seconds',
+  labelNames: ['queue'],
+});
+
+const redisReconnectTotal = new promClient.Counter({
+  name: 'udb_redis_reconnect_total',
+  help: 'Total Redis reconnection attempts',
+  labelNames: ['service'],
+});
+
+const jwtRefreshTotal = new promClient.Counter({
+  name: 'udb_jwt_refresh_total',
+  help: 'Total JWT refresh operations',
+  labelNames: ['status'],
+});
+
+const refreshReplayRejectionTotal = new promClient.Counter({
+  name: 'udb_refresh_replay_rejection_total',
+  help: 'Total refresh token replay rejections',
+});
+
+const requestDrainDurationSeconds = new promClient.Gauge({
+  name: 'udb_request_drain_duration_seconds',
+  help: 'Duration of request drain during graceful shutdown',
+});
+
+const dbReconnectTotal = new promClient.Counter({
+  name: 'udb_db_reconnect_total',
+  help: 'Total database reconnection attempts',
+  labelNames: ['service'],
+});
+
+const idempotencyHitsTotal = new promClient.Counter({
+  name: 'udb_idempotency_hits_total',
+  help: 'Total idempotency cache hits',
+  labelNames: ['endpoint'],
+});
+
 function metricsMiddleware(serviceName) {
   return (req, res, next) => {
     const start = Date.now();
@@ -89,6 +129,34 @@ function trackAiBudget(userId, spent) {
   aiBudgetUsage.labels(userId).set(spent);
 }
 
+function trackQueueLag(queue, seconds) {
+  queueLagSeconds.labels(queue).set(seconds);
+}
+
+function trackRedisReconnect(serviceName) {
+  redisReconnectTotal.labels(serviceName).inc();
+}
+
+function trackJwtRefresh(status) {
+  jwtRefreshTotal.labels(status).inc();
+}
+
+function trackRefreshReplayRejection() {
+  refreshReplayRejectionTotal.inc();
+}
+
+function trackRequestDrain(durationSeconds) {
+  requestDrainDurationSeconds.set(durationSeconds);
+}
+
+function trackDbReconnect(serviceName) {
+  dbReconnectTotal.labels(serviceName).inc();
+}
+
+function trackIdempotencyHit(endpoint) {
+  idempotencyHitsTotal.labels(endpoint).inc();
+}
+
 async function getMetrics() {
   return await promClient.register.metrics();
 }
@@ -105,6 +173,10 @@ function metricsEndpoint(req, res) {
 module.exports = {
   metricsMiddleware, trackAuthFailure, trackQueueDepth, trackQueueFailure,
   trackRedisLatency, trackDbPool, trackAiBudget, getMetrics, metricsEndpoint,
+  trackQueueLag, trackRedisReconnect, trackJwtRefresh, trackRefreshReplayRejection,
+  trackRequestDrain, trackDbReconnect, trackIdempotencyHit,
   httpRequestTotal, httpRequestDuration, authFailuresTotal, queueDepth,
   queueFailuresTotal, redisLatency, dbPoolUsage, aiBudgetUsage,
+  queueLagSeconds, redisReconnectTotal, jwtRefreshTotal, refreshReplayRejectionTotal,
+  requestDrainDurationSeconds, dbReconnectTotal, idempotencyHitsTotal,
 };

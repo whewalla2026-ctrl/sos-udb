@@ -1,0 +1,51 @@
+{
+  "generatedAt": "2026-05-09T02:48:58.374Z",
+  "aiCostOptimization": {
+    "current_hint_cost": 0.0004,
+    "optimized_hint_cost": 0.0002,
+    "savings_pct": 50,
+    "strategy": "Batch similar hints, use cached responses for repeated queries"
+  },
+  "cacheTtlOptimization": {
+    "current": {
+      "planner": "10min",
+      "ai": "1hr"
+    },
+    "recommended": {
+      "planner": "15min",
+      "ai": "2hr"
+    },
+    "impact": "30% reduction in DB queries for planner, 50% for AI cache"
+  },
+  "queryOptimization": [
+    {
+      "query": "SELECT with JOIN on large tables",
+      "suggestion": "Add composite indexes on foreign keys",
+      "impact": "2-5x faster"
+    },
+    {
+      "query": "Frequent user lookups",
+      "suggestion": "Cache user profiles in Redis",
+      "impact": "Reduce DB load by 60%"
+    }
+  ],
+  "autoscalingCostModel": {
+    "strategy": "HPA with CPU thresholds",
+    "ai_service": {
+      "min": 3,
+      "max": 20,
+      "threshold": 50,
+      "cost_savings_vs_fixed": "40% at low traffic"
+    },
+    "gateway": {
+      "min": 2,
+      "max": 10,
+      "threshold": 70,
+      "cost_savings_vs_fixed": "50% at low traffic"
+    }
+  },
+  "totalProjectedSavings": {
+    "monthly": "$150-300",
+    "percentage": "20-35% of variable costs"
+  }
+}

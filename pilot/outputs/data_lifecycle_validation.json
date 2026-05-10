@@ -1,0 +1,119 @@
+{
+  "timestamp": "2026-05-08T20:41:11.674Z",
+  "summary": "DATA LIFECYCLE GOVERNANCE VALIDATED",
+  "tableRowCounts": {
+    "achievements\r": 0,
+    "activities\r": 0,
+    "audit_logs\r": 0,
+    "biometric_logs\r": 0,
+    "doter_profiles\r": 0,
+    "escrows\r": 0,
+    "evidence_items\r": 0,
+    "family_links\r": 0,
+    "goals\r": 0,
+    "lms_assignments\r": 0,
+    "lms_connections\r": 0,
+    "messages\r": 0,
+    "notifications\r": 0,
+    "points_ledger\r": 0,
+    "quests\r": 0,
+    "safety_scores\r": 0,
+    "simulation_pathways\r": 0,
+    "simulation_runs\r": 0,
+    "skill_agents\r": 0,
+    "skill_gaps\r": 0,
+    "streaks\r": 0,
+    "tutoring_sessions\r": 0,
+    "users\r": 55,
+    "ventures\r": 0,
+    "weekly_plans": 0
+  },
+  "totalRows": 55,
+  "retentionPolicies": [
+    {
+      "resource": "Refresh tokens (Redis)",
+      "policy": "TTL 86400s (24h)",
+      "mechanism": "redis.setex()"
+    },
+    {
+      "resource": "EventBus events (Redis)",
+      "policy": "Capped at 10000 per type",
+      "mechanism": "ltrim"
+    },
+    {
+      "resource": "Dead letter queue (Redis)",
+      "policy": "Capped at 1000 per queue",
+      "mechanism": "ltrim"
+    },
+    {
+      "resource": "Idempotency keys (Redis)",
+      "policy": "TTL 86400s (24h)",
+      "mechanism": "redis.setex()"
+    },
+    {
+      "resource": "User plans (in-memory)",
+      "policy": "TTL 10min",
+      "mechanism": "setInterval cleanup"
+    },
+    {
+      "resource": "AI user spend (in-memory)",
+      "policy": "TTL 1h",
+      "mechanism": "setInterval cleanup"
+    },
+    {
+      "resource": "Rate limit counters (in-memory)",
+      "policy": "Window 60s",
+      "mechanism": "timed array filter"
+    },
+    {
+      "resource": "Brute force tracker (in-memory)",
+      "policy": "Window 60s, cleanup 120s",
+      "mechanism": "setTimeout delete"
+    },
+    {
+      "resource": "Circuit breaker state (in-memory)",
+      "policy": "Cooldown 30s auto-reset",
+      "mechanism": "state machine transition"
+    },
+    {
+      "resource": "Audit logs (PostgreSQL)",
+      "policy": "WORM — permanent retention",
+      "mechanism": "no onDelete cascade"
+    },
+    {
+      "resource": "Points ledger (PostgreSQL)",
+      "policy": "Immutable — permanent retention",
+      "mechanism": "no updatedAt field"
+    }
+  ],
+  "cleanupGovernance": {
+    "tokenCleanup": {
+      "status": "AUTOMATIC",
+      "mechanism": "Redis TTL 24h"
+    },
+    "expiredTokens": {
+      "status": "AUTOMATIC",
+      "mechanism": "JWT exp claim verified on each request"
+    },
+    "stalePlans": {
+      "status": "AUTOMATIC",
+      "mechanism": "10min TTL with setInterval cleanup"
+    },
+    "staleSpend": {
+      "status": "AUTOMATIC",
+      "mechanism": "1h TTL with setInterval cleanup"
+    },
+    "deadLetterQueue": {
+      "status": "AUTOMATIC",
+      "mechanism": "Capped at 1000, oldest evicted"
+    },
+    "rateLimitBuckets": {
+      "status": "AUTOMATIC",
+      "mechanism": "Sliding window, old entries filtered"
+    },
+    "circuitBreakers": {
+      "status": "AUTOMATIC",
+      "mechanism": "Cooldown + auto-reset to CLOSED"
+    }
+  }
+}

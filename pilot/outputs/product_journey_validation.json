@@ -1,0 +1,36 @@
+{
+  "generatedAt": "2026-05-09T03:13:13.227Z",
+  "journey": [
+    {
+      "step": "parent_onboarding",
+      "status": "completed — user registered and logged in",
+      "passed": true
+    },
+    {
+      "step": "child_setup",
+      "status": "N/A — not implemented in Phase 3 services",
+      "passed": false,
+      "note": "child setup requires family linking endpoint"
+    },
+    {
+      "step": "planner_creation",
+      "status": "completed — plan generated",
+      "passed": true
+    },
+    {
+      "step": "ai_interactions",
+      "status": "completed — hint delivered",
+      "passed": true
+    },
+    {
+      "step": "monitoring_visibility",
+      "status": "available",
+      "passed": true
+    }
+  ],
+  "summary": {
+    "total": 5,
+    "passed": 4,
+    "blocked": 1
+  }
+}

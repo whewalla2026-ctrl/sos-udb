@@ -1,12 +1,29 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useQuery } from '@apollo/client';
+import { GET_DASHBOARD_DATA, GET_ME } from '../../../lib/queries';
 
 const PILLAR_COLORS: Record<string, string> = {
   ACADEMIC: '#06B6D4', BIOMETRIC: '#10B981', GAMIFICATION: '#7C3AED',
   ENTREPRENEURSHIP: '#F59E0B', SOCIAL: '#EC4899', LIFE_SKILLS: '#6366F1',
 };
 
-const MOCK_QUESTS = [
+type Pillar = keyof typeof PILLAR_COLORS;
+type QuestStatus = 'PENDING' | 'IN_PROGRESS' | 'SUBMITTED' | 'APPROVED' | 'REJECTED';
+
+type Quest = {
+  id: string;
+  title: string;
+  pillar: Pillar;
+  status: QuestStatus;
+  xpReward: number;
+  coinReward: number;
+  progress: number;
+  dueDate: string;
+  isChunk: boolean;
+};
+
+var FALLBACK_QUESTS: Quest[] = [
   { id: '1', title: 'Complete 10 Fraction Worksheets', pillar: 'ACADEMIC', status: 'IN_PROGRESS', xpReward: 200, coinReward: 100, progress: 60, dueDate: '2026-05-10', isChunk: false },
   { id: '2', title: 'Sleep 8+ Hours for 5 Days', pillar: 'BIOMETRIC', status: 'IN_PROGRESS', xpReward: 150, coinReward: 75, progress: 80, dueDate: '2026-05-08', isChunk: false },
   { id: '3', title: 'Read 1 Chapter of Your Book', pillar: 'ACADEMIC', status: 'PENDING', xpReward: 100, coinReward: 50, progress: 0, dueDate: '2026-05-04', isChunk: false },
@@ -24,20 +41,99 @@ const STATUS_CONFIG: Record<string, { label: string; color: string; bg: string }
 
 type FilterType = 'ALL' | 'IN_PROGRESS' | 'PENDING' | 'SUBMITTED' | 'APPROVED';
 
-export default function QuestsPage() {
-  const [filter, setFilter] = useState<FilterType>('ALL');
-  const [showNewQuest, setShowNewQuest] = useState(false);
-  const [newTitle, setNewTitle] = useState('');
-  const [newPillar, setNewPillar] = useState('ACADEMIC');
+function clampInt(v: number, min: number, max: number) {
+  if (Number.isNaN(v)) return min;
+  return Math.max(min, Math.min(max, Math.trunc(v)));
+}
 
-  const filtered = MOCK_QUESTS.filter(q => filter === 'ALL' || q.status === filter);
+export default function QuestsPage() {
+  var { data: dashData, loading } = useQuery(GET_DASHBOARD_DATA);
+  var [filter, setFilter] = useState<FilterType>('ALL');
+  var [showNewQuest, setShowNewQuest] = useState(false);
+  var [newTitle, setNewTitle] = useState('');
+  var [newPillar, setNewPillar] = useState('ACADEMIC');
+
+  var [quests, setQuests] = useState<Quest[]>(FALLBACK_QUESTS);
+  var [toast, setToast] = useState<{ title: string; body?: string } | null>(null);
+  var [progressModal, setProgressModal] = useState<{ questId: string } | null>(null);
+  var [progressDraft, setProgressDraft] = useState(0);
+
+  useEffect(function() {
+    if (dashData?.dashboardData?.quests) {
+      setQuests(dashData.dashboardData.quests);
+    }
+  }, [dashData]);
+
+  var showToast = function(title: string, body?: string) {
+    setToast({ title, body });
+    window.clearTimeout((showToast as any)._t);
+    (showToast as any)._t = window.setTimeout(function() { setToast(null); }, 2600);
+  };
+
+  var filtered = quests.filter(function(q) { return filter === 'ALL' || q.status === filter; });
+
+  const createQuest = () => {
+    const title = newTitle.trim() || 'New Quest';
+    const pillar = (newPillar as Pillar) || 'ACADEMIC';
+    const newQuest: Quest = {
+      id: `q-${Date.now()}`,
+      title,
+      pillar,
+      status: 'PENDING',
+      xpReward: 120,
+      coinReward: 60,
+      progress: 0,
+      dueDate: new Date(Date.now() + 1000 * 60 * 60 * 24 * 7).toISOString().slice(0, 10),
+      isChunk: false,
+    };
+    setQuests((prev) => [newQuest, ...prev]);
+    setShowNewQuest(false);
+    setNewTitle('');
+    setNewPillar('ACADEMIC');
+    showToast('Quest created', `${title} • ${pillar.toLowerCase()}`);
+  };
+
+  const startQuest = (questId: string) => {
+    setQuests((prev) =>
+      prev.map((q) => (q.id === questId ? { ...q, status: 'IN_PROGRESS', progress: Math.max(q.progress, 5) } : q)),
+    );
+    const q = quests.find((x) => x.id === questId);
+    showToast('Quest started', q?.title);
+  };
+
+  const submitEvidence = (questId: string) => {
+    const ok = window.confirm('Submit evidence for review? (Demo: marks as Submitted)');
+    if (!ok) return;
+    setQuests((prev) => prev.map((q) => (q.id === questId ? { ...q, status: 'SUBMITTED', progress: 100 } : q)));
+    const q = quests.find((x) => x.id === questId);
+    showToast('Evidence submitted', q?.title);
+  };
+
+  const openProgress = (questId: string) => {
+    const q = quests.find((x) => x.id === questId);
+    if (!q) return;
+    setProgressDraft(q.progress);
+    setProgressModal({ questId });
+  };
+
+  const saveProgress = () => {
+    const questId = progressModal?.questId;
+    if (!questId) return;
+    const pct = clampInt(progressDraft, 0, 100);
+    setQuests((prev) => prev.map((q) => (q.id === questId ? { ...q, progress: pct } : q)));
+    const q = quests.find((x) => x.id === questId);
+    setProgressModal(null);
+    showToast('Progress updated', `${q?.title ?? 'Quest'} • ${pct}%`);
+  };
 
   return (
     <div className="fade-in">
       <div className="page-header flex items-center justify-between">
         <div>
           <h1 className="page-title">⚔️ My Quests</h1>
-          <p className="page-subtitle">{MOCK_QUESTS.filter(q => q.status === 'IN_PROGRESS').length} active · {MOCK_QUESTS.filter(q => q.status === 'APPROVED').length} completed this week</p>
+          <p className="page-subtitle">
+            {quests.filter(q => q.status === 'IN_PROGRESS').length} active · {quests.filter(q => q.status === 'APPROVED').length} completed this week
+          </p>
         </div>
         <button id="new-quest-btn" className="btn btn-primary" onClick={() => setShowNewQuest(true)}>+ New Quest</button>
       </div>
@@ -53,7 +149,7 @@ export default function QuestsPage() {
               boxShadow: filter === f ? '0 4px 12px rgba(124,58,237,0.35)' : 'none',
             }}
           >
-            {f === 'ALL' ? 'All' : f.replace('_', ' ')} {f === 'ALL' ? `(${MOCK_QUESTS.length})` : `(${MOCK_QUESTS.filter(q => q.status === f).length})`}
+            {f === 'ALL' ? 'All' : f.replace('_', ' ')} {f === 'ALL' ? `(${quests.length})` : `(${quests.filter(q => q.status === f).length})`}
           </button>
         ))}
       </div>
@@ -81,7 +177,7 @@ export default function QuestsPage() {
               </div>
               <div style={{ display: 'flex', gap: 12, marginTop: 8 }}>
                 <button className="btn btn-secondary" style={{ flex: 1 }} onClick={() => setShowNewQuest(false)}>Cancel</button>
-                <button id="create-quest-submit" className="btn btn-primary" style={{ flex: 2 }} onClick={() => setShowNewQuest(false)}>Create Quest</button>
+                <button id="create-quest-submit" className="btn btn-primary" style={{ flex: 2 }} onClick={createQuest}>Create Quest</button>
               </div>
             </div>
           </div>
@@ -125,12 +221,12 @@ export default function QuestsPage() {
               {/* Actions */}
               {q.status === 'IN_PROGRESS' && (
                 <div style={{ display: 'flex', gap: 10, marginTop: 16 }}>
-                  <button className="btn btn-primary btn-sm" id={`submit-quest-${q.id}`}>📤 Submit Evidence</button>
-                  <button className="btn btn-ghost btn-sm">✏️ Update Progress</button>
+                  <button className="btn btn-primary btn-sm" id={`submit-quest-${q.id}`} onClick={() => submitEvidence(q.id)}>📤 Submit Evidence</button>
+                  <button className="btn btn-ghost btn-sm" id={`update-progress-${q.id}`} onClick={() => openProgress(q.id)}>✏️ Update Progress</button>
                 </div>
               )}
               {q.status === 'PENDING' && (
-                <button className="btn btn-secondary btn-sm" style={{ marginTop: 16 }} id={`start-quest-${q.id}`}>▶️ Start Quest</button>
+                <button className="btn btn-secondary btn-sm" style={{ marginTop: 16 }} id={`start-quest-${q.id}`} onClick={() => startQuest(q.id)}>▶️ Start Quest</button>
               )}
               {q.status === 'APPROVED' && (
                 <div className="badge badge-success" style={{ marginTop: 12, display: 'inline-flex' }}>✓ Completed — XP & Coins awarded!</div>
@@ -139,6 +235,70 @@ export default function QuestsPage() {
           );
         })}
       </div>
+
+      {/* Update Progress Modal */}
+      {progressModal && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          style={{
+            position: 'fixed',
+            inset: 0,
+            background: 'rgba(0,0,0,0.55)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: 16,
+            zIndex: 200,
+          }}
+          onMouseDown={(e) => {
+            if (e.currentTarget === e.target) setProgressModal(null);
+          }}
+        >
+          <div className="glass-card" style={{ width: 'min(560px, 100%)', padding: 22 }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, marginBottom: 14 }}>
+              <div>
+                <div style={{ fontWeight: 800, fontSize: '1.1rem' }}>Update progress</div>
+                <div style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>Demo mode</div>
+              </div>
+              <button className="btn btn-ghost btn-sm" onClick={() => setProgressModal(null)} aria-label="Close modal">✕</button>
+            </div>
+
+            <div style={{ display: 'grid', gap: 12 }}>
+              <label style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
+                <span>Progress</span>
+                <span style={{ color: 'var(--color-primary-light)', fontWeight: 800 }}>{clampInt(progressDraft, 0, 100)}%</span>
+              </label>
+              <input
+                id="progress-range"
+                type="range"
+                min={0}
+                max={100}
+                value={progressDraft}
+                onChange={(e) => setProgressDraft(clampInt(Number(e.target.value), 0, 100))}
+              />
+              <div className="progress-track">
+                <div className="progress-fill" style={{ width: `${clampInt(progressDraft, 0, 100)}%` }} />
+              </div>
+            </div>
+
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10, marginTop: 16 }}>
+              <button className="btn btn-secondary btn-sm" onClick={() => setProgressModal(null)}>Cancel</button>
+              <button className="btn btn-primary btn-sm" onClick={saveProgress} id="save-progress-btn">Save</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Toast */}
+      {toast && (
+        <div style={{ position: 'fixed', right: 18, bottom: 18, zIndex: 250, maxWidth: 360 }}>
+          <div className="glass-card" style={{ padding: 14, borderRadius: 16 }}>
+            <div style={{ fontWeight: 800, fontSize: '0.95rem' }}>{toast.title}</div>
+            {toast.body && <div style={{ color: 'var(--text-muted)', fontSize: '0.85rem', marginTop: 2 }}>{toast.body}</div>}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

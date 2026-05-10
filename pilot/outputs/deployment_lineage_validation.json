@@ -1,0 +1,10 @@
+{
+  "generatedAt": "2026-05-09T02:51:47.637Z",
+  "deployment": {
+    "environment": "local (Windows)",
+    "method": "manual node start",
+    "docker_ready": true,
+    "k8s_ready": true
+  },
+  "traceability": "Full: commit SHA → service version → deployment target"
+}

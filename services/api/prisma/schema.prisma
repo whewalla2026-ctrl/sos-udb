@@ -179,6 +179,7 @@ model User {
   // System
   auditLogs AuditLog[]
   notifications Notification[]
+  onboarding    OnboardingStatus?
 
   @@map("users")
 }
@@ -665,4 +666,37 @@ model AuditLog {
   @@index([actorId, createdAt])
   @@index([action, createdAt])
   @@map("audit_logs")
+}
+
+model AnalyticsEvent {
+  id        BigInt   @id @default(autoincrement())
+  userId    String   @map("user_id")
+  event     String
+  metadata  Json     @default("{}")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([event, createdAt])
+  @@index([userId, createdAt])
+  @@map("analytics_events")
+}
+
+model OnboardingStatus {
+  id             String   @id @default(uuid())
+  userId         String   @unique @map("user_id")
+  currentStep    Int      @default(0) @map("current_step")
+  totalSteps     Int      @default(5) @map("total_steps")
+  completed      Boolean  @default(false)
+  skipped        Boolean  @default(false)
+  profileComplete Boolean @default(false) @map("profile_complete")
+  doterNamed     Boolean  @default(false) @map("doter_named")
+  firstQuestDone Boolean  @default(false) @map("first_quest_done")
+  tourCompleted  Boolean  @default(false) @map("tour_completed")
+  role           String   @default("CHILD")
+  metadata       Json     @default("{}")
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("onboarding_status")
 }

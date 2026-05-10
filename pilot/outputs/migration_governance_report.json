@@ -1,0 +1,43 @@
+{
+  "timestamp": "2026-05-08T20:41:06.138Z",
+  "schemaChecksum": "22a565f8b5c97bd174fe23f5c549ddbc6122593fdb2fbe50a7c1dffd4f108fdb",
+  "tableCount": 25,
+  "migrationValidation": {
+    "schemaVersion": "1.0.0",
+    "checksumAlgorithm": "SHA-256",
+    "migrationOrdering": "Prisma-managed (migration files in prisma/migrations/)",
+    "rollbackStrategy": "Prisma migrate down not used — use pg_dump restore for rollback",
+    "schemaDrift": {
+      "status": "NONE_DETECTED",
+      "method": "Live schema vs checksum comparison",
+      "lastChecksum": "22a565f8b5c97bd174fe23f5c549ddbc6122593fdb2fbe50a7c1dffd4f108fdb"
+    }
+  },
+  "findings": [
+    {
+      "check": "Schema checksum generated",
+      "status": "PASS",
+      "detail": "SHA-256: 22a565f8b5c97bd1..."
+    },
+    {
+      "check": "All 25 tables present",
+      "status": "PASS",
+      "detail": "25 tables"
+    },
+    {
+      "check": "Migration ordering maintained by Prisma",
+      "status": "PASS",
+      "detail": "prisma/migrations/ directory"
+    },
+    {
+      "check": "Rollback via pg_dump restore",
+      "status": "PASS",
+      "detail": "Backup at pilot/outputs/udb-backup-20260508-215843.dump"
+    },
+    {
+      "check": "No schema drift detected",
+      "status": "PASS",
+      "detail": "Live schema matches expected"
+    }
+  ]
+}

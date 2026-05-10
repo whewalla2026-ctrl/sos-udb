@@ -1,0 +1,71 @@
+{
+  "generatedAt": "2026-05-09T03:32:53.583Z",
+  "saturationForecast": [
+    {
+      "service": "gateway",
+      "latencyTrendMs": -29,
+      "slope": -0.51,
+      "p95": 4,
+      "approachingSaturation": false,
+      "saturationRisk": "LOW",
+      "failureProbability": "<5% within 1hr"
+    },
+    {
+      "service": "auth",
+      "latencyTrendMs": -4,
+      "slope": -0.07,
+      "p95": 8,
+      "approachingSaturation": false,
+      "saturationRisk": "LOW",
+      "failureProbability": "<5% within 1hr"
+    },
+    {
+      "service": "planner",
+      "latencyTrendMs": -3,
+      "slope": -0.05,
+      "p95": 9,
+      "approachingSaturation": false,
+      "saturationRisk": "LOW",
+      "failureProbability": "<5% within 1hr"
+    },
+    {
+      "service": "ai",
+      "latencyTrendMs": -5,
+      "slope": -0.08,
+      "p95": 8,
+      "approachingSaturation": false,
+      "saturationRisk": "LOW",
+      "failureProbability": "<5% within 1hr"
+    },
+    {
+      "service": "monitoring",
+      "latencyTrendMs": -5,
+      "slope": -0.08,
+      "p95": 8,
+      "approachingSaturation": false,
+      "saturationRisk": "LOW",
+      "failureProbability": "<5% within 1hr"
+    }
+  ],
+  "cascadeRisk": {
+    "probability": "LOW — <5%",
+    "triggerServices": [],
+    "isolationCapable": true,
+    "circuitBreakersStatus": "All CLOSED — cascade contained if triggered"
+  },
+  "memoryAnalysis": {
+    "indicator": "NORMAL",
+    "uptimeSeconds": 347,
+    "recommendation": "Within normal bounds"
+  },
+  "queueBacklog": {
+    "queueKeys": 1,
+    "retryStormRisk": "LOW",
+    "recommendation": "Current workers adequate"
+  },
+  "retryStormRisk": {
+    "probability": "LOW",
+    "mitigation": "Circuit breakers at 5 failures, cooldown 30s, exponential backoff"
+  },
+  "overallPrediction": "STABLE — no imminent failure detected"
+}

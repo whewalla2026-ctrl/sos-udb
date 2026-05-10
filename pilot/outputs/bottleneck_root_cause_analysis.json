@@ -1,0 +1,146 @@
+{
+  "generatedAt": "2026-05-08T05:48:59.495Z",
+  "methodology": "Real load test data at 10-300 concurrent users + service metrics analysis",
+  "capacityData": "Loaded from capacity_analysis_report.json",
+  "bottlenecksIdentified": 1,
+  "bottlenecks": [
+    {
+      "type": "latency_spike",
+      "concurrency": 50,
+      "ratio": "3.50",
+      "detail": "Latency ratio 3.50x at 50 concurrent"
+    }
+  ],
+  "systemConstraints": [
+    {
+      "component": "PostgreSQL",
+      "constraint": "connection_pool",
+      "limit": "20 concurrent (Prisma default)",
+      "severity": "medium",
+      "impact": "300 concurrent users cause connection queueing"
+    },
+    {
+      "component": "Redis",
+      "constraint": "version_3.0",
+      "limit": "No Streams, polling-based queue (500ms)",
+      "severity": "medium",
+      "impact": "Queue throughput limited to ~2 jobs/sec per worker"
+    },
+    {
+      "component": "API Gateway",
+      "constraint": "http_proxy_connections",
+      "limit": "~2,400 req/s at 300 concurrent (measured)",
+      "severity": "low",
+      "impact": "Well within expected range for Express"
+    },
+    {
+      "component": "Planner Service",
+      "constraint": "in-memory_plan_cache",
+      "limit": "Unbounded growth",
+      "severity": "low",
+      "impact": "No memory limit on plans Map — potential OOM over extended periods"
+    },
+    {
+      "component": "AI Service",
+      "constraint": "in-memory_budget_tracking",
+      "limit": "Unbounded growth",
+      "severity": "low",
+      "impact": "No memory limit on userSpend Map — potential OOM"
+    },
+    {
+      "component": "Event Bus",
+      "constraint": "redis_list_cap_10k",
+      "limit": "10,000 events per type",
+      "severity": "low",
+      "impact": "Historical events lost after cap. DLQ capped at 1,000"
+    }
+  ],
+  "rootCauses": [
+    {
+      "id": "RC1",
+      "component": "Database",
+      "cause": "No pgBouncer — Prisma pool limited to 20 fixed connections",
+      "evidence": "Latency degrades from 2ms (10 users) to 61ms (300 users) — DB connection contention",
+      "recommendation": "Deploy pgBouncer (Docker container) for connection pooling at transaction level"
+    },
+    {
+      "id": "RC2",
+      "component": "Queue",
+      "cause": "Redis 3.0 lacks Streams — polling-based workers at 500ms interval",
+      "evidence": "Queue processing limited to poll interval, not event-driven",
+      "recommendation": "Upgrade Redis to 5.0+ for Streams, enabling real-time queue consumption"
+    },
+    {
+      "id": "RC3",
+      "component": "Caching",
+      "cause": "Per-service in-memory caches with no eviction policy",
+      "evidence": "Planner and AI services store unlimited data in memory",
+      "recommendation": "Add TTL-based eviction or switch to Redis-backed caching"
+    },
+    {
+      "id": "RC4",
+      "component": "Gateway",
+      "cause": "Single-threaded Node.js event loop under high concurrency",
+      "evidence": "p50=58ms, p95=113ms at 300 concurrent — well within limits for Express",
+      "recommendation": "No immediate action. Monitor at >1000 concurrent users"
+    }
+  ],
+  "latencyAnalysis": [
+    {
+      "concurrency": 10,
+      "p50": 2,
+      "p95": 4,
+      "p99": 6,
+      "avg": 2,
+      "throughput": 3571,
+      "scalingFactor": "1.00"
+    },
+    {
+      "concurrency": 25,
+      "p50": 4,
+      "p95": 9,
+      "p99": 9,
+      "avg": 4,
+      "throughput": 3333,
+      "scalingFactor": "2.00"
+    },
+    {
+      "concurrency": 50,
+      "p50": 13,
+      "p95": 25,
+      "p99": 26,
+      "avg": 14,
+      "throughput": 2027,
+      "scalingFactor": "7.00"
+    },
+    {
+      "concurrency": 100,
+      "p50": 23,
+      "p95": 44,
+      "p99": 48,
+      "avg": 24,
+      "throughput": 2190,
+      "scalingFactor": "12.00"
+    },
+    {
+      "concurrency": 200,
+      "p50": 44,
+      "p95": 83,
+      "p99": 91,
+      "avg": 45,
+      "throughput": 2439,
+      "scalingFactor": "22.50"
+    },
+    {
+      "concurrency": 300,
+      "p50": 58,
+      "p95": 113,
+      "p99": 126,
+      "avg": 61,
+      "throughput": 2375,
+      "scalingFactor": "30.50"
+    }
+  ],
+  "scalabilityCeiling": "300+ concurrent users with acceptabledegradation (p99 < 130ms)",
+  "conclusion": "System performs well up to 300 concurrent users. Bottlenecks are infrastructure-related (no pgBouncer, Redis 3.0) rather than code defects."
+}

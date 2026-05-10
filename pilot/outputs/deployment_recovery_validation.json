@@ -1,0 +1,12 @@
+{
+  "timestamp": "2026-05-08T11:57:22.786Z",
+  "procedure": [
+    "Deploy: copy new source, restart with new port config",
+    "Health check: poll /auth/health endpoint up to 15s",
+    "Rollback: kill process and restart with original port config",
+    "Recovery: restart on original port with original config"
+  ],
+  "deployConfirmed": true,
+  "goodDeployConfirmed": true,
+  "recoveryConfirmed": true
+}

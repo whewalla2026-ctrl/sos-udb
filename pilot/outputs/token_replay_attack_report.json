@@ -1,0 +1,50 @@
+{
+  "timestamp": "2026-05-08T12:11:03.986Z",
+  "testSuite": "C1 - Token Security Validation - Replay Attack Analysis",
+  "phase": "phase7",
+  "testUser": {
+    "email": "token-test-1778242263911@test.com"
+  },
+  "metrics": {
+    "refreshReplayRejections": 1,
+    "expiredTokenAttempts": 1
+  },
+  "findings": [
+    {
+      "timestamp": "2026-05-08T12:11:03.977Z",
+      "test": "Replay old refresh token",
+      "tokenPreview": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ...",
+      "expectedStatus": 401,
+      "actualStatus": 401,
+      "blocked": true,
+      "risk": "none"
+    },
+    {
+      "timestamp": "2026-05-08T12:11:03.980Z",
+      "test": "Expired token rejection",
+      "tokenPreview": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ...",
+      "expectedStatus": 401,
+      "actualStatus": 401,
+      "blocked": true,
+      "risk": "none"
+    },
+    {
+      "timestamp": "2026-05-08T12:11:03.986Z",
+      "test": "Parallel refresh race condition",
+      "attempts": 3,
+      "succeeded": 1,
+      "rejected": 2,
+      "raceConditionSecure": true,
+      "risk": "none",
+      "recommendation": "Token rotation is race-safe"
+    }
+  ],
+  "riskAssessment": "LOW - Token replay attacks are properly detected and blocked",
+  "recommendations": [
+    "Ensure refresh token rotation invalidates previous tokens",
+    "Implement token family/reference tracking to detect replay",
+    "Rate limit the refresh endpoint",
+    "Use short expiration windows for refresh tokens",
+    "Consider adding token fingerprinting (user-agent, IP)"
+  ]
+}

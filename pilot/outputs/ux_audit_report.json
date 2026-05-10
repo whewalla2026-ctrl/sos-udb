@@ -1,0 +1,69 @@
+{
+  "generatedAt": "2026-05-09T03:13:13.223Z",
+  "audit": [
+    {
+      "flow": "onboarding",
+      "step": "registration",
+      "status": 201,
+      "latency": "122ms",
+      "passed": true,
+      "userExperience": "seamless"
+    },
+    {
+      "flow": "authentication",
+      "step": "login",
+      "status": 200,
+      "latency": "44ms",
+      "passed": true,
+      "userExperience": "instant"
+    },
+    {
+      "flow": "plan_creation",
+      "step": "generate",
+      "status": 200,
+      "latency": "7ms",
+      "passed": true,
+      "userExperience": "responsive",
+      "activitiesReceived": 4
+    },
+    {
+      "flow": "ai_interaction",
+      "step": "hint_request",
+      "status": 200,
+      "latency": "8ms",
+      "passed": true,
+      "userExperience": "helpful",
+      "hintProvided": true
+    },
+    {
+      "flow": "monitoring",
+      "step": "dashboard_health",
+      "status": 200,
+      "passed": true
+    },
+    {
+      "flow": "input_validation",
+      "step": "empty_fields",
+      "status": 400,
+      "passed": true,
+      "userExperience": "clear error"
+    },
+    {
+      "flow": "error_handling",
+      "step": "invalid_credentials",
+      "status": 401,
+      "passed": true,
+      "userExperience": "clear rejection"
+    }
+  ],
+  "summary": {
+    "total": 7,
+    "passed": 7,
+    "failed": 0
+  },
+  "recommendations": [
+    "Add email verification step",
+    "Improve error messages for 429 rate limits",
+    "Add loading states for plan generation"
+  ]
+}

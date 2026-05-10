@@ -1,0 +1,46 @@
+{
+  "generatedAt": "2026-05-08T09:56:30.936Z",
+  "framework": "SOC2 + GDPR readiness assessment",
+  "soc2Readiness": {
+    "security": {
+      "encryption": "scrypt (passwords)",
+      "transit": "HTTPS (via Helmet HSTS)",
+      "access": "RBAC + JWT"
+    },
+    "availability": {
+      "uptime": "Manual restart",
+      "dr": "Runbook defined",
+      "monitoring": "Prometheus"
+    },
+    "processingIntegrity": {
+      "audit": "Console logging only",
+      "verification": "Manual"
+    },
+    "confidentiality": {
+      "dataAccess": "Auth token scoped",
+      "network": "Internal services"
+    },
+    "privacy": {
+      "dataCollection": "Minimal (email + role)",
+      "retention": "Not defined"
+    }
+  },
+  "gdprReadiness": {
+    "dataDeletion": "DELETE /user/:id endpoint not implemented",
+    "dataPortability": "No user data export endpoint",
+    "consentLogging": "Not implemented",
+    "breachNotification": "Not automated",
+    "dataRetention": "No automated deletion policy",
+    "recommendation": "Add user data export + deletion endpoints. Define 90-day log retention policy."
+  },
+  "auditRetention": {
+    "current": "Logs retained in application memory. Lost on restart.",
+    "target": "90-day retention in centralized log storage (ELK/Loki)",
+    "gap": "No log persistence, rotation, or archival",
+    "actionItems": [
+      "Add file-based audit log",
+      "Ship to centralized logging",
+      "Implement log rotation + archival"
+    ]
+  }
+}

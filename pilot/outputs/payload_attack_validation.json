@@ -1,0 +1,21 @@
+{
+  "timestamp": "2026-05-08T12:00:22.370Z",
+  "tests": [
+    {
+      "test": "Malformed JSON - /auth/register",
+      "passed": true,
+      "detail": "Sent malformed JSON to http://localhost:3001/auth/register - got 400 (expect 400)",
+      "statusCode": 400
+    },
+    {
+      "test": "Oversized Payload - /auth/register (200KB+)",
+      "passed": true,
+      "detail": "Sent ~200KB payload to http://localhost:3001/auth/register - got 413 (expect 413 or 400)",
+      "statusCode": 413
+    }
+  ],
+  "summary": {
+    "passed": 2,
+    "failed": 0
+  }
+}

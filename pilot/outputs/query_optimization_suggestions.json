@@ -1,0 +1,16 @@
+{
+  "generatedAt": "2026-05-09T02:48:58.374Z",
+  "suggestions": [
+    {
+      "query": "SELECT with JOIN on large tables",
+      "suggestion": "Add composite indexes on foreign keys",
+      "impact": "2-5x faster"
+    },
+    {
+      "query": "Frequent user lookups",
+      "suggestion": "Cache user profiles in Redis",
+      "impact": "Reduce DB load by 60%"
+    }
+  ],
+  "methodology": "Query pattern analysis from Prisma query logs"
+}

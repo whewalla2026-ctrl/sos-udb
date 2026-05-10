@@ -1,0 +1,449 @@
+{
+  "generatedAt": "2026-05-08T08:38:20.690Z",
+  "title": "SOS-UDB Production Monitoring Dashboard",
+  "version": "1.0",
+  "metricsSchema": {
+    "counters": [
+      {
+        "name": "http_requests_total",
+        "labels": [
+          "method",
+          "path",
+          "status",
+          "service"
+        ],
+        "type": "counter",
+        "help": "Total HTTP requests"
+      },
+      {
+        "name": "auth_failures_total",
+        "labels": [
+          "reason",
+          "service"
+        ],
+        "type": "counter",
+        "help": "Auth failures by reason"
+      },
+      {
+        "name": "queue_failures_total",
+        "labels": [
+          "queue",
+          "service"
+        ],
+        "type": "counter",
+        "help": "Queue processing failures"
+      },
+      {
+        "name": "ai_hints_generated_total",
+        "labels": [
+          "subject",
+          "service"
+        ],
+        "type": "counter",
+        "help": "Total AI hints generated"
+      },
+      {
+        "name": "error_budget_burn",
+        "labels": [
+          "slo",
+          "service"
+        ],
+        "type": "counter",
+        "help": "Error budget burn units"
+      }
+    ],
+    "histograms": [
+      {
+        "name": "request_duration_seconds",
+        "labels": [
+          "method",
+          "path",
+          "service"
+        ],
+        "type": "histogram",
+        "help": "Request latency distribution",
+        "buckets": [
+          0.01,
+          0.025,
+          0.05,
+          0.1,
+          0.25,
+          0.5,
+          1,
+          2.5,
+          5,
+          10
+        ]
+      }
+    ],
+    "gauges": [
+      {
+        "name": "db_pool_usage",
+        "labels": [
+          "service"
+        ],
+        "type": "gauge",
+        "help": "Current DB pool connections in use"
+      },
+      {
+        "name": "db_pool_max",
+        "labels": [
+          "service"
+        ],
+        "type": "gauge",
+        "help": "Max DB pool connections"
+      },
+      {
+        "name": "redis_latency",
+        "labels": [
+          "service"
+        ],
+        "type": "gauge",
+        "help": "Redis operation latency in ms"
+      },
+      {
+        "name": "queue_depth",
+        "labels": [
+          "queue",
+          "service"
+        ],
+        "type": "gauge",
+        "help": "Current queue depth"
+      },
+      {
+        "name": "ai_budget_usage",
+        "labels": [
+          "userId",
+          "service"
+        ],
+        "type": "gauge",
+        "help": "AI budget used in $"
+      }
+    ]
+  },
+  "dashboard": {
+    "__inputs": [],
+    "__requires": [],
+    "annotations": {
+      "list": []
+    },
+    "editable": true,
+    "gnetId": null,
+    "graphTooltip": 0,
+    "hideControls": false,
+    "id": null,
+    "links": [],
+    "refresh": "15s",
+    "rows": [
+      {
+        "title": "System Overview",
+        "height": "250px",
+        "panels": [
+          {
+            "title": "Request Rate (req/s)",
+            "type": "graph",
+            "targets": [
+              {
+                "expr": "sum(rate(http_requests_total[1m]))",
+                "legendFormat": "All"
+              },
+              {
+                "expr": "rate(gateway_http_requests_total[1m])",
+                "legendFormat": "Gateway"
+              },
+              {
+                "expr": "rate(auth_http_requests_total[1m])",
+                "legendFormat": "Auth"
+              },
+              {
+                "expr": "rate(planner_http_requests_total[1m])",
+                "legendFormat": "Planner"
+              },
+              {
+                "expr": "rate(ai_http_requests_total[1m])",
+                "legendFormat": "AI"
+              }
+            ],
+            "grid": {
+              "leftMax": null
+            },
+            "yaxes": [
+              {
+                "format": "reqps"
+              },
+              {
+                "format": "short"
+              }
+            ],
+            "linewidth": 2
+          },
+          {
+            "title": "Latency (p95)",
+            "type": "graph",
+            "targets": [
+              {
+                "expr": "histogram_quantile(0.95, sum(rate(request_duration_seconds_bucket[1m])) by (le, service))",
+                "legendFormat": "{{service}}"
+              }
+            ],
+            "yaxes": [
+              {
+                "format": "s"
+              },
+              {
+                "format": "short"
+              }
+            ],
+            "linewidth": 2
+          },
+          {
+            "title": "Error Rate",
+            "type": "graph",
+            "targets": [
+              {
+                "expr": "sum(rate(http_requests_total{status=~\"5..\"}[1m])) / sum(rate(http_requests_total[1m])) * 100",
+                "legendFormat": "Error %"
+              },
+              {
+                "expr": "rate(auth_failures_total[1m])",
+                "legendFormat": "Auth failures"
+              }
+            ],
+            "yaxes": [
+              {
+                "format": "percent"
+              },
+              {
+                "format": "short"
+              }
+            ],
+            "linewidth": 2
+          }
+        ]
+      },
+      {
+        "title": "Database & Redis",
+        "height": "250px",
+        "panels": [
+          {
+            "title": "DB Pool Saturation",
+            "type": "graph",
+            "targets": [
+              {
+                "expr": "db_pool_usage / db_pool_max * 100",
+                "legendFormat": "Pool %"
+              }
+            ],
+            "yaxes": [
+              {
+                "format": "percent",
+                "max": 100
+              },
+              {
+                "format": "short"
+              }
+            ],
+            "linewidth": 2
+          },
+          {
+            "title": "Redis Latency",
+            "type": "graph",
+            "targets": [
+              {
+                "expr": "redis_latency",
+                "legendFormat": "Latency (ms)"
+              }
+            ],
+            "yaxes": [
+              {
+                "format": "ms"
+              },
+              {
+                "format": "short"
+              }
+            ],
+            "linewidth": 2
+          },
+          {
+            "title": "Queue Depth",
+            "type": "graph",
+            "targets": [
+              {
+                "expr": "queue_depth",
+                "legendFormat": "Queue depth"
+              },
+              {
+                "expr": "rate(queue_failures_total[1m])",
+                "legendFormat": "Queue failures"
+              }
+            ],
+            "yaxes": [
+              {
+                "format": "short"
+              },
+              {
+                "format": "short"
+              }
+            ],
+            "linewidth": 2
+          }
+        ]
+      },
+      {
+        "title": "AI & Cost",
+        "height": "250px",
+        "panels": [
+          {
+            "title": "AI Usage",
+            "type": "graph",
+            "targets": [
+              {
+                "expr": "rate(ai_hints_generated_total[1m])",
+                "legendFormat": "Hints/min"
+              },
+              {
+                "expr": "ai_budget_usage",
+                "legendFormat": "Budget usage ($)"
+              }
+            ],
+            "yaxes": [
+              {
+                "format": "short"
+              },
+              {
+                "format": "currency"
+              }
+            ],
+            "linewidth": 2
+          },
+          {
+            "title": "SLO Compliance",
+            "type": "singlestat",
+            "targets": [
+              {
+                "expr": "sum(rate(http_requests_total{status=~\"2..\"}[1m])) / sum(rate(http_requests_total[1m])) * 100"
+              }
+            ],
+            "format": "percent",
+            "gauge": {
+              "show": true,
+              "minValue": 99,
+              "maxValue": 100,
+              "thresholdMarkers": true
+            },
+            "thresholds": {
+              "": {
+                "color": "green"
+              },
+              "99.5": {
+                "color": "orange"
+              },
+              "99.0": {
+                "color": "red"
+              }
+            }
+          },
+          {
+            "title": "Budget Burn Rate",
+            "type": "graph",
+            "targets": [
+              {
+                "expr": "rate(error_budget_burn[1m])",
+                "legendFormat": "Burn rate"
+              }
+            ],
+            "yaxes": [
+              {
+                "format": "short"
+              },
+              {
+                "format": "short"
+              }
+            ],
+            "linewidth": 2
+          }
+        ]
+      }
+    ],
+    "schemaVersion": 14,
+    "style": "dark",
+    "tags": [
+      "sos-udb",
+      "production"
+    ],
+    "templating": {
+      "list": []
+    },
+    "time": {
+      "from": "now-1h",
+      "to": "now"
+    },
+    "timepicker": {
+      "refresh_intervals": [
+        "5s",
+        "15s",
+        "30s",
+        "1m",
+        "5m",
+        "15m"
+      ],
+      "time_options": [
+        "5m",
+        "15m",
+        "1h",
+        "6h",
+        "12h",
+        "24h",
+        "2d",
+        "7d",
+        "30d"
+      ]
+    },
+    "timezone": "browser",
+    "title": "SOS-UDB Production Monitoring",
+    "version": 1
+  },
+  "provisioning": {
+    "datasources": [
+      {
+        "name": "Prometheus",
+        "type": "prometheus",
+        "url": "http://localhost:9090",
+        "access": "proxy",
+        "isDefault": true
+      }
+    ],
+    "dashboards": {
+      "name": "SOS-UDB Production",
+      "folder": "Production"
+    }
+  },
+  "prometheusConfig": {
+    "global": {
+      "scrape_interval": "15s",
+      "evaluation_interval": "15s"
+    },
+    "scrape_configs": [
+      {
+        "job_name": "gateway",
+        "static_configs": [
+          {
+            "targets": [
+              "gateway:3000"
+            ]
+          }
+        ]
+      },
+      {
+        "job_name": "monitoring",
+        "static_configs": [
+          {
+            "targets": [
+              "monitoring:3004"
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

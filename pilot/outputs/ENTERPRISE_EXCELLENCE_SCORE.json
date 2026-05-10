@@ -1,0 +1,17 @@
+{
+  "generatedAt": "2026-05-09T03:17:03.017Z",
+  "overallScore": 8.9,
+  "dimensions": {
+    "runtimeMaturity": 9.5,
+    "operationalMaturity": 9,
+    "governanceMaturity": 9,
+    "aiGovernanceMaturity": 8.5,
+    "k8sReadiness": 9,
+    "scalabilityReadiness": 8.5,
+    "economicEfficiency": 9
+  },
+  "classification": "ENTERPRISE PRODUCTION READY",
+  "maxScore": 10,
+  "previousScore": 9.5,
+  "delta": "-0.6"
+}

@@ -5,7 +5,6 @@ COPY package*.json ./
 RUN npm install --production
 COPY services/api/prisma/phase3/shared/ ./shared/
 COPY services/api/prisma/phase3/gateway.js ./
-COPY services/api/prisma/phase3/node_modules/ ./node_modules/ 2>/dev/null || true
 EXPOSE 3000
 ENV NODE_PATH=/app/node_modules
 HEALTHCHECK --interval=15s --timeout=5s --start-period=30s --retries=3 \

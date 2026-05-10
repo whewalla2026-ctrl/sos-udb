@@ -1,0 +1,24 @@
+{
+  "generatedAt": "2026-05-09T03:10:30.049Z",
+  "rateGovernance": [
+    {
+      "test": "ai_hint_rate_limit",
+      "requests": 30,
+      "rateLimited": 0,
+      "passed": false,
+      "note": "no rate limiting detected"
+    },
+    {
+      "test": "brute_force_protection",
+      "attempts": 20,
+      "blocked": 12,
+      "passed": true
+    }
+  ],
+  "perTenantQuotas": {
+    "ai_hints": "100/min",
+    "login": "10/min/IP",
+    "api": "100/min"
+  },
+  "throttling": "active"
+}

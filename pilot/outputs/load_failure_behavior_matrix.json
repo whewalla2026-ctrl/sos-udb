@@ -1,0 +1,30 @@
+{
+  "generatedAt": "2026-05-08T05:49:48.554Z",
+  "matrix": {
+    "redisFailure": {
+      "loadImpact": "minimal",
+      "dataLoss": "possible",
+      "autoRecovery": true
+    },
+    "dbFailure": {
+      "loadImpact": "auth_unavailable",
+      "dataLoss": "none",
+      "autoRecovery": true
+    },
+    "queueCrash": {
+      "loadImpact": "processing_delay",
+      "dataLoss": "none",
+      "autoRecovery": true
+    },
+    "authFlood": {
+      "loadImpact": "none",
+      "dataLoss": "none",
+      "autoRecovery": true
+    },
+    "malformedPayload": {
+      "loadImpact": "none",
+      "dataLoss": "none",
+      "autoRecovery": true
+    }
+  }
+}

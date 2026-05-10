@@ -1,0 +1,41 @@
+{
+  "generatedAt": "2026-05-08T08:41:50.408Z",
+  "tenantA": {
+    "email": "tenant-a-1778229710380@test.com",
+    "registered": true
+  },
+  "tenantB": {
+    "email": "tenant-b-1778229710380@test.com",
+    "registered": true
+  },
+  "tests": [
+    {
+      "name": "Cross-tenant data access",
+      "error": "Could not acquire tokens",
+      "verdict": "SKIPPED"
+    },
+    {
+      "name": "JWT token isolation",
+      "error": "Missing tokens",
+      "verdict": "SKIPPED"
+    },
+    {
+      "name": "RBAC scope enforcement",
+      "error": "Could not register parent",
+      "verdict": "SKIPPED"
+    },
+    {
+      "name": "Rate limiting per identity",
+      "error": "Missing token A",
+      "verdict": "SKIPPED"
+    }
+  ],
+  "summary": {
+    "total": 4,
+    "passed": 0,
+    "skipped": 4,
+    "warning": 0,
+    "allPassed": false
+  },
+  "recommendations": []
+}

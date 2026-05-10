@@ -1,0 +1,15 @@
+{
+  "timestamp": "2026-05-09T02:27:37.397Z",
+  "summary": "SECURITY ANOMALY REPORTING ACTIVE",
+  "anomalyTypes": [
+    "Refresh token replay",
+    "Auth failures",
+    "RBAC violations",
+    "Rate limit breaches"
+  ],
+  "detectionMechanisms": [
+    "Prometheus counters",
+    "EventBus events",
+    "logAudit() records"
+  ]
+}

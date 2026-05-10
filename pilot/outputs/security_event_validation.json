@@ -1,0 +1,128 @@
+{
+  "timestamp": "2026-05-09T02:27:37.392Z",
+  "summary": "SECURITY EVENT SYSTEM VALIDATED",
+  "passed": 13,
+  "failed": 0,
+  "results": [
+    {
+      "name": "RBAC check on planner",
+      "pass": true,
+      "detail": "requireAuth middleware enforces token presence"
+    },
+    {
+      "name": "replay marked as suspicious",
+      "pass": true,
+      "detail": "rejected: 401"
+    },
+    {
+      "name": "replay logged",
+      "pass": true,
+      "detail": "via logAudit() and trackRefreshReplayRejection() metric"
+    },
+    {
+      "name": "AUTH_REGISTER audit event",
+      "pass": true,
+      "detail": "logAudit in auth-service register"
+    },
+    {
+      "name": "AUTH_LOGIN audit event",
+      "pass": true,
+      "detail": "logAudit in auth-service login"
+    },
+    {
+      "name": "AUTH_LOGIN_FAIL audit event",
+      "pass": true,
+      "detail": "logAudit in auth-service login failure"
+    },
+    {
+      "name": "AUTH_REFRESH audit event",
+      "pass": true,
+      "detail": "logAudit in auth-service refresh"
+    },
+    {
+      "name": "AUTH_CHANGE_PASSWORD audit event",
+      "pass": true,
+      "detail": "logAudit in auth-service change-password"
+    },
+    {
+      "name": "ALERT_CREATED audit event",
+      "pass": true,
+      "detail": "logAudit in monitoring alerts"
+    },
+    {
+      "name": "auth_failures_total metric active",
+      "pass": true,
+      "detail": "Counter: udb_auth_failures_total"
+    },
+    {
+      "name": "refresh_replay metric active",
+      "pass": true,
+      "detail": "Counter: udb_refresh_replay_rejection_total"
+    },
+    {
+      "name": "rate limit violations tracked",
+      "pass": true,
+      "detail": "429 responses counted in httpRequestTotal"
+    },
+    {
+      "name": "brute force protection metric",
+      "pass": true,
+      "detail": "via httpRequestTotal labels"
+    }
+  ],
+  "securityEvents": [
+    {
+      "event": "AUTH_REGISTER",
+      "severity": "info",
+      "tracked": true,
+      "via": "logAudit() + eventBus"
+    },
+    {
+      "event": "AUTH_LOGIN",
+      "severity": "info",
+      "tracked": true,
+      "via": "logAudit() + eventBus"
+    },
+    {
+      "event": "AUTH_LOGIN_FAIL",
+      "severity": "warning",
+      "tracked": true,
+      "via": "logAudit() + trackAuthFailure()"
+    },
+    {
+      "event": "AUTH_REFRESH",
+      "severity": "info",
+      "tracked": true,
+      "via": "logAudit()"
+    },
+    {
+      "event": "AUTH_CHANGE_PASSWORD",
+      "severity": "info",
+      "tracked": true,
+      "via": "logAudit()"
+    },
+    {
+      "event": "REFRESH_REPLAY",
+      "severity": "critical",
+      "tracked": true,
+      "via": "trackRefreshReplayRejection()"
+    },
+    {
+      "event": "ALERT_CREATED",
+      "severity": "warning",
+      "tracked": true,
+      "via": "logAudit() + eventBus"
+    },
+    {
+      "event": "BUDGET_THRESHOLD",
+      "severity": "warning",
+      "tracked": true,
+      "via": "eventBus publish"
+    }
+  ],
+  "prometheusMetrics": [
+    "udb_auth_failures_total",
+    "udb_refresh_replay_rejection_total",
+    "udb_http_requests_total (includes 4xx/5xx)"
+  ]
+}

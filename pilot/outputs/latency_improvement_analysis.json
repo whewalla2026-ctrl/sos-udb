@@ -1,0 +1,64 @@
+{
+  "generatedAt": "2026-05-08T08:44:56.408Z",
+  "baseline": {
+    "gateway": {
+      "p50": 367,
+      "p95": 593,
+      "p99": 607,
+      "throughput": 1585
+    },
+    "planner": {
+      "p50": 212,
+      "p95": 253,
+      "p99": 258,
+      "throughput": 769
+    },
+    "ai": {
+      "p50": 183,
+      "p95": 235,
+      "p99": 240,
+      "throughput": 806
+    }
+  },
+  "optimizations": [
+    {
+      "name": "Queue: BRPOP instead of polling",
+      "estimatedLatencyReduction": {
+        "p50": "~40%",
+        "p95": "~60%",
+        "p99": "~60%"
+      },
+      "combinedEstimatedImpact": {
+        "p50": "~55% reduction from 367ms → ~165ms",
+        "p95": "~70% reduction from 593ms → ~178ms",
+        "p99": "~70% reduction from 607ms → ~182ms"
+      }
+    },
+    {
+      "name": "Cache: TTL-based eviction",
+      "estimatedLatencyReduction": {
+        "p50": "~15%",
+        "p95": "~20%",
+        "p99": "~20%"
+      },
+      "combinedEstimatedImpact": {
+        "p50": "~55% reduction from 367ms → ~165ms",
+        "p95": "~70% reduction from 593ms → ~178ms",
+        "p99": "~70% reduction from 607ms → ~182ms"
+      }
+    },
+    {
+      "name": "DB: pgBouncer deployment",
+      "estimatedLatencyReduction": {
+        "p50": "~0% (throughput improvement)",
+        "p95": "~0%",
+        "p99": "~0%"
+      },
+      "combinedEstimatedImpact": {
+        "p50": "~55% reduction from 367ms → ~165ms",
+        "p95": "~70% reduction from 593ms → ~178ms",
+        "p99": "~70% reduction from 607ms → ~182ms"
+      }
+    }
+  ]
+}

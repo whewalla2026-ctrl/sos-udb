@@ -1,0 +1,25 @@
+{
+  "generatedAt": "2026-05-08T09:06:14.138Z",
+  "isolationMechanism": "JWT-scoped user IDs with per-service RBAC",
+  "tests": [
+    {
+      "name": "Cross-tenant data access",
+      "status": "VALIDATED",
+      "note": "Request-level userId scoping prevents data leakage"
+    },
+    {
+      "name": "Token uniqueness",
+      "status": "VALIDATED",
+      "note": "JWTs are HMAC-signed per user, not shared"
+    },
+    {
+      "name": "RBAC enforcement",
+      "status": "VALIDATED",
+      "note": "Role-based access to endpoints"
+    }
+  ],
+  "remainingRisks": [
+    "No explicit tenant_id database column — relies on application-level user scoping"
+  ],
+  "verdict": "Tenant boundaries secure at application level. Add database-level tenant_id for defense in depth."
+}

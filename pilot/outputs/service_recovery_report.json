@@ -1,0 +1,45 @@
+{
+  "generatedAt": "2026-05-09T02:48:13.559Z",
+  "services": [
+    {
+      "service": "gateway",
+      "status": "degraded",
+      "auto_restart": true,
+      "recovery_time": "<5s",
+      "ready": true
+    },
+    {
+      "service": "auth",
+      "status": "healthy",
+      "auto_restart": true,
+      "recovery_time": "<1s",
+      "ready": true
+    },
+    {
+      "service": "planner",
+      "status": "healthy",
+      "auto_restart": true,
+      "recovery_time": "<1s",
+      "ready": true
+    },
+    {
+      "service": "ai",
+      "status": "healthy",
+      "auto_restart": true,
+      "recovery_time": "<1s",
+      "ready": true
+    },
+    {
+      "service": "monitoring",
+      "status": "healthy",
+      "auto_restart": true,
+      "recovery_time": "<1s",
+      "ready": true
+    }
+  ],
+  "recovery_procedures": {
+    "single_service": "auto-restart <3s",
+    "full_system": "sequential restart ~30s",
+    "queue_continuity": "AOF preserves messages"
+  }
+}

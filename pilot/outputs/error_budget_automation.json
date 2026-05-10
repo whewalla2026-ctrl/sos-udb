@@ -1,0 +1,33 @@
+{
+  "generatedAt": "2026-05-09T03:34:25.498Z",
+  "sloCompliance": {
+    "target": "99.5%",
+    "currentComplianceRate": "0%",
+    "compliantServices": 0,
+    "drifts": [],
+    "status": "SLO DRIFT DETECTED"
+  },
+  "burnRate": {
+    "currentErrorRate": "0%",
+    "sampledRequests": 50,
+    "errorsFound": 0,
+    "acceleration": "NONE — 0 errors",
+    "burnRateAlert": "INACTIVE"
+  },
+  "reliabilityScore": {
+    "current": 0,
+    "trend": "IMPROVING",
+    "degradationDetected": true
+  },
+  "availability": {
+    "currentUptimeSeconds": 439,
+    "currentUptimeHours": "0.1",
+    "uptimePercentage": "99.9%+"
+  },
+  "automatedEnforcement": {
+    "recommendation": "AUTO-SCALE: Increase replicas to recover SLO",
+    "circuitBreakerAction": "CLOSE — maintain normal operations",
+    "scalingAction": "Trigger HPA scale-up"
+  },
+  "enforcements": []
+}

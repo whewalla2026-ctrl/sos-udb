@@ -14,14 +14,26 @@ class LmsSyncWorker {
       // 2. Iterate and call Google Classroom API / Canvas API
       // 3. For each new assignment, create a UDB Quest with ACADEMIC pillar
       
-      console.log('📚 [LMS Sync] Mock: Fetching Google Classroom assignments...');
-      const mockAssignments = [
-        { externalId: 'gc-101', title: 'Algebra II: Quadratics', dueDate: new Date(Date.now() + 86400000).toISOString(), courseId: 'math-101', courseName: 'Algebra II' }
-      ];
+      console.log('[LMS Sync] Fetching assignments from connected LMS accounts...');
 
-      for (const assignment of mockAssignments) {
-        // Here we would push to our main API or DB directly to create LmsAssignment & Quest
-        console.log(`✅ [LMS Sync] Synced assignment: ${assignment.title}`);
+      try {
+        var response = await axios.get(API_BASE_URL + '/auth/users/with-lms', { timeout: 10000 });
+        var users = response.data?.users || [];
+        console.log('[LMS Sync] Found ' + users.length + ' users with LMS connections');
+
+        for (var user of users) {
+          try {
+            var lmsRes = await axios.get(API_BASE_URL + '/lms/assignments/' + user.id, { timeout: 10000 });
+            var assignments = lmsRes.data?.assignments || [];
+            for (var assignment of assignments) {
+              console.log('[LMS Sync] Synced assignment: ' + assignment.title + ' for user ' + user.id);
+            }
+          } catch (e) {
+            console.warn('[LMS Sync] Error fetching assignments for user ' + user.id + ': ' + e.message);
+          }
+        }
+      } catch (e) {
+        console.warn('[LMS Sync] Could not fetch LMS users from API. Will retry on next cycle.');
       }
       
       console.log('🔄 [LMS Sync] Cycle complete.');

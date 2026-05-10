@@ -1,0 +1,47 @@
+{
+  "generatedAt": "2026-05-08T08:37:13.707Z",
+  "description": "Prisma connection pool stress test at increasing concurrency levels",
+  "tests": [
+    {
+      "concurrency": 10,
+      "operations": 100,
+      "success": 95,
+      "errors": 5,
+      "duration_ms": 1151,
+      "clientsUsed": 10
+    },
+    {
+      "concurrency": 20,
+      "operations": 200,
+      "success": 97,
+      "errors": 103,
+      "duration_ms": 4240,
+      "clientsUsed": 20
+    },
+    {
+      "concurrency": 50,
+      "operations": 300,
+      "success": 149,
+      "errors": 151,
+      "duration_ms": 5203,
+      "clientsUsed": 20
+    },
+    {
+      "concurrency": 100,
+      "operations": 500,
+      "success": 200,
+      "errors": 300,
+      "duration_ms": 5375,
+      "clientsUsed": 20
+    }
+  ],
+  "poolConfig": {
+    "maxConnections": 20,
+    "idleTimeout": 30000,
+    "connectTimeout": 10000
+  },
+  "pgbouncerAvailable": false,
+  "pgbouncerConfig": true,
+  "verdict": "Pool exhaustion detected",
+  "recommendation": "Deploy pgBouncer immediately. Pool exhaustion at tested concurrency levels."
+}

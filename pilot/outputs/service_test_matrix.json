@@ -1,0 +1,11 @@
+{
+  "generatedAt": "2026-05-08T10:53:55.815Z",
+  "serviceTestMatrix": {
+    "gateway": 3,
+    "auth": 4,
+    "planner": 3,
+    "ai": 4,
+    "monitoring": 2
+  },
+  "totalCoverage": 16
+}

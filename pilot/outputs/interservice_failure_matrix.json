@@ -1,0 +1,214 @@
+{
+  "timestamp": "2026-05-09T02:27:45.243Z",
+  "summary": "SOME MODES UNVERIFIED",
+  "total": 24,
+  "passed": 20,
+  "failed": 4,
+  "results": [
+    {
+      "name": "nonexistent user login returns 401",
+      "pass": false,
+      "detail": "status=429"
+    },
+    {
+      "name": "nonexistent user error message",
+      "pass": false,
+      "detail": "msg=Too many attempts. Try again later."
+    },
+    {
+      "name": "wrong password returns 401",
+      "pass": false,
+      "detail": "status=429"
+    },
+    {
+      "name": "duplicate email returns 409",
+      "pass": false,
+      "detail": "status=429"
+    },
+    {
+      "name": "planner no auth returns 401",
+      "pass": true,
+      "detail": "status=401"
+    },
+    {
+      "name": "planner empty body returns 400",
+      "pass": true,
+      "detail": "status=400"
+    },
+    {
+      "name": "planner nonexistent user returns 404",
+      "pass": true,
+      "detail": "status=404"
+    },
+    {
+      "name": "AI hint no auth returns 401",
+      "pass": true,
+      "detail": "status=401"
+    },
+    {
+      "name": "AI hint empty body returns 400",
+      "pass": true,
+      "detail": "status=400"
+    },
+    {
+      "name": "monitoring alert no auth returns 401",
+      "pass": true,
+      "detail": "status=401"
+    },
+    {
+      "name": "monitoring bad severity returns 400",
+      "pass": true,
+      "detail": "status=400"
+    },
+    {
+      "name": "monitoring alert no message returns 400",
+      "pass": true,
+      "detail": "status=400"
+    },
+    {
+      "name": "invalid token returns 401 on protected route",
+      "pass": true,
+      "detail": "status=401"
+    },
+    {
+      "name": "queue has DLQ protection",
+      "pass": true,
+      "detail": "dlq: prefix with cap at 1000 entries"
+    },
+    {
+      "name": "queue has retry mechanism",
+      "pass": true,
+      "detail": "maxAttempts with exponential backoff"
+    },
+    {
+      "name": "EventBus has memory fallback",
+      "pass": true,
+      "detail": "_fallback() when Redis unavailable"
+    },
+    {
+      "name": "EventBus has DLQ",
+      "pass": true,
+      "detail": "_deadLetter() with cap at 1000"
+    },
+    {
+      "name": "EventBus handler errors captured",
+      "pass": true,
+      "detail": "try/catch in consume() routes to DLQ"
+    },
+    {
+      "name": "Gateway→Auth: 4 failure modes mapped",
+      "pass": true,
+      "detail": "unavailable, bad_credentials, duplicate, malformed"
+    },
+    {
+      "name": "Gateway→Planner: 4 failure modes mapped",
+      "pass": true,
+      "detail": "unavailable, no_auth, invalid, not_found"
+    },
+    {
+      "name": "Gateway→AI: 3 failure modes mapped",
+      "pass": true,
+      "detail": "unavailable, no_auth, budget"
+    },
+    {
+      "name": "Gateway→Monitoring: 3 failure modes mapped",
+      "pass": true,
+      "detail": "unavailable, no_auth, invalid"
+    },
+    {
+      "name": "Redis: fallback exists",
+      "pass": true,
+      "detail": "memory fallback in EventBus + Queue"
+    },
+    {
+      "name": "PostgreSQL: fail-fast",
+      "pass": true,
+      "detail": "process exits, requires restart"
+    }
+  ],
+  "failure_matrix": {
+    "Gateway→Auth": {
+      "downstream_unavailable": {
+        "effect": "502 Bad Gateway",
+        "recoverable": true
+      },
+      "bad_credentials": {
+        "effect": "401 Unauthorized",
+        "recoverable": true
+      },
+      "duplicate_email": {
+        "effect": "409 Conflict",
+        "recoverable": true
+      },
+      "malformed_body": {
+        "effect": "400 Bad Request",
+        "recoverable": true
+      }
+    },
+    "Gateway→Planner": {
+      "downstream_unavailable": {
+        "effect": "502 Bad Gateway",
+        "recoverable": true
+      },
+      "missing_auth": {
+        "effect": "401 Unauthorized",
+        "recoverable": true
+      },
+      "invalid_userId": {
+        "effect": "400 Bad Request",
+        "recoverable": true
+      },
+      "not_found": {
+        "effect": "404 Not Found",
+        "recoverable": true
+      }
+    },
+    "Gateway→AI": {
+      "downstream_unavailable": {
+        "effect": "502 Bad Gateway",
+        "recoverable": true
+      },
+      "missing_auth": {
+        "effect": "401 Unauthorized",
+        "recoverable": true
+      },
+      "budget_exceeded": {
+        "effect": "402 Payment Required",
+        "recoverable": true
+      }
+    },
+    "Gateway→Monitoring": {
+      "downstream_unavailable": {
+        "effect": "502 Bad Gateway",
+        "recoverable": true
+      },
+      "missing_auth": {
+        "effect": "401 Unauthorized",
+        "recoverable": true
+      },
+      "invalid_payload": {
+        "effect": "400 Bad Request",
+        "recoverable": true
+      }
+    },
+    "Services→Redis": {
+      "connection_failure": {
+        "effect": "memory fallback + warning",
+        "recoverable": true
+      }
+    },
+    "Services→PostgreSQL": {
+      "connection_failure": {
+        "effect": "process exits with error",
+        "recoverable": false,
+        "requires": "restart"
+      }
+    }
+  },
+  "recommendations": [
+    "Add circuit breaker pattern for PostgreSQL connectivity",
+    "Add automatic retry for PostgreSQL connection in auth-service",
+    "Add health-check-based routing in gateway for degraded services",
+    "Add rate limit headers to all error responses"
+  ]
+}

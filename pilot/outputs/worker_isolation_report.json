@@ -1,0 +1,12 @@
+{
+  "generatedAt": "2026-05-09T02:48:13.559Z",
+  "isolation": {
+    "architecture": "per-service Node.js process",
+    "failure_boundary": "service crash isolated — gateway stays up (502 for failed service)",
+    "queue_isolation": "separate Redis lists per queue type",
+    "connection_isolation": "separate Redis connections per service",
+    "process_recovery": "auto-restart via Windows task scheduler or PM2"
+  },
+  "validation": "Each service is an independent Node.js process — failure does not cascade",
+  "tested": true
+}

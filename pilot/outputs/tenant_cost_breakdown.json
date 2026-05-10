@@ -1,0 +1,31 @@
+{
+  "generatedAt": "2026-05-09T02:48:46.533Z",
+  "perTenant": {
+    "cost_per_tenant": 0.5,
+    "ai_budget_cap": 0.5,
+    "billing_model": "per-active-user/month",
+    "currency": "USD"
+  },
+  "tiers": [
+    {
+      "users": 100,
+      "costPerUser": 4.55
+    },
+    {
+      "users": 1000,
+      "costPerUser": 0.64
+    },
+    {
+      "users": 10000,
+      "costPerUser": 0.26
+    },
+    {
+      "users": 50000,
+      "costPerUser": 0.22
+    },
+    {
+      "users": 100000,
+      "costPerUser": 0.22
+    }
+  ]
+}

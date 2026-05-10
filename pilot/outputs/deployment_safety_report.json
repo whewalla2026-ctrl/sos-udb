@@ -1,0 +1,92 @@
+{
+  "generatedAt": "2026-05-08T09:06:15.434Z",
+  "currentDeploymentModel": {
+    "type": "Manual start/stop (Start-Process)",
+    "zeroDowntime": false,
+    "rollingRestart": false,
+    "gracefulShutdown": "Not implemented — services use app.listen() without process signal handling",
+    "startupOrdering": "PostgreSQL → Redis → Auth → Planner → AI → Monitoring → Gateway"
+  },
+  "gracefulShutdownTest": {
+    "serviceKilled": "planner",
+    "gatewayResponseToDownstreamFailure": "PROPERLY ISOLATED (502)",
+    "gatewaySelfHealth": "STABLE",
+    "verdict": "Service failure properly isolated. Gateway continues serving."
+  },
+  "deploymentSafety": {
+    "rollingRestartRisk": "When a service is killed, in-flight requests fail with 502. In-memory cache (plans, userSpend) is lost.",
+    "mitigation": "Add process.on('SIGTERM', callback) to drain connections before exit. Add Redis-backed shared cache."
+  },
+  "startupDependencyGraph": [
+    {
+      "service": "PostgreSQL",
+      "dependsOn": [],
+      "port": 5432,
+      "startupTime": "<2s",
+      "healthEndpoint": "TCP connect"
+    },
+    {
+      "service": "Redis",
+      "dependsOn": [],
+      "port": 6379,
+      "startupTime": "<1s",
+      "healthEndpoint": "PING"
+    },
+    {
+      "service": "Auth",
+      "dependsOn": [
+        "PostgreSQL",
+        "Redis"
+      ],
+      "port": 3001,
+      "startupTime": "<2s",
+      "healthEndpoint": "/auth/health"
+    },
+    {
+      "service": "Planner",
+      "dependsOn": [
+        "Redis"
+      ],
+      "port": 3002,
+      "startupTime": "<1s",
+      "healthEndpoint": "/planner/health"
+    },
+    {
+      "service": "AI",
+      "dependsOn": [
+        "Redis"
+      ],
+      "port": 3003,
+      "startupTime": "<1s",
+      "healthEndpoint": "/ai/health"
+    },
+    {
+      "service": "Monitoring",
+      "dependsOn": [
+        "Redis"
+      ],
+      "port": 3004,
+      "startupTime": "<1s",
+      "healthEndpoint": "/monitoring/health"
+    },
+    {
+      "service": "Gateway",
+      "dependsOn": [
+        "Auth",
+        "Planner",
+        "AI",
+        "Monitoring",
+        "Redis"
+      ],
+      "port": 3000,
+      "startupTime": "<2s",
+      "healthEndpoint": "/gateway/health"
+    }
+  ],
+  "recommendations": [
+    "Add process.on(\"SIGTERM\", ...) handlers to all services for connection draining",
+    "Implement /health/ready (readiness) separate from /health/live (liveness)",
+    "Add Redis-backed shared cache to preserve state across restarts",
+    "For zero-downtime: add load balancer health check removal before stopping services"
+  ]
+}

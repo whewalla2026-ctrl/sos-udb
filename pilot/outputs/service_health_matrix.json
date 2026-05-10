@@ -1,0 +1,52 @@
+{
+  "generatedAt": "2026-05-08T09:14:11.389Z",
+  "services": {
+    "gateway": {
+      "status": "healthy",
+      "uptime": ">2h",
+      "endpoints": 14,
+      "errors": 0
+    },
+    "auth": {
+      "status": "healthy",
+      "uptime": ">2h",
+      "dependencies": [
+        "postgresql",
+        "redis"
+      ],
+      "errors": 0
+    },
+    "planner": {
+      "status": "healthy",
+      "uptime": ">2h",
+      "cacheSize": "active (TTL: 10min)",
+      "errors": 0
+    },
+    "ai": {
+      "status": "healthy",
+      "uptime": ">2h",
+      "budgetUsers": "active (TTL: 1hr)",
+      "errors": 0
+    },
+    "monitoring": {
+      "status": "healthy",
+      "uptime": ">2h",
+      "metrics": "Prometheus",
+      "errors": 0
+    }
+  },
+  "infrastructure": {
+    "postgresql": {
+      "status": "connected",
+      "poolUsage": "low",
+      "maxConnections": 20
+    },
+    "redis": {
+      "status": "connected",
+      "version": "3.0.504",
+      "persistence": "RDB",
+      "queues": "4 (depth: 0)"
+    }
+  },
+  "overallHealth": "ALL SYSTEMS OPERATIONAL"
+}

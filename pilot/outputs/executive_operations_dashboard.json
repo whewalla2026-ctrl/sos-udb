@@ -1,0 +1,51 @@
+{
+  "generatedAt": "2026-05-09T02:51:15.834Z",
+  "dashboard": {
+    "executiveSummary": {
+      "overallHealth": "healthy",
+      "uptime": "100% during all test periods",
+      "totalRequestsToday": 10780,
+      "errorRate": "0%",
+      "p95Latency": 6,
+      "servicesOnline": "5/5",
+      "activeAlerts": 0
+    },
+    "kpis": {
+      "availability": "100%",
+      "latency_p95": "<200ms user-facing",
+      "throughput": "5,714 req/s peak",
+      "errorBudget": "100% remaining",
+      "costPerUser": "$0.13 at 10k",
+      "cacheHitRate": ">85%"
+    },
+    "riskOverview": [
+      {
+        "risk": "No zero-downtime deploys",
+        "severity": "medium",
+        "mitigation": "K8s RollingUpdate strategy defined"
+      },
+      {
+        "risk": "pgBouncer not deployed",
+        "severity": "medium",
+        "mitigation": "Config ready, deploy with Docker"
+      },
+      {
+        "risk": "Redis version 3.0",
+        "severity": "low",
+        "mitigation": "BRPOP workers mitigate polling"
+      }
+    ],
+    "scalingReadiness": {
+      "currentMax": 5000,
+      "target10k": "conditional GO",
+      "target50k": "GO with items",
+      "target100k": "conditional GO"
+    },
+    "costOverview": {
+      "monthlyBase": 435,
+      "costAt10k": 1295,
+      "costAt100k": 12000,
+      "dominantDriver": "AI hint generation (46-65%)"
+    }
+  }
+}

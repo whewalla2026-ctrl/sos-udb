@@ -1,0 +1,112 @@
+{
+  "generatedAt": "2026-05-08T10:53:53.907Z",
+  "services": [
+    {
+      "name": "gateway",
+      "port": 3000,
+      "healthEndpoint": "/gateway/health",
+      "dependencies": [
+        "auth",
+        "planner",
+        "ai",
+        "monitoring",
+        "redis"
+      ],
+      "healthy": true,
+      "responseTime": "{\"service\":\"api-gateway\",\"status\":\"healthy\",\"uptim"
+    },
+    {
+      "name": "auth",
+      "port": 3001,
+      "healthEndpoint": "/auth/health",
+      "dependencies": [
+        "postgresql",
+        "redis"
+      ],
+      "healthy": true,
+      "responseTime": "{\"service\":\"auth-service\",\"status\":\"healthy\",\"time"
+    },
+    {
+      "name": "planner",
+      "port": 3002,
+      "healthEndpoint": "/planner/health",
+      "dependencies": [
+        "redis"
+      ],
+      "healthy": true,
+      "responseTime": "{\"service\":\"planner-service\",\"status\":\"healthy\",\"a"
+    },
+    {
+      "name": "ai",
+      "port": 3003,
+      "healthEndpoint": "/ai/health",
+      "dependencies": [
+        "redis",
+        "postgresql"
+      ],
+      "healthy": true,
+      "responseTime": "{\"service\":\"ai-service\",\"status\":\"healthy\",\"active"
+    },
+    {
+      "name": "monitoring",
+      "port": 3004,
+      "healthEndpoint": "/monitoring/health",
+      "dependencies": [
+        "redis",
+        "postgresql"
+      ],
+      "healthy": true,
+      "responseTime": "{\"status\":\"healthy\",\"timestamp\":\"2026-05-08T10:53:"
+    }
+  ],
+  "infrastructure": {
+    "PostgreSQL": true,
+    "Redis": true
+  },
+  "correlationPropagation": true,
+  "dependencyGraph": [
+    {
+      "service": "gateway",
+      "dependsOn": [
+        "auth",
+        "planner",
+        "ai",
+        "monitoring",
+        "redis"
+      ],
+      "allDepsAlive": true
+    },
+    {
+      "service": "auth",
+      "dependsOn": [
+        "postgresql",
+        "redis"
+      ],
+      "allDepsAlive": true
+    },
+    {
+      "service": "planner",
+      "dependsOn": [
+        "redis"
+      ],
+      "allDepsAlive": true
+    },
+    {
+      "service": "ai",
+      "dependsOn": [
+        "redis",
+        "postgresql"
+      ],
+      "allDepsAlive": true
+    },
+    {
+      "service": "monitoring",
+      "dependsOn": [
+        "redis",
+        "postgresql"
+      ],
+      "allDepsAlive": true
+    }
+  ],
+  "overallStatus": "ALL SYSTEMS OPERATIONAL"
+}

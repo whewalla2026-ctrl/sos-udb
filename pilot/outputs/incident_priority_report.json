@@ -1,0 +1,58 @@
+{
+  "generatedAt": "2026-05-08T09:56:30.933Z",
+  "definitions": [
+    {
+      "name": "Critical (P0)",
+      "responseTime": "< 5min",
+      "examples": [
+        "Gateway down",
+        "DB inaccessible",
+        "Data corruption"
+      ]
+    },
+    {
+      "name": "High (P1)",
+      "responseTime": "< 15min",
+      "examples": [
+        "Single service down",
+        "Queue backlog > 1000",
+        "p95 > 1s"
+      ]
+    },
+    {
+      "name": "Medium (P2)",
+      "responseTime": "< 1hr",
+      "examples": [
+        "Auth error spike",
+        "Memory > 80%",
+        "Cache miss rate > 50%"
+      ]
+    },
+    {
+      "name": "Low (P3)",
+      "responseTime": "< 24hr",
+      "examples": [
+        "Deprecated dependency",
+        "Documentation update",
+        "Minor optimization"
+      ]
+    }
+  ],
+  "escalationPath": [
+    {
+      "level": "L1",
+      "responder": "On-call SRE",
+      "responseTime": "< 5min P0, < 15min P1"
+    },
+    {
+      "level": "L2",
+      "responder": "SRE Lead",
+      "escalatedAfter": "15min P0, 30min P1"
+    },
+    {
+      "level": "L3",
+      "responder": "Engineering Manager",
+      "escalatedAfter": "30min P0, 1hr P1"
+    }
+  ]
+}

@@ -1,3 +1,6 @@
+const { initTracing, shutdownTracing } = require('./shared/tracing');
+initTracing('api-gateway');
+
 const express = require('express');
 const http = require('http');
 const helmet = require('helmet');
@@ -5,7 +8,8 @@ const cors = require('cors');
 const compression = require('compression');
 const { createLogger, correlationId } = require('./shared/logger');
 const { verifyToken, rateLimit, logAudit } = require('./shared/security');
-const { metricsMiddleware, metricsEndpoint } = require('./shared/prometheus');
+const { metricsMiddleware, metricsEndpoint, trackRequestDrain } = require('./shared/prometheus');
+const { CircuitBreaker } = require('./shared/circuit-breaker');
 const eventBus = require('./shared/event-bus');
 const queueService = require('./shared/queue');
 
@@ -14,11 +18,16 @@ const PORT = process.env.GATEWAY_PORT || 3000;
 const log = createLogger('api-gateway');
 
 const SERVICES = {
-  auth: { host: 'localhost', port: parseInt(process.env.AUTH_SERVICE_PORT || '3001') },
-  planner: { host: 'localhost', port: parseInt(process.env.PLANNER_SERVICE_PORT || '3002') },
-  ai: { host: 'localhost', port: parseInt(process.env.AI_SERVICE_PORT || '3003') },
-  monitoring: { host: 'localhost', port: parseInt(process.env.MONITORING_SERVICE_PORT || '3004') },
+  auth: { host: process.env.AUTH_SERVICE_HOST || 'localhost', port: parseInt(process.env.AUTH_SERVICE_PORT || '3001') },
+  planner: { host: process.env.PLANNER_SERVICE_HOST || 'localhost', port: parseInt(process.env.PLANNER_SERVICE_PORT || '3002') },
+  ai: { host: process.env.AI_SERVICE_HOST || 'localhost', port: parseInt(process.env.AI_SERVICE_PORT || '3003') },
+  monitoring: { host: process.env.MONITORING_SERVICE_HOST || 'localhost', port: parseInt(process.env.MONITORING_SERVICE_PORT || '3004') },
 };
+
+const circuitBreakers = {};
+for (const name of Object.keys(SERVICES)) {
+  circuitBreakers[name] = new CircuitBreaker(name, { failureThreshold: 5, cooldownMs: 30000, successThreshold: 2, timeoutMs: 10000 });
+}
 
 // Security middleware
 app.use(helmet({
@@ -34,69 +43,103 @@ app.use(express.urlencoded({ extended: true, limit: '100kb' }));
 app.use(correlationId);
 app.use(metricsMiddleware('api-gateway'));
 
-// Brute-force protection for auth routes
-const authIpTracker = new Map();
-function bruteForceProtect(req, res, next) {
-  const ip = req.ip;
-  const now = Date.now();
-  const minute = Math.floor(now / 60000);
-  const key = `${ip}:${minute}`;
-  const count = (authIpTracker.get(key) || 0) + 1;
-  authIpTracker.set(key, count);
-  if (count > 10) return res.status(429).json({ error: 'Too many attempts. Try again later.' });
-  setTimeout(() => authIpTracker.delete(key), 120000);
+// Brute-force protection for auth routes (Redis-backed, shared across instances)
+const { checkBruteForce } = require('./shared/redis-state');
+async function bruteForceProtect(req, res, next) {
+  let ip = req.connection?.remoteAddress || req.socket?.remoteAddress || req.ip || 'unknown';
+  if (ip.startsWith('::ffff:')) ip = ip.substring(7);
+  if (ip === '::1') ip = '127.0.0.1';
+  try {
+    const result = await checkBruteForce(ip);
+    if (!result.allowed) return res.status(429).json({ error: 'Too many attempts. Try again later.', distributed: true });
+  } catch (e) {
+    // Fallback: permissive if Redis is down
+  }
   next();
 }
 
 const globalRateLimit = rateLimit({ windowMs: 60000, max: 200 });
 
+const apiRateLimit = rateLimit({ windowMs: 60000, max: 100 });
+
+// Cross-tenant isolation: verify request userId matches token userId
+function enforceTenantAccess(req, res, next) {
+  if (req.params.userId && req.user && req.params.userId !== req.user.userId) {
+    return res.status(403).json({ error: 'Cross-tenant access denied', requested: req.params.userId, authenticated: req.user.userId });
+  }
+  next();
+}
+
 function proxy(targetService) {
-  return (req, res) => {
+  return async (req, res) => {
     const target = SERVICES[targetService];
     if (!target) return res.status(502).json({ error: `Service '${targetService}' not configured` });
+    const cb = circuitBreakers[targetService];
     const path = req.originalUrl;
+    const extraHeaders = { 'x-correlation-id': req.correlationId, 'x-forwarded-for': req.ip };
+    if (req.user) extraHeaders['x-user-id'] = req.user.userId;
+    const forwardedHeaders = { ...req.headers, ...extraHeaders };
+    // Recompute content-length when re-serializing the body
+    delete forwardedHeaders['content-length'];
+    delete forwardedHeaders['host'];
+    delete forwardedHeaders['connection'];
+    const bodyStr = Object.keys(req.body || {}).length > 0 ? JSON.stringify(req.body) : null;
+    if (bodyStr) forwardedHeaders['content-length'] = Buffer.byteLength(bodyStr).toString();
     const opts = {
       hostname: target.host,
       port: target.port,
       path,
       method: req.method,
-      headers: { ...req.headers, 'x-correlation-id': req.correlationId, 'x-forwarded-for': req.ip },
+      headers: forwardedHeaders,
       timeout: 10000,
     };
     const start = Date.now();
-    const proxyReq = http.request(opts, (proxyRes) => {
-      let body = '';
-      proxyRes.on('data', c => body += c);
-      proxyRes.on('end', () => {
-        const duration = Date.now() - start;
-        log.info('Request proxied', { method: req.method, path, statusCode: proxyRes.statusCode, duration_ms: duration });
-        // Secure cookies
-        const cookies = proxyRes.headers['set-cookie'];
-        if (cookies) {
-          proxyRes.headers['set-cookie'] = cookies.map(c => {
-            if (!c.includes('Secure')) c += '; Secure';
-            if (!c.includes('HttpOnly')) c += '; HttpOnly';
-            if (!c.includes('SameSite')) c += '; SameSite=Strict';
-            return c;
+
+    try {
+      const result = await cb.call(() => new Promise((resolve, reject) => {
+        const proxyReq = http.request(opts, (proxyRes) => {
+          let body = '';
+          proxyRes.on('data', c => body += c);
+          proxyRes.on('end', () => {
+            const duration = Date.now() - start;
+            log.info('Request proxied', { method: req.method, path, statusCode: proxyRes.statusCode, duration_ms: duration });
+            if (proxyRes.statusCode >= 500) {
+              reject(new Error(`Upstream ${proxyRes.statusCode}: ${body.slice(0, 200)}`));
+              return;
+            }
+            const cookies = proxyRes.headers['set-cookie'];
+            if (cookies) {
+              proxyRes.headers['set-cookie'] = cookies.map(c => {
+                if (!c.includes('Secure')) c += '; Secure';
+                if (!c.includes('HttpOnly')) c += '; HttpOnly';
+                if (!c.includes('SameSite')) c += '; SameSite=Strict';
+                return c;
+              });
+            }
+            res.status(proxyRes.statusCode).set(proxyRes.headers).send(body);
+            resolve();
           });
-        }
-        res.status(proxyRes.statusCode).set(proxyRes.headers).send(body);
-      });
-    });
-    proxyReq.on('error', (err) => {
-      log.error('Proxy error', { target: targetService, path, error: err.message });
-      res.status(502).json({ error: `Service '${targetService}' unavailable`, detail: err.message });
-    });
-    if (Object.keys(req.body || {}).length > 0) proxyReq.write(JSON.stringify(req.body));
-    proxyReq.end();
+        });
+        proxyReq.on('error', reject);
+        if (bodyStr) proxyReq.write(bodyStr);
+        proxyReq.end();
+      }));
+    } catch (err) {
+      const duration = Date.now() - start;
+      log.error('Proxy error', { target: targetService, path, error: err.message, circuitState: cb.getState(), duration_ms: duration });
+      if (err.name === 'CircuitBreakerOpenError') {
+        return res.status(503).json({ error: `Service '${targetService}' temporarily unavailable`, circuitState: 'OPEN', retryAfterMs: cb.cooldownMs });
+      }
+      return res.status(502).json({ error: `Service '${targetService}' unavailable`, detail: err.message });
+    }
   };
 }
 
-function requireAuth(req, res, next) {
+async function requireAuth(req, res, next) {
   const authHeader = req.headers['authorization'];
   if (!authHeader) return res.status(401).json({ error: 'Authorization header required' });
   const token = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : authHeader;
-  const decoded = verifyToken(token);
+  const decoded = await verifyToken(token);
   if (!decoded) return res.status(401).json({ error: 'Invalid or expired token' });
   req.user = decoded;
   next();
@@ -107,35 +150,37 @@ function requireAuth(req, res, next) {
 // Auth routes (unauthenticated)
 app.post('/auth/register', bruteForceProtect, globalRateLimit, proxy('auth'));
 app.post('/auth/login', bruteForceProtect, globalRateLimit, proxy('auth'));
-app.post('/auth/refresh', proxy('auth'));
-app.post('/auth/validate', proxy('auth'));
+app.post('/auth/refresh', globalRateLimit, proxy('auth'));
+app.post('/auth/validate', globalRateLimit, proxy('auth'));
+app.post('/auth/forgot-password', globalRateLimit, proxy('auth'));
+app.post('/auth/reset-password', globalRateLimit, proxy('auth'));
+app.post('/auth/change-password', globalRateLimit, proxy('auth'));
 
 // Auth routes (authenticated)
 app.get('/auth/me', requireAuth, (req, res) => res.json(req.user));
 
 // Planner routes
-app.post('/planning/generate', requireAuth, proxy('planner'));
-app.post('/planning/update', requireAuth, proxy('planner'));
-app.get('/planning/:userId', requireAuth, proxy('planner'));
+app.post('/planning/generate', requireAuth, apiRateLimit, proxy('planner'));
+app.post('/planning/update', requireAuth, apiRateLimit, proxy('planner'));
+app.get('/planning/:userId', requireAuth, enforceTenantAccess, apiRateLimit, proxy('planner'));
 
 // AI routes
-app.post('/ai-lite/hint', requireAuth, proxy('ai'));
-app.post('/ai-lite/batch', requireAuth, proxy('ai'));
-app.get('/ai-lite/budget/:userId', requireAuth, proxy('ai'));
+app.post('/ai-lite/hint', requireAuth, apiRateLimit, proxy('ai'));
+app.post('/ai-lite/batch', requireAuth, apiRateLimit, proxy('ai'));
+app.get('/ai-lite/budget/:userId', requireAuth, enforceTenantAccess, apiRateLimit, proxy('ai'));
 
 // Monitoring routes
 app.get('/monitoring/health', proxy('monitoring'));
-app.get('/monitoring/signals', requireAuth, proxy('monitoring'));
-app.post('/monitoring/alerts', requireAuth, proxy('monitoring'));
-app.get('/monitoring/alerts', requireAuth, proxy('monitoring'));
-app.get('/monitoring/events', requireAuth, proxy('monitoring'));
-app.post('/monitoring/signal', requireAuth, proxy('monitoring'));
+app.get('/monitoring/signals', requireAuth, apiRateLimit, proxy('monitoring'));
+app.post('/monitoring/alerts', requireAuth, apiRateLimit, proxy('monitoring'));
+app.get('/monitoring/alerts', requireAuth, apiRateLimit, proxy('monitoring'));
+app.get('/monitoring/events', requireAuth, apiRateLimit, proxy('monitoring'));
+app.post('/monitoring/signal', requireAuth, apiRateLimit, proxy('monitoring'));
 
 // Audit routes
-app.get('/audit/log', requireAuth, (req, res, next) => {
-  const { ROLES } = require('./shared/security');
-  const userRole = ROLES[req.user?.role];
-  if (!userRole || userRole < ROLES.ADMIN) return res.status(403).json({ error: 'Insufficient permissions' });
+app.get('/audit/log', requireAuth, apiRateLimit, (req, res, next) => {
+  const { hasRole } = require('./shared/security');
+  if (!req.user || !hasRole(req.user.role, 'ADMIN')) return res.status(403).json({ error: 'Insufficient permissions', required: 'ADMIN', userRole: req.user?.role });
   next();
 }, proxy('monitoring'));
 
@@ -151,6 +196,27 @@ app.get('/gateway/health', (req, res) => {
 app.get('/gateway/routes', (req, res) => {
   return res.json({ services: SERVICES, routes: ['/auth/*', '/planning/*', '/ai-lite/*', '/monitoring/*', '/audit/*', '/metrics', '/gateway/*'] });
 });
+
+// Circuit breaker status
+app.get('/gateway/circuit-breakers', (req, res) => {
+  const stats = {};
+  for (const [name, cb] of Object.entries(circuitBreakers)) {
+    stats[name] = cb.getMetrics();
+  }
+  return res.json({ circuitBreakers: stats, timestamp: new Date().toISOString() });
+});
+
+app.post('/gateway/circuit-breakers/:name/reset', (req, res) => {
+  const cb = circuitBreakers[req.params.name];
+  if (!cb) return res.status(404).json({ error: `Circuit breaker '${req.params.name}' not found` });
+  cb.reset();
+  return res.json({ message: `Circuit breaker '${req.params.name}' reset to CLOSED`, state: cb.getState() });
+});
+
+// Service health endpoints
+app.get('/auth/health', proxy('auth'));
+app.get('/planner/health', proxy('planner'));
+app.get('/ai/health', proxy('ai'));
 
 async function start() {
   await eventBus.connect();
@@ -192,6 +258,21 @@ async function start() {
 
   await eventBus.listen();
   log.info('Gateway started', { services: Object.keys(SERVICES) });
-  app.listen(PORT, () => log.info(`API Gateway listening on :${PORT}`));
+  const server = app.listen(PORT, () => log.info(`API Gateway listening on :${PORT}`));
+
+  process.on('SIGTERM', async () => {
+    const drainStart = Date.now();
+    log.info('SIGTERM received, draining active requests');
+    server.close(() => {
+      const drainDuration = (Date.now() - drainStart) / 1000;
+      trackRequestDrain(drainDuration);
+      log.info('HTTP server closed', { drainDurationMs: Date.now() - drainStart });
+    });
+    if (eventBus.client) { await eventBus.client.quit(); }
+    if (eventBus.subscriber) { await eventBus.subscriber.quit(); }
+    if (queueService.client) { await queueService.client.quit(); }
+    await shutdownTracing();
+    setTimeout(() => { log.warn('Forced exit after timeout', { drainDurationMs: Date.now() - drainStart }); process.exit(0); }, 10000).unref();
+  });
 }
 start();

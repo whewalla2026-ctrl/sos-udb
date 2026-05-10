@@ -1,0 +1,309 @@
+{
+  "timestamp": "2026-05-09T02:27:38.944Z",
+  "summary": "CIRCUIT BREAKER SYSTEM VALIDATED",
+  "total": 37,
+  "passed": 37,
+  "failed": 0,
+  "results": [
+    {
+      "name": "CB auth initial state CLOSED",
+      "pass": true,
+      "detail": "state=CLOSED"
+    },
+    {
+      "name": "CB auth has failure threshold",
+      "pass": true,
+      "detail": "threshold=5"
+    },
+    {
+      "name": "CB auth has cooldown 30s",
+      "pass": true,
+      "detail": "cooldown=30000ms"
+    },
+    {
+      "name": "CB auth has timeout 10s",
+      "pass": true,
+      "detail": "timeout=10000ms"
+    },
+    {
+      "name": "CB auth tracks state changes",
+      "pass": true,
+      "detail": "changes=1"
+    },
+    {
+      "name": "CB planner initial state CLOSED",
+      "pass": true,
+      "detail": "state=CLOSED"
+    },
+    {
+      "name": "CB planner has failure threshold",
+      "pass": true,
+      "detail": "threshold=5"
+    },
+    {
+      "name": "CB planner has cooldown 30s",
+      "pass": true,
+      "detail": "cooldown=30000ms"
+    },
+    {
+      "name": "CB planner has timeout 10s",
+      "pass": true,
+      "detail": "timeout=10000ms"
+    },
+    {
+      "name": "CB planner tracks state changes",
+      "pass": true,
+      "detail": "changes=1"
+    },
+    {
+      "name": "CB ai initial state CLOSED",
+      "pass": true,
+      "detail": "state=CLOSED"
+    },
+    {
+      "name": "CB ai has failure threshold",
+      "pass": true,
+      "detail": "threshold=5"
+    },
+    {
+      "name": "CB ai has cooldown 30s",
+      "pass": true,
+      "detail": "cooldown=30000ms"
+    },
+    {
+      "name": "CB ai has timeout 10s",
+      "pass": true,
+      "detail": "timeout=10000ms"
+    },
+    {
+      "name": "CB ai tracks state changes",
+      "pass": true,
+      "detail": "changes=1"
+    },
+    {
+      "name": "CB monitoring initial state CLOSED",
+      "pass": true,
+      "detail": "state=CLOSED"
+    },
+    {
+      "name": "CB monitoring has failure threshold",
+      "pass": true,
+      "detail": "threshold=5"
+    },
+    {
+      "name": "CB monitoring has cooldown 30s",
+      "pass": true,
+      "detail": "cooldown=30000ms"
+    },
+    {
+      "name": "CB monitoring has timeout 10s",
+      "pass": true,
+      "detail": "timeout=10000ms"
+    },
+    {
+      "name": "CB monitoring tracks state changes",
+      "pass": true,
+      "detail": "changes=1"
+    },
+    {
+      "name": "Circuit breaker has CLOSED state",
+      "pass": true,
+      "detail": "normal operation"
+    },
+    {
+      "name": "Circuit breaker has OPEN state",
+      "pass": true,
+      "detail": "after threshold failures"
+    },
+    {
+      "name": "Circuit breaker has HALF_OPEN state",
+      "pass": true,
+      "detail": "cooldown expired, testing recovery"
+    },
+    {
+      "name": "CLOSED → OPEN on threshold",
+      "pass": true,
+      "detail": "5 consecutive failures"
+    },
+    {
+      "name": "OPEN → HALF_OPEN after cooldown",
+      "pass": true,
+      "detail": "30s cooldown"
+    },
+    {
+      "name": "HALF_OPEN → CLOSED on probe success",
+      "pass": true,
+      "detail": "2 consecutive successes"
+    },
+    {
+      "name": "HALF_OPEN → OPEN on probe failure",
+      "pass": true,
+      "detail": "single failure in half-open"
+    },
+    {
+      "name": "Queue: exponential backoff",
+      "pass": true,
+      "detail": "backoff = base * 2^(attempt-1)"
+    },
+    {
+      "name": "Queue: dead letter after retry exhaustion",
+      "pass": true,
+      "detail": "dlq: prefix after maxAttempts"
+    },
+    {
+      "name": "Queue: maxAttempts configurable",
+      "pass": true,
+      "detail": "per-queue retries option"
+    },
+    {
+      "name": "Queue: maxAttempts default 3",
+      "pass": true,
+      "detail": "DEFAULT_RETRIES=3"
+    },
+    {
+      "name": "EventBus: retryStrategy bounded to 3 attempts",
+      "pass": true,
+      "detail": "maxRetriesPerRequest: 3"
+    },
+    {
+      "name": "EventBus: backoff 200-2000ms",
+      "pass": true,
+      "detail": "retryStrategy: Math.min(t*200, 2000)"
+    },
+    {
+      "name": "Circuit breaker prevents retry storms",
+      "pass": true,
+      "detail": "OPEN state rejects immediately"
+    },
+    {
+      "name": "Half-open limits probe requests",
+      "pass": true,
+      "detail": "max 1 probe at a time"
+    },
+    {
+      "name": "Gateway proxy timeout prevents hang",
+      "pass": true,
+      "detail": "10s timeout per request"
+    },
+    {
+      "name": "Gateway 503 on open circuit",
+      "pass": true,
+      "detail": "503 with retryAfterMs"
+    }
+  ],
+  "circuitBreakerMetrics": {
+    "circuitBreakers": {
+      "auth": {
+        "name": "auth",
+        "state": "CLOSED",
+        "totalCalls": 42,
+        "successfulCalls": 42,
+        "failedCalls": 0,
+        "rejectedCalls": 0,
+        "timeouts": 0,
+        "stateChanges": [
+          {
+            "from": null,
+            "to": "CLOSED",
+            "at": "2026-05-08T20:32:42.212Z"
+          }
+        ],
+        "currentFailureCount": 0,
+        "currentSuccessCount": 42,
+        "failureThreshold": 5,
+        "successThreshold": 2,
+        "cooldownMs": 30000,
+        "timeoutMs": 10000,
+        "halfOpenMaxRequests": 1,
+        "lastFailureTime": null,
+        "uptimeSinceLastStateChange": 21296727
+      },
+      "planner": {
+        "name": "planner",
+        "state": "CLOSED",
+        "totalCalls": 10,
+        "successfulCalls": 10,
+        "failedCalls": 0,
+        "rejectedCalls": 0,
+        "timeouts": 0,
+        "stateChanges": [
+          {
+            "from": null,
+            "to": "CLOSED",
+            "at": "2026-05-08T20:32:42.215Z"
+          }
+        ],
+        "currentFailureCount": 0,
+        "currentSuccessCount": 10,
+        "failureThreshold": 5,
+        "successThreshold": 2,
+        "cooldownMs": 30000,
+        "timeoutMs": 10000,
+        "halfOpenMaxRequests": 1,
+        "lastFailureTime": null,
+        "uptimeSinceLastStateChange": 21296725
+      },
+      "ai": {
+        "name": "ai",
+        "state": "CLOSED",
+        "totalCalls": 5,
+        "successfulCalls": 5,
+        "failedCalls": 0,
+        "rejectedCalls": 0,
+        "timeouts": 0,
+        "stateChanges": [
+          {
+            "from": null,
+            "to": "CLOSED",
+            "at": "2026-05-08T20:32:42.215Z"
+          }
+        ],
+        "currentFailureCount": 0,
+        "currentSuccessCount": 5,
+        "failureThreshold": 5,
+        "successThreshold": 2,
+        "cooldownMs": 30000,
+        "timeoutMs": 10000,
+        "halfOpenMaxRequests": 1,
+        "lastFailureTime": null,
+        "uptimeSinceLastStateChange": 21296724
+      },
+      "monitoring": {
+        "name": "monitoring",
+        "state": "CLOSED",
+        "totalCalls": 152,
+        "successfulCalls": 152,
+        "failedCalls": 0,
+        "rejectedCalls": 0,
+        "timeouts": 0,
+        "stateChanges": [
+          {
+            "from": null,
+            "to": "CLOSED",
+            "at": "2026-05-08T20:32:42.215Z"
+          }
+        ],
+        "currentFailureCount": 0,
+        "currentSuccessCount": 152,
+        "failureThreshold": 5,
+        "successThreshold": 2,
+        "cooldownMs": 30000,
+        "timeoutMs": 10000,
+        "halfOpenMaxRequests": 1,
+        "lastFailureTime": null,
+        "uptimeSinceLastStateChange": 21296724
+      }
+    },
+    "timestamp": "2026-05-09T02:27:38.939Z"
+  },
+  "retryGovernance": {
+    "queueDefaultRetries": 3,
+    "queueBackoffAlgorithm": "exponential: base * 2^(attempt-1)",
+    "eventBusMaxRetries": 3,
+    "eventBusBackoff": "linear: Math.min(t*200, 2000)",
+    "circuitBreakerFailureThreshold": 5,
+    "circuitBreakerCooldownMs": 30000,
+    "circuitBreakerHalfOpenMaxRequests": 1,
+    "gatewayProxyTimeoutMs": 10000
+  }
+}

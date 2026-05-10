@@ -1,0 +1,81 @@
+{
+  "timestamp": "2026-05-08T12:06:01.089Z",
+  "tests": [
+    {
+      "test": "Gateway routes traffic",
+      "ok": 50,
+      "fail": 0,
+      "passed": true
+    },
+    {
+      "test": "All services concurrent",
+      "allUp": true,
+      "passed": true
+    },
+    {
+      "test": "Gateway proxies to downstream",
+      "proxyOk": 3,
+      "proxyFail": 0,
+      "passed": true
+    },
+    {
+      "test": "Queue processing active",
+      "queueActivity": {
+        "user_created": {
+          "count": 10,
+          "dlq": 4
+        },
+        "user_logged_in": {
+          "count": 34,
+          "dlq": 0
+        },
+        "planner_created": {
+          "count": 908,
+          "dlq": 0
+        },
+        "planner_updated": {
+          "count": 0,
+          "dlq": 0
+        },
+        "hint_generated": {
+          "count": 4012,
+          "dlq": 3
+        },
+        "budget_threshold_hit": {
+          "count": 0,
+          "dlq": 0
+        },
+        "alert_triggered": {
+          "count": 7,
+          "dlq": 0
+        }
+      },
+      "passed": true
+    },
+    {
+      "test": "Gateway drain mechanism",
+      "hasUptime": true,
+      "passed": true
+    }
+  ],
+  "summary": {
+    "passed": 5,
+    "failed": 0
+  },
+  "services": [
+    "gateway",
+    "auth",
+    "planner",
+    "ai",
+    "monitoring"
+  ],
+  "sigtermHandlers": [
+    "gateway.js",
+    "auth-service.js",
+    "planner-service.js",
+    "ai-service.js",
+    "monitoring-service.js"
+  ],
+  "drainMechanism": "server.close() on SIGTERM + 10s force exit fallback",
+  "validationResult": "PASS"
+}

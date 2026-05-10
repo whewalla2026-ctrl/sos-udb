@@ -1,0 +1,32 @@
+{
+  "timestamp": "2026-05-08T12:01:53.180Z",
+  "tests": [
+    {
+      "test": "Auth health x100",
+      "ok": 100,
+      "fail": 0,
+      "passed": true
+    },
+    {
+      "test": "Planner health x100",
+      "ok": 100,
+      "fail": 0,
+      "passed": true
+    },
+    {
+      "test": "All services healthy",
+      "allHealthy": true,
+      "passed": true
+    },
+    {
+      "test": "Redis + DB connectivity",
+      "redisOk": true,
+      "dbOk": true,
+      "passed": true
+    }
+  ],
+  "summary": {
+    "passed": 4,
+    "failed": 0
+  }
+}

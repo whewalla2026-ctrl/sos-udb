@@ -1,0 +1,69 @@
+{
+  "timestamp": "2026-05-08T12:00:24.037Z",
+  "tests": [
+    {
+      "test": "Failed login",
+      "statusCode": 401,
+      "passed": true
+    },
+    {
+      "test": "Audit log entries exist",
+      "entryCount": 4,
+      "passed": true
+    },
+    {
+      "test": "Auth audit events",
+      "eventCount": 0,
+      "passed": false
+    },
+    {
+      "test": "Alert audit event",
+      "alertCreated": true,
+      "hasAlertAudit": true,
+      "passed": true
+    },
+    {
+      "test": "Audit entry structure",
+      "allHaveTimestamp": true,
+      "allHaveEvent": true,
+      "allHaveUserId": true,
+      "passed": true
+    }
+  ],
+  "summary": {
+    "passed": 4,
+    "failed": 1
+  },
+  "eventTrace": [
+    {
+      "event": "ALERT_CREATED",
+      "action": "alert_created",
+      "timestamp": "2026-05-08T11:51:30.877Z",
+      "userId": "anonymous"
+    },
+    {
+      "event": "ALERT_CREATED",
+      "action": "alert_created",
+      "timestamp": "2026-05-08T11:51:30.889Z",
+      "userId": "anonymous"
+    },
+    {
+      "event": "ALERT_CREATED",
+      "action": "alert_created",
+      "timestamp": "2026-05-08T11:53:09.963Z",
+      "userId": "anonymous"
+    },
+    {
+      "event": "ALERT_CREATED",
+      "action": "alert_created",
+      "timestamp": "2026-05-08T11:53:09.970Z",
+      "userId": "anonymous"
+    },
+    {
+      "event": "ALERT_CREATED",
+      "action": "alert_created",
+      "timestamp": "2026-05-08T12:00:24.058Z",
+      "userId": "anonymous"
+    }
+  ]
+}

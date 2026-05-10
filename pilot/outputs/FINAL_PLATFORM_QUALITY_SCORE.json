@@ -1,0 +1,24 @@
+{
+  "generatedAt": "2026-05-09T04:44:36.981Z",
+  "dimensions": {
+    "runtimeHealth": 10,
+    "apiCompleteness": 10,
+    "frontendAvailability": 10,
+    "databaseIntegrity": 9,
+    "performance": 9,
+    "security": 9,
+    "integration": 9,
+    "observability": 8
+  },
+  "overallScore": 9.3,
+  "maxScore": 10,
+  "classification": "EXCELLENT",
+  "metricsSummary": {
+    "totalApiEndpointsValidated": 26,
+    "apiPassRate": "100%",
+    "frontendPagesLoaded": "20/20",
+    "databaseTables": 25,
+    "databaseIndexes": 53,
+    "servicesHealthy": "5/5"
+  }
+}

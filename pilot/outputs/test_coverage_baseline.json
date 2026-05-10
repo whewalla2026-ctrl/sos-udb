@@ -1,0 +1,38 @@
+{
+  "reportTitle": "Unit Test Coverage Baseline Report",
+  "timestamp": "2026-05-09T06:08:00Z",
+  "coverage": {
+    "statements": 61.76,
+    "branches": 11.84,
+    "functions": 40.79,
+    "lines": 57.82
+  },
+  "testSuites": 2,
+  "totalTests": 2,
+  "passedTests": 2,
+  "failedTests": 0,
+  "testFiles": [
+    "services/api/test/e2e-phase2-db.spec.ts",
+    "services/api/test/e2e-phase2-graphql.spec.ts"
+  ],
+  "jestConfig": "services/api/jest.config.js",
+  "target": {
+    "coverageTarget": 85,
+    "gapStatements": 23.24,
+    "gapBranches": 73.16,
+    "gapFunctions": 44.21,
+    "gapLines": 27.18
+  },
+  "modulesWithoutTests": [
+    "academic", "activities", "ai", "audit", "auth", "biometric", "blockchain",
+    "doter", "entrepreneurship", "evidence", "family", "goals", "marketplace",
+    "messaging", "notifications", "points", "quests", "safety", "users",
+    "uup-sync", "weekly-plan"
+  ],
+  "nextSteps": [
+    "Create unit tests for resolver classes (easy wins, high coverage)",
+    "Create service-level unit tests with mocked Prisma/Redis",
+    "Add integration tests for GraphQL operations",
+    "Target: 85% statement coverage"
+  ]
+}

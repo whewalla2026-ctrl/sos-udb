@@ -1,0 +1,85 @@
+{
+  "generatedAt": "__TIMESTAMP__",
+  "manifestSet": {
+    "namespace": "sos-udb",
+    "services": [
+      {
+        "name": "gateway",
+        "replicas": 2,
+        "port": 3000,
+        "healthProbe": "/gateway/health",
+        "dependsOn": ["auth", "planner", "ai", "monitoring"]
+      },
+      {
+        "name": "auth",
+        "replicas": 2,
+        "port": 3001,
+        "healthProbe": "/auth/health",
+        "dependsOn": ["postgresql", "redis"]
+      },
+      {
+        "name": "planner",
+        "replicas": 2,
+        "port": 3002,
+        "healthProbe": "/planner/health",
+        "dependsOn": ["redis"]
+      },
+      {
+        "name": "ai",
+        "replicas": 3,
+        "port": 3003,
+        "healthProbe": "/ai/health",
+        "dependsOn": ["redis"]
+      },
+      {
+        "name": "monitoring",
+        "replicas": 1,
+        "port": 3004,
+        "healthProbe": "/monitoring/health",
+        "dependsOn": ["redis"]
+      }
+    ],
+    "infrastructure": {
+      "postgresql": { "replicas": 1, "port": 5432, "storage": "20Gi", "ha": "pgBouncer sidecar" },
+      "redis": { "replicas": 1, "port": 6379, "storage": "5Gi", "version": "7-alpine" }
+    }
+  },
+  "hpa": [
+    { "service": "gateway", "minReplicas": 2, "maxReplicas": 10, "cpuPercent": 70 },
+    { "service": "auth", "minReplicas": 2, "maxReplicas": 8, "cpuPercent": 70 },
+    { "service": "planner", "minReplicas": 2, "maxReplicas": 10, "cpuPercent": 60 },
+    { "service": "ai", "minReplicas": 3, "maxReplicas": 20, "cpuPercent": 50 },
+    { "service": "monitoring", "minReplicas": 1, "maxReplicas": 3, "cpuPercent": 80 }
+  ],
+  "configMap": {
+    "LOG_LEVEL": "INFO",
+    "NODE_ENV": "production",
+    "JWT_TOKEN_EXPIRY": "3600",
+    "QUEUE_DEFAULT_RETRIES": "3",
+    "QUEUE_DEFAULT_BACKOFF": "1000",
+    "DB_POOL_MAX": "20",
+    "DB_POOL_IDLE_TIMEOUT": "30000",
+    "AI_COST_PER_HINT": "0.0004",
+    "AI_BUDGET_PER_USER_MONTHLY": "0.50"
+  },
+  "secrets": ["DATABASE_URL", "REDIS_URL", "JWT_SECRET"],
+  "deploymentStrategy": {
+    "type": "RollingUpdate",
+    "maxUnavailable": 1,
+    "maxSurge": 1
+  },
+  "readinessProbe": { "initialDelaySeconds": 5, "periodSeconds": 10, "timeoutSeconds": 3 },
+  "livenessProbe": { "initialDelaySeconds": 15, "periodSeconds": 20, "timeoutSeconds": 5 },
+  "resources": {
+    "gateway": { "requests": { "cpu": "100m", "memory": "128Mi" }, "limits": { "cpu": "500m", "memory": "256Mi" } },
+    "auth": { "requests": { "cpu": "100m", "memory": "128Mi" }, "limits": { "cpu": "500m", "memory": "256Mi" } },
+    "planner": { "requests": { "cpu": "200m", "memory": "256Mi" }, "limits": { "cpu": "1", "memory": "512Mi" } },
+    "ai": { "requests": { "cpu": "200m", "memory": "256Mi" }, "limits": { "cpu": "1", "memory": "512Mi" } },
+    "monitoring": { "requests": { "cpu": "100m", "memory": "128Mi" }, "limits": { "cpu": "300m", "memory": "256Mi" } }
+  },
+  "ingress": {
+    "host": "api.sos-udb.io",
+    "tls": true,
+    "rateLimit": "100 req/min per IP"
+  }
+}

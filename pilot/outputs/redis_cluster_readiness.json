@@ -1,0 +1,13 @@
+{
+  "generatedAt": "2026-05-08T10:56:27.796Z",
+  "queueThroughput": {
+    "generatedAt": "2026-05-08T10:56:27.795Z",
+    "testSize": 10000,
+    "pushRate_ops": 181818,
+    "popRate_ops": 8658,
+    "estimated100kPushSec": 1,
+    "estimated100kPopSec": 12,
+    "recommendation": "Queue handles 10k items in 55ms. 100k estimated in ~1s."
+  },
+  "clusterReadiness": "Redis 3.0 adequate for 10k users. Upgrade to Redis 7 for clustering."
+}

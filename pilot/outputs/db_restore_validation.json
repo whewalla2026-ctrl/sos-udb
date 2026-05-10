@@ -1,0 +1,140 @@
+{
+  "generatedAt": "2026-05-08T09:49:36.015Z",
+  "backupTimestamp": "2026-05-08T09:49:35.974Z",
+  "validationResults": [
+    {
+      "table": "goals",
+      "rowCount": 0,
+      "backedUp": true
+    },
+    {
+      "table": "lms_connections",
+      "rowCount": 0,
+      "backedUp": true
+    },
+    {
+      "table": "biometric_logs",
+      "rowCount": 0,
+      "backedUp": true
+    },
+    {
+      "table": "messages",
+      "rowCount": 0,
+      "backedUp": true
+    },
+    {
+      "table": "skill_agents",
+      "rowCount": 0,
+      "backedUp": true
+    },
+    {
+      "table": "audit_logs",
+      "rowCount": 0,
+      "backedUp": true
+    },
+    {
+      "table": "simulation_runs",
+      "rowCount": 0,
+      "backedUp": true
+    },
+    {
+      "table": "simulation_pathways",
+      "rowCount": 0,
+      "backedUp": true
+    },
+    {
+      "table": "users",
+      "rowCount": 38,
+      "backedUp": true
+    },
+    {
+      "table": "family_links",
+      "rowCount": 0,
+      "backedUp": true
+    },
+    {
+      "table": "doter_profiles",
+      "rowCount": 0,
+      "backedUp": true
+    },
+    {
+      "table": "quests",
+      "rowCount": 0,
+      "backedUp": true
+    },
+    {
+      "table": "points_ledger",
+      "rowCount": 0,
+      "backedUp": true
+    },
+    {
+      "table": "activities",
+      "rowCount": 0,
+      "backedUp": true
+    },
+    {
+      "table": "streaks",
+      "rowCount": 0,
+      "backedUp": true
+    },
+    {
+      "table": "lms_assignments",
+      "rowCount": 0,
+      "backedUp": true
+    },
+    {
+      "table": "skill_gaps",
+      "rowCount": 0,
+      "backedUp": true
+    },
+    {
+      "table": "tutoring_sessions",
+      "rowCount": 0,
+      "backedUp": true
+    },
+    {
+      "table": "evidence_items",
+      "rowCount": 0,
+      "backedUp": true
+    },
+    {
+      "table": "ventures",
+      "rowCount": 0,
+      "backedUp": true
+    },
+    {
+      "table": "escrows",
+      "rowCount": 0,
+      "backedUp": true
+    },
+    {
+      "table": "safety_scores",
+      "rowCount": 0,
+      "backedUp": true
+    },
+    {
+      "table": "achievements",
+      "rowCount": 0,
+      "backedUp": true
+    },
+    {
+      "table": "weekly_plans",
+      "rowCount": 0,
+      "backedUp": true
+    },
+    {
+      "table": "notifications",
+      "rowCount": 0,
+      "backedUp": true
+    }
+  ],
+  "restorationSteps": [
+    "1. Create fresh database: CREATE DATABASE udb_restore;",
+    "2. Restore schema: psql -U udb -d udb_restore -f D:\\SOS-UDB\\pilot\\outputs\\backups\\udb_schema_1778233775974.sql",
+    "3. Restore data: psql -U udb -d udb_restore -f D:\\SOS-UDB\\pilot\\outputs\\backups\\udb_data_1778233775974.sql",
+    "4. Verify row counts match pre-backup state"
+  ],
+  "estimatedRTO": "2 minutes (schema + data re-import)",
+  "estimatedRPO": "Up to 24 hours (nightly backup schedule)",
+  "gap": "No automated restore testing — manual validation required"
+}

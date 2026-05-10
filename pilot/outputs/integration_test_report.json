@@ -1,0 +1,64 @@
+{
+  "generatedAt": "2026-05-09T03:12:37.163Z",
+  "integrationTests": [
+    {
+      "layer": "PostgreSQL",
+      "test": "connectivity",
+      "passed": true,
+      "note": "Prisma connected successfully"
+    },
+    {
+      "layer": "Redis",
+      "test": "connectivity",
+      "passed": true,
+      "note": "Redis connected, 83 keys"
+    },
+    {
+      "layer": "Queue",
+      "test": "push_pop",
+      "passed": true,
+      "note": "BRPOP push: 181k ops/s, pop: 8.6k ops/s"
+    },
+    {
+      "layer": "Gateway",
+      "test": "gateway_health",
+      "status": 200,
+      "passed": true
+    },
+    {
+      "layer": "Gateway",
+      "test": "auth_health",
+      "status": 200,
+      "passed": true
+    },
+    {
+      "layer": "Gateway",
+      "test": "planner_health",
+      "status": 200,
+      "passed": true
+    },
+    {
+      "layer": "Gateway",
+      "test": "ai_health",
+      "status": 200,
+      "passed": true
+    },
+    {
+      "layer": "Gateway",
+      "test": "monitoring_health",
+      "status": 200,
+      "passed": true
+    },
+    {
+      "layer": "Monitoring",
+      "test": "metrics_endpoint",
+      "status": 404,
+      "passed": false
+    }
+  ],
+  "summary": {
+    "total": 9,
+    "passed": 8,
+    "failed": 1
+  }
+}

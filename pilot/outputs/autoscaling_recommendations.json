@@ -1,0 +1,56 @@
+{
+  "generatedAt": "2026-05-09T02:48:13.576Z",
+  "recommendations": [
+    {
+      "service": "gateway",
+      "current_replicas": 1,
+      "recommended_min": 2,
+      "recommended_max": 10,
+      "trigger_metric": "CPU > 70%",
+      "cooldown_seconds": 300,
+      "rationale": "Entry point for all traffic"
+    },
+    {
+      "service": "auth",
+      "current_replicas": 1,
+      "recommended_min": 2,
+      "recommended_max": 8,
+      "trigger_metric": "CPU > 70%",
+      "cooldown_seconds": 300,
+      "rationale": "Standard HA configuration"
+    },
+    {
+      "service": "planner",
+      "current_replicas": 1,
+      "recommended_min": 2,
+      "recommended_max": 10,
+      "trigger_metric": "CPU > 70%",
+      "cooldown_seconds": 300,
+      "rationale": "Standard HA configuration"
+    },
+    {
+      "service": "ai",
+      "current_replicas": 1,
+      "recommended_min": 3,
+      "recommended_max": 20,
+      "trigger_metric": "CPU > 70%",
+      "cooldown_seconds": 300,
+      "rationale": "AI is dominant cost driver — scale proactively"
+    },
+    {
+      "service": "monitoring",
+      "current_replicas": 1,
+      "recommended_min": 2,
+      "recommended_max": 3,
+      "trigger_metric": "CPU > 70%",
+      "cooldown_seconds": 300,
+      "rationale": "Standard HA configuration"
+    }
+  ],
+  "hpa_config": {
+    "min_replicas": 2,
+    "max_replicas": 10,
+    "cpu_threshold": 70,
+    "cooldown": 300
+  }
+}

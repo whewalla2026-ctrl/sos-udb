@@ -1,0 +1,30 @@
+{
+  "generatedAt": "2026-05-09T03:11:51.573Z",
+  "events": [
+    {
+      "event": "auth_login_fail",
+      "status": 401,
+      "blocked": true,
+      "timestamp": "2026-05-09T03:11:51.513Z"
+    },
+    {
+      "event": "unauthorized_route_access",
+      "status": 401,
+      "blocked": true,
+      "timestamp": "2026-05-09T03:11:51.516Z"
+    },
+    {
+      "event": "brute_force_detection",
+      "blocked": 6,
+      "total_attempts": 15,
+      "mechanism": "IP-based rate limit 10/min",
+      "detected": true
+    }
+  ],
+  "pipeline": "active — all auth events logged with timestamps",
+  "metrics": [
+    "udb_auth_failures_total",
+    "udb_refresh_replay_rejection_total",
+    "udb_http_requests_total"
+  ]
+}

@@ -1,0 +1,34 @@
+{
+  "title": "UDB Runtime Overview",
+  "panels": [
+    {
+      "title": "HTTP Request Rate",
+      "type": "graph",
+      "targets": [
+        { "expr": "rate(udb_http_requests_total[1m])", "legendFormat": "{{service}} {{method}}" }
+      ]
+    },
+    {
+      "title": "Request Duration (p95)",
+      "type": "graph",
+      "targets": [
+        { "expr": "histogram_quantile(0.95, sum(rate(udb_http_request_duration_seconds_bucket[1m])) by (le, service))", "legendFormat": "{{service}}" }
+      ]
+    },
+    {
+      "title": "Active Memory",
+      "type": "graph",
+      "targets": [
+        { "expr": "udb_process_resident_memory_bytes / 1024 / 1024", "legendFormat": "{{service}}" }
+      ]
+    },
+    {
+      "title": "Auth Failures",
+      "type": "graph",
+      "targets": [
+        { "expr": "rate(udb_auth_failures_total[1m])", "legendFormat": "failures" }
+      ]
+    }
+  ],
+  "schemaVersion": 27
+}

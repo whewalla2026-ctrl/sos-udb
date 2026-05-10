@@ -1,0 +1,37 @@
+{
+  "generatedAt": "2026-05-08T05:42:55.173Z",
+  "maxTestedConcurrency": 300,
+  "scalabilityCeiling": "No degradation observed within tested range (up to 300 concurrent)",
+  "bottleneckDetails": [
+    {
+      "concurrency": 10,
+      "issues": [],
+      "healthy": true
+    },
+    {
+      "concurrency": 25,
+      "issues": [],
+      "healthy": true
+    },
+    {
+      "concurrency": 50,
+      "issues": [],
+      "healthy": true
+    },
+    {
+      "concurrency": 100,
+      "issues": [],
+      "healthy": true
+    },
+    {
+      "concurrency": 200,
+      "issues": [],
+      "healthy": true
+    },
+    {
+      "concurrency": 300,
+      "issues": [],
+      "healthy": true
+    }
+  ]
+}

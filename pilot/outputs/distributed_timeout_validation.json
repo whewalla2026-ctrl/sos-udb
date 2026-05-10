@@ -1,0 +1,108 @@
+{
+  "timestamp": "2026-05-09T02:27:46.793Z",
+  "summary": "ALL TIMEOUT VALIDATIONS PASSED",
+  "total": 19,
+  "passed": 19,
+  "failed": 0,
+  "results": [
+    {
+      "name": "auth responds < 500ms (avg=16ms)",
+      "pass": true,
+      "detail": "avg=16ms min=1ms max=70ms"
+    },
+    {
+      "name": "planner responds < 500ms (avg=4ms)",
+      "pass": true,
+      "detail": "avg=4ms min=2ms max=9ms"
+    },
+    {
+      "name": "ai responds < 500ms (avg=5ms)",
+      "pass": true,
+      "detail": "avg=5ms min=1ms max=14ms"
+    },
+    {
+      "name": "monitoring responds < 500ms (avg=2ms)",
+      "pass": true,
+      "detail": "avg=2ms min=1ms max=5ms"
+    },
+    {
+      "name": "gateway responds < 500ms (avg=1ms)",
+      "pass": true,
+      "detail": "avg=1ms min=0ms max=3ms"
+    },
+    {
+      "name": "gateway proxy has explicit timeout",
+      "pass": true,
+      "detail": "10s timeout configured in proxy()"
+    },
+    {
+      "name": "auth service responds within bounds",
+      "pass": true,
+      "detail": "Express default timeout applies"
+    },
+    {
+      "name": "planner service responds within bounds",
+      "pass": true,
+      "detail": "Express default timeout applies"
+    },
+    {
+      "name": "ai service responds within bounds",
+      "pass": true,
+      "detail": "Express default timeout applies"
+    },
+    {
+      "name": "monitoring service responds within bounds",
+      "pass": true,
+      "detail": "Express default timeout applies"
+    },
+    {
+      "name": "gateway proxy timeout = 10s",
+      "pass": true,
+      "detail": "10000ms"
+    },
+    {
+      "name": "all HTTP timeouts bounded",
+      "pass": true,
+      "detail": "all 5 services bounded"
+    },
+    {
+      "name": "EventBus maxRetriesPerRequest=3",
+      "pass": true,
+      "detail": "configured in event-bus.js"
+    },
+    {
+      "name": "EventBus retryStrategy bounded",
+      "pass": true,
+      "detail": "max 3 retries, backoff 200-2000ms"
+    },
+    {
+      "name": "Queue maxRetriesPerRequest=3",
+      "pass": true,
+      "detail": "configured in queue.js"
+    },
+    {
+      "name": "Queue DEFAULT_RETRIES=3",
+      "pass": true,
+      "detail": "configured in queue.js"
+    },
+    {
+      "name": "Queue exponential backoff",
+      "pass": true,
+      "detail": "backoff = base * 2^(attempt-1)"
+    },
+    {
+      "name": "Queue dead letter after max retries",
+      "pass": true,
+      "detail": "moved to dlq: prefix after exhaustion"
+    },
+    {
+      "name": "Redis connections bounded (max 3 retries)",
+      "pass": true,
+      "detail": "3 services use bounded Redis retries"
+    }
+  ],
+  "gatewayProxyTimeoutMs": 10000,
+  "queueDefaultRetries": 3,
+  "redisMaxRetries": 3,
+  "eventBusMaxRetries": 3
+}

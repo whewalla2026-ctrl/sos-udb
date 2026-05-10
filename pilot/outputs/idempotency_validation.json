@@ -1,0 +1,121 @@
+{
+  "timestamp": "2026-05-09T02:27:40.919Z",
+  "summary": "ALL IDEMPOTENCY VALIDATIONS PASSED",
+  "total": 18,
+  "passed": 18,
+  "failed": 0,
+  "results": [
+    {
+      "name": "planner first call returns 200",
+      "pass": true,
+      "detail": "status=200"
+    },
+    {
+      "name": "planner idempotent call returns same status",
+      "pass": true,
+      "detail": "first=200 second=200"
+    },
+    {
+      "name": "planner idempotent returns same planId",
+      "pass": true,
+      "detail": "first=88ce9f73-0e0f-451c-aa6e-5eb55bacdd88 second=88ce9f73-0e0f-451c-aa6e-5eb55bacdd88"
+    },
+    {
+      "name": "planner no key returns 200",
+      "pass": true,
+      "detail": "status=200"
+    },
+    {
+      "name": "AI hint first call returns 200",
+      "pass": true,
+      "detail": "status=200"
+    },
+    {
+      "name": "AI hint has hint text",
+      "pass": true,
+      "detail": "has hint"
+    },
+    {
+      "name": "AI hint idempotent call returns same response",
+      "pass": true,
+      "detail": "match=true"
+    },
+    {
+      "name": "first refresh returns 200",
+      "pass": true,
+      "detail": "status=200"
+    },
+    {
+      "name": "replay old refresh rejected",
+      "pass": true,
+      "detail": "status=401"
+    },
+    {
+      "name": "replay rejection message",
+      "pass": true,
+      "detail": "msg=Refresh token revoked or already used"
+    },
+    {
+      "name": "password change returns 200",
+      "pass": true,
+      "detail": "status=200"
+    },
+    {
+      "name": "password change revoked tokens",
+      "pass": true,
+      "detail": "revoked=1"
+    },
+    {
+      "name": "second password change works",
+      "pass": true,
+      "detail": "status=200"
+    },
+    {
+      "name": "queue has retry with backoff",
+      "pass": true,
+      "detail": "exponential backoff + DLQ"
+    },
+    {
+      "name": "queue prevents duplicate processing",
+      "pass": true,
+      "detail": "SHA-256 hash dedup via deduplicateJob()"
+    },
+    {
+      "name": "queue dead letter after exhaustion",
+      "pass": true,
+      "detail": "dlq: prefix with 1000 cap"
+    },
+    {
+      "name": "short idempotency key rejected",
+      "pass": true,
+      "detail": "status=400"
+    },
+    {
+      "name": "long idempotency key rejected",
+      "pass": true,
+      "detail": "status=400"
+    }
+  ],
+  "idempotencyCoverage": {
+    "plannerGenerate": {
+      "status": "PROTECTED",
+      "mechanism": "Idempotency-Key via Redis 24h TTL"
+    },
+    "aiHint": {
+      "status": "PROTECTED",
+      "mechanism": "Idempotency-Key via Redis 24h TTL"
+    },
+    "refreshToken": {
+      "status": "PROTECTED",
+      "mechanism": "SHA-256 hash rotation + deletion"
+    },
+    "passwordChange": {
+      "status": "PROTECTED",
+      "mechanism": "all refresh tokens revoked"
+    },
+    "queueReplay": {
+      "status": "PROTECTED",
+      "mechanism": "SHA-256 dedup + DLQ"
+    }
+  }
+}

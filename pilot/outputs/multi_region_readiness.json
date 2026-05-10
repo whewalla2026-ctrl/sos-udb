@@ -1,0 +1,63 @@
+{
+  "generatedAt": "2026-05-09T03:35:35.193Z",
+  "strategy": "Active/Passive with regional failover",
+  "primaryRegion": {
+    "name": "us-east-1",
+    "status": "ACTIVE",
+    "services": [
+      "gateway",
+      "auth",
+      "planner",
+      "ai",
+      "monitoring"
+    ],
+    "db": "PostgreSQL primary",
+    "redis": "3.0.504 local"
+  },
+  "secondaryRegion": {
+    "name": "us-west-2",
+    "status": "PLANNED — requires K8s deployment",
+    "prerequisites": [
+      "Docker image promotion",
+      "K8s manifest apply",
+      "Route53 geo-routing",
+      "DB read replica"
+    ],
+    "estimatedSetupTime": "2-3 weeks"
+  },
+  "regionalFailover": {
+    "strategy": "Manual with runbook — can be automated via K8s",
+    "rto": "5 minutes (if K8s automated)",
+    "rpo": "60 seconds (WAL streaming)",
+    "tested": false,
+    "runbookPath": "pilot/outputs/disaster_recovery_validation.json"
+  },
+  "dataReplication": {
+    "postgresql": "Streaming replication to read replica(s). WAL archiving for PITR.",
+    "redis": "Redis Cluster or Sentinel for cross-region. Currently: standalone.",
+    "queue": "AOF persistence survives restart. Cross-region: Kafka or RabbitMQ mirroring.",
+    "recommendation": "Deploy read replicas in us-west-2 with streaming replication"
+  },
+  "geoRouting": {
+    "currentCapability": "None — single region",
+    "recommendedApproach": "Route53 latency-based routing -> K8s ingress -> regional gateway",
+    "dnsStrategy": "Route53 failover record sets",
+    "estimatedLatencyImpact": "+50-100ms cross-region"
+  },
+  "disasterRegionRecovery": {
+    "fullRegionFailure": "Restore from pg_dump backup + Redis AOF. Estimated 30min RTO.",
+    "procedure": "launch K8s in secondary region -> restore DB -> start services -> update DNS",
+    "backupLocation": "pilot/outputs/ (local disk — needs S3/cloud storage for production)"
+  },
+  "readinessScore": 35,
+  "gaps": [
+    "No secondary region deployed",
+    "No automated DNS failover",
+    "No cross-region Redis"
+  ],
+  "immediateActions": [
+    "Containerize all services via existing Dockerfiles",
+    "Deploy to K8s with 2 replicas",
+    "Add read replica"
+  ]
+}

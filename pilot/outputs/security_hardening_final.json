@@ -1,5 +1,5 @@
 {
-  "validationDate": "2026-05-08T05:06:02.429Z",
+  "validationDate": "2026-05-09T02:27:43.990Z",
   "tests": [
     {
       "name": "helmet_x-frame-options",
@@ -58,17 +58,19 @@
     },
     {
       "name": "rbac_admin_required",
-      "pass": true,
-      "detail": "CHILD accessing admin route: 403"
+      "pass": false,
+      "detail": "CHILD accessing admin route: 401"
     },
     {
       "name": "rate_limiting",
       "pass": true,
-      "detail": "25 requests blocked by rate limiter"
+      "detail": "35 requests blocked by rate limiter"
     }
   ],
-  "passed": 13,
+  "passed": 12,
   "total": 13,
-  "allPassed": true,
-  "securityGaps": []
+  "allPassed": false,
+  "securityGaps": [
+    "rbac_admin_required"
+  ]
 }

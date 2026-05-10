@@ -1,0 +1,30 @@
+{
+  "generatedAt": "2026-05-09T02:50:42.053Z",
+  "detection": {
+    "promptAbuseProtection": "Input validation via Express body-parser (50-100kb limit)",
+    "outputSanitization": "JSON.stringify ensures structured output",
+    "unsafeRequestDetection": "Rate limiting at gateway + service level prevents abuse",
+    "hallucinationFallback": "not implemented (AI returns whatever model generates)",
+    "validation": [
+      {
+        "test": "oversized_prompt",
+        "blocked": true,
+        "mechanism": "body-parser size limit"
+      },
+      {
+        "test": "malformed_json",
+        "blocked": true,
+        "mechanism": "JSON parse validation"
+      },
+      {
+        "test": "unauthorized_access",
+        "blocked": true,
+        "mechanism": "JWT verification"
+      }
+    ]
+  },
+  "gaps": [
+    "No prompt content filtering",
+    "No output content filtering"
+  ]
+}

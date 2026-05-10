@@ -1,0 +1,75 @@
+{
+  "report": "Production Dress Rehearsal Report",
+  "timestamp": "2026-05-09T08:24:00Z",
+  "flows": {
+    "parent_user_flow": {
+      "status": "PASS",
+      "steps": {
+        "register": {"status": "PASS", "detail": "POST /auth/register -> 201, userId + token returned"},
+        "login": {"status": "PASS", "detail": "POST /auth/login -> 200, JWT + refresh token returned"},
+        "token_validation": {"status": "PASS", "detail": "GET /auth/me -> 200, user decoded from JWT"},
+        "planner_generate": {"status": "PASS", "detail": "POST /planning/generate -> plan with 4 activities, focus pillars"},
+        "planner_get": {"status": "PASS", "detail": "GET /planning/:userId -> full plan with activities"},
+        "ai_hint": {"status": "PASS", "detail": "POST /ai-lite/hint -> hint text, confidence 0.85, cost tracking"},
+        "ai_batch": {"status": "PASS", "detail": "POST /ai-lite/batch -> 2 hints, budget tracking"},
+        "ai_budget": {"status": "PASS", "detail": "GET /ai-lite/budget/:userId -> spent/total/remaining"},
+        "change_password": {"status": "PASS", "detail": "POST /auth/change-password -> revokedTokens:2, old password invalidated"},
+        "relogin_new_password": {"status": "PASS", "detail": "POST /auth/login with new password -> new JWT"},
+        "token_refresh": {"status": "PASS", "detail": "POST /auth/refresh -> new access token"}
+      },
+      "total_steps": 11,
+      "passed": 11,
+      "failed": 0
+    },
+    "admin_flow": {
+      "status": "PASS",
+      "steps": {
+        "prometheus_metrics": {"status": "PASS", "detail": "GET /metrics -> 241 metric values, 17 metric families"},
+        "monitoring_signals": {"status": "PASS", "detail": "GET /monitoring/signals -> 15 golden signals, all healthy"},
+        "monitoring_health": {"status": "PASS", "detail": "GET /monitoring/health -> all 6 services healthy, uptime 8106s"},
+        "audit_log_direct": {"status": "PASS", "detail": "GET /monitoring events -> 7 event types, 5254 total events"},
+        "alert_create": {"status": "PASS", "detail": "POST /monitoring/alerts -> alert created with ID"},
+        "alert_list": {"status": "PASS", "detail": "GET /monitoring/alerts -> 1 alert returned"},
+        "events_list": {"status": "PASS", "detail": "GET /monitoring/events -> 7 event categories with counts"},
+        "gateway_rbac": {"status": "PASS", "detail": "Gateway /audit/log -> 403 for CHILD role (correct RBAC enforcement)"}
+      },
+      "total_steps": 8,
+      "passed": 8,
+      "failed": 0
+    },
+    "failure_scenario": {
+      "status": "PASS",
+      "steps": {
+        "baseline_health": {"status": "PASS", "detail": "All services healthy before failure injection"},
+        "service_kill": {"status": "PASS", "detail": "Auth service (port 3001) killed, port cleared within 2s"},
+        "gateway_degraded": {"status": "PASS", "detail": "Gateway remained responsive during auth outage"},
+        "service_restart": {"status": "PASS", "detail": "Auth service restarted, connected to PostgreSQL + Redis + EventBus"},
+        "service_functional": {"status": "PASS", "detail": "Auth service accepting requests after restart"},
+        "gateway_recovered": {"status": "PASS", "detail": "Gateway health shows all services healthy post-recovery"},
+        "recovery_time": {"status": "PASS", "detail": "Full recovery in ~8 seconds (target: <60s)"}
+      },
+      "total_steps": 7,
+      "passed": 7,
+      "failed": 0
+    },
+    "trace_correlation": {
+      "status": "PASS",
+      "steps": {
+        "x_correlation_id": {"status": "PASS", "detail": "All responses include x-correlation-id header"},
+        "structured_logging": {"status": "PASS", "detail": "Gateway logs contain correlation ID, service name, method, path, status, duration_ms"},
+        "request_proxied": {"status": "PASS", "detail": "All proxied requests logged with status code and timing"}
+      },
+      "total_steps": 3,
+      "passed": 3,
+      "failed": 0
+    }
+  },
+  "overall": {
+    "total_flows": 4,
+    "total_steps": 29,
+    "passed": 29,
+    "failed": 0,
+    "success_rate": "100%",
+    "verdict": "ALL BUSINESS FLOWS PASS"
+  }
+}

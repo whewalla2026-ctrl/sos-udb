@@ -1,0 +1,9 @@
+{
+  "timestamp": "2026-05-08T12:06:01.089Z",
+  "recoveryStrategy": "Sequential start via starter.js (2s gap between services)",
+  "recoveryTime": "~3-8s per service (Redis+DB connect + HTTP listen)",
+  "autoHealing": "auto-healing-start.js monitors and restarts crashed services within 3s",
+  "sigtermVerified": true,
+  "allServicesHealthy": true,
+  "queueContinuation": "Jobs survive restart via Redis persistence (AOF)"
+}

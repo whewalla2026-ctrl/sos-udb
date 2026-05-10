@@ -1,0 +1,194 @@
+{
+  "generatedAt": "2026-05-09T03:55:57.259Z",
+  "summary": {
+    "total": 26,
+    "passed": 26,
+    "failed": 0
+  },
+  "results": [
+    {
+      "test": "AUTH_REGISTER",
+      "status": "PASS",
+      "expected": 201,
+      "actual": 201,
+      "detail": "userId: 550a9d5b-0ab3-422f-b943-90dae3e42a72"
+    },
+    {
+      "test": "AUTH_LOGIN",
+      "status": "PASS",
+      "expected": 200,
+      "actual": 200,
+      "detail": ""
+    },
+    {
+      "test": "AUTH_VALIDATE",
+      "status": "PASS",
+      "expected": 200,
+      "actual": 200,
+      "detail": "valid=true"
+    },
+    {
+      "test": "AUTH_ME",
+      "status": "PASS",
+      "expected": 200,
+      "actual": 200,
+      "detail": "userId: 550a9d5b-0ab3-422f-b943-90dae3e42a72"
+    },
+    {
+      "test": "AUTH_REFRESH",
+      "status": "PASS",
+      "expected": 200,
+      "actual": 200,
+      "detail": ""
+    },
+    {
+      "test": "PLANNER_GENERATE",
+      "status": "PASS",
+      "expected": 200,
+      "actual": 200,
+      "detail": ""
+    },
+    {
+      "test": "PLANNER_GET",
+      "status": "PASS",
+      "expected": 200,
+      "actual": 200,
+      "detail": ""
+    },
+    {
+      "test": "PLANNER_UPDATE",
+      "status": "PASS",
+      "expected": 200,
+      "actual": 200,
+      "detail": ""
+    },
+    {
+      "test": "AI_HINT",
+      "status": "PASS",
+      "expected": 200,
+      "actual": 200,
+      "detail": "hint: Break the problem into smaller steps. What is the "
+    },
+    {
+      "test": "AI_BATCH",
+      "status": "PASS",
+      "expected": 200,
+      "actual": 200,
+      "detail": ""
+    },
+    {
+      "test": "AI_BUDGET",
+      "status": "PASS",
+      "expected": 200,
+      "actual": 200,
+      "detail": ""
+    },
+    {
+      "test": "MONITORING_HEALTH",
+      "status": "PASS",
+      "expected": 200,
+      "actual": 200,
+      "detail": ""
+    },
+    {
+      "test": "MONITORING_SIGNALS",
+      "status": "PASS",
+      "expected": 200,
+      "actual": 200,
+      "detail": ""
+    },
+    {
+      "test": "MONITORING_ALERT_CREATE",
+      "status": "PASS",
+      "expected": 201,
+      "actual": 201,
+      "detail": ""
+    },
+    {
+      "test": "MONITORING_ALERTS_GET",
+      "status": "PASS",
+      "expected": 200,
+      "actual": 200,
+      "detail": ""
+    },
+    {
+      "test": "MONITORING_EVENTS",
+      "status": "PASS",
+      "expected": 200,
+      "actual": 200,
+      "detail": ""
+    },
+    {
+      "test": "GATEWAY_HEALTH",
+      "status": "PASS",
+      "expected": 200,
+      "actual": 200,
+      "detail": ""
+    },
+    {
+      "test": "GATEWAY_ROUTES",
+      "status": "PASS",
+      "expected": 200,
+      "actual": 200,
+      "detail": ""
+    },
+    {
+      "test": "GATEWAY_CIRCUIT_BREAKERS",
+      "status": "PASS",
+      "expected": 200,
+      "actual": 200,
+      "detail": ""
+    },
+    {
+      "test": "METRICS_ENDPOINT",
+      "status": "PASS",
+      "expected": 200,
+      "actual": 200,
+      "detail": ""
+    },
+    {
+      "test": "INVALID_TOKEN",
+      "status": "PASS",
+      "expected": 401,
+      "actual": 401,
+      "detail": ""
+    },
+    {
+      "test": "NO_AUTH_HEADER",
+      "status": "PASS",
+      "expected": 401,
+      "actual": 401,
+      "detail": ""
+    },
+    {
+      "test": "MALFORMED_PAYLOAD",
+      "status": "PASS",
+      "expected": 400,
+      "actual": 400,
+      "detail": ""
+    },
+    {
+      "test": "NOT_FOUND",
+      "status": "PASS",
+      "expected": 404,
+      "actual": 404,
+      "detail": ""
+    },
+    {
+      "test": "AUDIT_LOG_RBAC_PARENT",
+      "status": "PASS",
+      "expected": 403,
+      "actual": 403,
+      "detail": "PARENT role blocked from audit"
+    },
+    {
+      "test": "AUDIT_LOG_RBAC_ADMIN",
+      "status": "PASS",
+      "expected": 200,
+      "actual": 200,
+      "detail": "ADMIN role can access audit"
+    }
+  ],
+  "errors": [],
+  "allPassed": true
+}

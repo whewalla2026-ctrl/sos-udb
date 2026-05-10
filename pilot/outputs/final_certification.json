@@ -1,0 +1,135 @@
+{
+    "sections":  {
+                     "C_pgbouncer":  {
+                                         "status":  "PASS"
+                                     },
+                     "B_observability":  {
+                                             "status":  "PASS"
+                                         },
+                     "E_failure_injection":  {
+                                                 "status":  "PASS"
+                                             },
+                     "D_load_test":  {
+                                         "status":  "PASS"
+                                     },
+                     "A_auth_container":  {
+                                              "status":  "PASS"
+                                          }
+                 },
+    "timestamp":  "2026-05-09T22:49:26.0123066+03:00",
+    "certification":  {
+                          "target":  "9.8+/10",
+                          "score":  100,
+                          "certified":  true,
+                          "total":  18,
+                          "passed":  18
+                      },
+    "checks":  [
+                   {
+                       "section":  "A",
+                       "pass":  true,
+                       "check":  "Auth container healthy"
+                   },
+                   {
+                       "section":  "A",
+                       "pass":  true,
+                       "check":  "Auth registration works via gateway"
+                   },
+                   {
+                       "section":  "B",
+                       "pass":  true,
+                       "check":  "udb-jaeger running"
+                   },
+                   {
+                       "section":  "B",
+                       "pass":  true,
+                       "check":  "udb-otel-collector running"
+                   },
+                   {
+                       "section":  "B",
+                       "pass":  true,
+                       "check":  "udb-prometheus running"
+                   },
+                   {
+                       "section":  "B",
+                       "pass":  true,
+                       "check":  "udb-grafana running"
+                   },
+                   {
+                       "section":  "B",
+                       "pass":  true,
+                       "check":  "All Prometheus targets UP"
+                   },
+                   {
+                       "section":  "B",
+                       "pass":  true,
+                       "check":  "Jaeger receiving traces"
+                   },
+                   {
+                       "section":  "C",
+                       "pass":  true,
+                       "check":  "pgBouncer healthy"
+                   },
+                   {
+                       "section":  "C",
+                       "pass":  true,
+                       "check":  "pgBouncer pool configured"
+                   },
+                   {
+                       "section":  "C",
+                       "pass":  true,
+                       "check":  "ignore_startup_parameters configured"
+                   },
+                   {
+                       "section":  "D",
+                       "pass":  true,
+                       "check":  "Load test - registration 0 failures"
+                   },
+                   {
+                       "section":  "E",
+                       "pass":  true,
+                       "check":  "Redis failure and recovery"
+                   },
+                   {
+                       "section":  "E",
+                       "pass":  true,
+                       "check":  "Auth service restart"
+                   },
+                   {
+                       "section":  "E",
+                       "pass":  true,
+                       "check":  "Gateway restart"
+                   },
+                   {
+                       "section":  "E",
+                       "pass":  true,
+                       "check":  "pgBouncer restart"
+                   },
+                   {
+                       "section":  "E",
+                       "pass":  true,
+                       "check":  "Auth flow after recovery"
+                   },
+                   {
+                       "section":  "E",
+                       "pass":  true,
+                       "check":  "Observability survived restarts"
+                   }
+               ],
+    "all_containers":  [
+                           "udb-postgres=Up About an hour (healthy)",
+                           "udb-pgbouncer=Up 37 seconds (healthy)",
+                           "udb-redis=Up About a minute (healthy)",
+                           "udb-auth=Up About a minute (healthy)",
+                           "udb-gateway=Up 49 seconds (healthy)",
+                           "udb-nestjs=Up 42 minutes (healthy)",
+                           "udb-frontend=Up About an hour (healthy)",
+                           "udb-planner=Up 53 minutes (healthy)",
+                           "udb-ai=Up 53 minutes (healthy)",
+                           "udb-monitoring=Up About an hour (healthy)",
+                           "udb-jaeger=Up About an hour",
+                           "udb-otel-collector=Up About an hour",
+                           "udb-prometheus=Up About an hour",
+                           "udb-grafana=Up About an hour"
+                       ]
+}

@@ -1,0 +1,29 @@
+{
+  "generatedAt": "2026-05-08T05:49:01.074Z",
+  "risks": [
+    {
+      "risk": "AI budget abuse",
+      "probability": "medium",
+      "impact": "high",
+      "mitigation": "Hard monthly cap ($0.50/user) already implemented"
+    },
+    {
+      "risk": "Cloud cost overrun",
+      "probability": "low",
+      "impact": "medium",
+      "mitigation": "Monitor cost-per-user, right-size instances"
+    },
+    {
+      "risk": "Scaling DB storage",
+      "probability": "medium",
+      "impact": "medium",
+      "mitigation": "Set auto-scaling storage limits; archive old data"
+    },
+    {
+      "risk": "Unexpected traffic spike",
+      "probability": "medium",
+      "impact": "high",
+      "mitigation": "Rate limiting in place (200 req/min global); auto-scaling via K8s"
+    }
+  ]
+}

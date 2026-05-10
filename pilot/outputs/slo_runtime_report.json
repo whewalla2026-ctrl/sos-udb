@@ -1,0 +1,71 @@
+{
+  "generatedAt": "2026-05-09T03:11:06.958Z",
+  "sloTargets": {
+    "availability": {
+      "target": 99.5,
+      "window": "30d rolling"
+    },
+    "latency_p95": {
+      "target": 200,
+      "unit": "ms",
+      "window": "5m rolling"
+    },
+    "error_rate": {
+      "target": 1,
+      "unit": "%",
+      "window": "10m rolling"
+    }
+  },
+  "serviceResults": [
+    {
+      "service": "gateway",
+      "availability": 100,
+      "errorRate": 0,
+      "p95Latency": 2,
+      "sloCompliant": true,
+      "errorBudgetRemaining": 1,
+      "burnRate": 0
+    },
+    {
+      "service": "auth",
+      "availability": 100,
+      "errorRate": 0,
+      "p95Latency": 3,
+      "sloCompliant": true,
+      "errorBudgetRemaining": 1,
+      "burnRate": 0
+    },
+    {
+      "service": "planner",
+      "availability": 100,
+      "errorRate": 0,
+      "p95Latency": 3,
+      "sloCompliant": true,
+      "errorBudgetRemaining": 1,
+      "burnRate": 0
+    },
+    {
+      "service": "ai",
+      "availability": 100,
+      "errorRate": 0,
+      "p95Latency": 3,
+      "sloCompliant": true,
+      "errorBudgetRemaining": 1,
+      "burnRate": 0
+    },
+    {
+      "service": "monitoring",
+      "availability": 100,
+      "errorRate": 0,
+      "p95Latency": 4,
+      "sloCompliant": true,
+      "errorBudgetRemaining": 1,
+      "burnRate": 0
+    }
+  ],
+  "summary": {
+    "total": 5,
+    "compliant": 5,
+    "violating": 0
+  }
+}

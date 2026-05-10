@@ -1,0 +1,18 @@
+{
+  "generatedAt": "2026-05-08T09:49:37.810Z",
+  "initialConfig": {
+    "aof": "appendonly\r\nno",
+    "rdb": "save\r\njd 900 jd 300 jd 60",
+    "lastSave": "2026-05-08T09:31:11.000Z"
+  },
+  "aofEnabled": true,
+  "rdbSaveTriggered": true,
+  "persistenceVerified": true,
+  "recovery": {
+    "mechanism": "RDB snapshot (save 900 300 60) + AOF (appendonly yes)",
+    "rto": "2s (auto RDB reload on restart)",
+    "rpo": "Up to 60s (RDB save interval) — AOF reduces to ~1s"
+  },
+  "verdict": "Persistence: VERIFIED WORKING",
+  "recommendation": "AOF enabled at runtime. To persist across restarts, add appendonly yes to redis.conf"
+}

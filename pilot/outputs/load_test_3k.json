@@ -1,0 +1,138 @@
+[
+  {
+    "label": "health_2000",
+    "concurrency": 2000,
+    "total": 800,
+    "success": 800,
+    "errors": 0,
+    "dur_ms": 2086,
+    "throughput_rps": 384,
+    "latency": {
+      "min": 1176,
+      "p50": 2035,
+      "p95": 2052,
+      "p99": 2060,
+      "max": 2061,
+      "avg": 1913
+    }
+  },
+  {
+    "label": "plan_2000",
+    "concurrency": 2000,
+    "total": 300,
+    "success": 300,
+    "errors": 0,
+    "dur_ms": 112,
+    "throughput_rps": 2679,
+    "latency": {
+      "min": 59,
+      "p50": 83,
+      "p95": 101,
+      "p99": 103,
+      "max": 104,
+      "avg": 82
+    }
+  },
+  {
+    "label": "plan_cached_2000",
+    "concurrency": 2000,
+    "total": 200,
+    "success": 200,
+    "errors": 0,
+    "dur_ms": 49,
+    "throughput_rps": 4082,
+    "latency": {
+      "min": 14,
+      "p50": 19,
+      "p95": 44,
+      "p99": 45,
+      "max": 45,
+      "avg": 26
+    }
+  },
+  {
+    "label": "ai_2000",
+    "concurrency": 2000,
+    "total": 300,
+    "success": 300,
+    "errors": 0,
+    "dur_ms": 69,
+    "throughput_rps": 4348,
+    "latency": {
+      "min": 15,
+      "p50": 52,
+      "p95": 63,
+      "p99": 64,
+      "max": 64,
+      "avg": 52
+    }
+  },
+  {
+    "label": "health_3000",
+    "concurrency": 3000,
+    "total": 1000,
+    "success": 1000,
+    "errors": 0,
+    "dur_ms": 1174,
+    "throughput_rps": 852,
+    "latency": {
+      "min": 33,
+      "p50": 1096,
+      "p95": 1142,
+      "p99": 1147,
+      "max": 1148,
+      "avg": 891
+    }
+  },
+  {
+    "label": "plan_3000",
+    "concurrency": 3000,
+    "total": 300,
+    "success": 300,
+    "errors": 0,
+    "dur_ms": 93,
+    "throughput_rps": 3226,
+    "latency": {
+      "min": 59,
+      "p50": 68,
+      "p95": 83,
+      "p99": 84,
+      "max": 84,
+      "avg": 69
+    }
+  },
+  {
+    "label": "plan_cached_3000",
+    "concurrency": 3000,
+    "total": 200,
+    "success": 200,
+    "errors": 0,
+    "dur_ms": 30,
+    "throughput_rps": 6667,
+    "latency": {
+      "min": 13,
+      "p50": 17,
+      "p95": 23,
+      "p99": 24,
+      "max": 24,
+      "avg": 17
+    }
+  },
+  {
+    "label": "ai_3000",
+    "concurrency": 3000,
+    "total": 300,
+    "success": 300,
+    "errors": 0,
+    "dur_ms": 68,
+    "throughput_rps": 4412,
+    "latency": {
+      "min": 13,
+      "p50": 61,
+      "p95": 64,
+      "p99": 64,
+      "max": 64,
+      "avg": 60
+    }
+  }
+]

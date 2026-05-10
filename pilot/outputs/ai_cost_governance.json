@@ -1,0 +1,95 @@
+{
+  "generatedAt": "2026-05-09T03:36:56.360Z",
+  "totalRequests": 20,
+  "totalCost": "0.008000",
+  "averageCostPerRequest": "0.000400",
+  "costPerSubject": [
+    {
+      "subject": "math",
+      "requests": 2,
+      "totalCost": "0.000800",
+      "avgCost": "0.000400"
+    },
+    {
+      "subject": "reading",
+      "requests": 2,
+      "totalCost": "0.000800",
+      "avgCost": "0.000400"
+    },
+    {
+      "subject": "science",
+      "requests": 2,
+      "totalCost": "0.000800",
+      "avgCost": "0.000400"
+    },
+    {
+      "subject": "history",
+      "requests": 2,
+      "totalCost": "0.000800",
+      "avgCost": "0.000400"
+    },
+    {
+      "subject": "art",
+      "requests": 2,
+      "totalCost": "0.000800",
+      "avgCost": "0.000400"
+    },
+    {
+      "subject": "music",
+      "requests": 2,
+      "totalCost": "0.000800",
+      "avgCost": "0.000400"
+    },
+    {
+      "subject": "physics",
+      "requests": 2,
+      "totalCost": "0.000800",
+      "avgCost": "0.000400"
+    },
+    {
+      "subject": "chemistry",
+      "requests": 2,
+      "totalCost": "0.000800",
+      "avgCost": "0.000400"
+    },
+    {
+      "subject": "biology",
+      "requests": 2,
+      "totalCost": "0.000800",
+      "avgCost": "0.000400"
+    },
+    {
+      "subject": "geography",
+      "requests": 2,
+      "totalCost": "0.000800",
+      "avgCost": "0.000400"
+    }
+  ],
+  "expensiveRequestCount": 0,
+  "expensiveRequests": [],
+  "cacheEfficiency": {
+    "cacheHitSamples": 5,
+    "cacheHits": 5,
+    "cacheHitRate": "100%",
+    "estimatedSavings": "0.002000",
+    "recommendation": "Cache effective — maintain TTL policy"
+  },
+  "costAnomalySpikes": "NONE",
+  "optimizationGuidance": [
+    {
+      "action": "Increase cache TTL for popular subjects",
+      "impact": "Reduce cost by 20-30%",
+      "effort": "Low"
+    },
+    {
+      "action": "Batch similar requests",
+      "impact": "Reduce cost by 15-25%",
+      "effort": "Low"
+    },
+    {
+      "action": "Implement response caching layer",
+      "impact": "Reduce cost by 40-60%",
+      "effort": "Medium"
+    }
+  ]
+}

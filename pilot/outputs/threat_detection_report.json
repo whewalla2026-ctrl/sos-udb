@@ -1,0 +1,44 @@
+{
+  "generatedAt": "2026-05-08T09:56:30.935Z",
+  "detectionLayers": [
+    {
+      "layer": "1 — Network",
+      "tools": [
+        "Rate limiting"
+      ],
+      "status": "ACTIVE"
+    },
+    {
+      "layer": "2 — Application",
+      "tools": [
+        "Helmet",
+        "CORS",
+        "Input validation"
+      ],
+      "status": "ACTIVE"
+    },
+    {
+      "layer": "3 — Auth",
+      "tools": [
+        "JWT HMAC",
+        "scrypt",
+        "RBAC"
+      ],
+      "status": "ACTIVE"
+    },
+    {
+      "layer": "4 — Audit",
+      "tools": [
+        "Log audit events"
+      ],
+      "status": "BASIC"
+    },
+    {
+      "layer": "5 — Anomaly",
+      "tools": [
+        "Not implemented"
+      ],
+      "status": "PLANNED"
+    }
+  ]
+}

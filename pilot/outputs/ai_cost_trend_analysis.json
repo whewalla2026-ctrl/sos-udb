@@ -1,0 +1,31 @@
+{
+  "generatedAt": "2026-05-09T02:50:42.050Z",
+  "trends": [
+    {
+      "users": 100,
+      "monthly_ai_cost": 20,
+      "ai_share": "4.5%"
+    },
+    {
+      "users": 1000,
+      "monthly_ai_cost": 60,
+      "ai_share": "12.1%"
+    },
+    {
+      "users": 10000,
+      "monthly_ai_cost": 600,
+      "ai_share": "46.3%"
+    },
+    {
+      "users": 50000,
+      "monthly_ai_cost": 2700,
+      "ai_share": "60%"
+    },
+    {
+      "users": 100000,
+      "monthly_ai_cost": 7800,
+      "ai_share": "65%"
+    }
+  ],
+  "driver": "AI hint generation dominates at scale"
+}

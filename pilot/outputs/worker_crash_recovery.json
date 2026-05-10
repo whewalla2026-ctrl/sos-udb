@@ -1,0 +1,9 @@
+{
+  "timestamp": "2026-05-08T12:02:42.763Z",
+  "enqueueSuccess": true,
+  "redisPersistent": true,
+  "workerType": "BRPOP blocking with self-scheduling setTimeout",
+  "recoveryMechanism": "Worker auto-recovers via setTimeout reschedule on process restart",
+  "queuePersistence": "Redis AOF (appendonly yes) with ~1s RPO",
+  "validationResult": "PASS"
+}

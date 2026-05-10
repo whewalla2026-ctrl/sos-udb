@@ -1,0 +1,51 @@
+{
+  "timestamp": "2026-05-08T11:53:09.953Z",
+  "tests": [
+    {
+      "test": "Critical alert generation",
+      "statusCode": 201,
+      "hasAlertId": true,
+      "severity": "critical",
+      "passed": true
+    },
+    {
+      "test": "Warning alert generation",
+      "statusCode": 201,
+      "severity": "warning",
+      "passed": true
+    },
+    {
+      "test": "Auth brute force rate limit",
+      "attempts": 15,
+      "statusCodes": [
+        401,
+        401,
+        401,
+        401,
+        401,
+        401,
+        401,
+        401,
+        401,
+        401,
+        429,
+        429,
+        429,
+        429,
+        429
+      ],
+      "rateLimitTriggered": true,
+      "passed": true
+    },
+    {
+      "test": "Metrics expose queue + auth signals",
+      "hasQueueMetrics": true,
+      "hasAuthMetrics": true,
+      "passed": true
+    }
+  ],
+  "summary": {
+    "passed": 4,
+    "failed": 0
+  }
+}

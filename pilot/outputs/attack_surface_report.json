@@ -1,0 +1,47 @@
+{
+  "generatedAt": "2026-05-08T08:41:52.522Z",
+  "attackSurface": [
+    {
+      "vector": "SQL injection",
+      "protected": true
+    },
+    {
+      "vector": "XSS",
+      "protected": true
+    },
+    {
+      "vector": "Path traversal",
+      "protected": true
+    },
+    {
+      "vector": "Command injection",
+      "protected": true
+    },
+    {
+      "vector": "NoSQL injection",
+      "protected": true
+    },
+    {
+      "vector": "Oversized payload",
+      "protected": true
+    },
+    {
+      "vector": "Rate limit bypass",
+      "protected": "Partial (requires IP-based)"
+    },
+    {
+      "vector": "Token replay",
+      "protected": false,
+      "note": "Stateless JWTs — use refresh tokens + short expiry"
+    },
+    {
+      "vector": "CORS abuse",
+      "protected": true
+    },
+    {
+      "vector": "Missing security headers",
+      "protected": true
+    }
+  ],
+  "securityPosture": "AT RISK"
+}

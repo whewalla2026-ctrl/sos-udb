@@ -1,0 +1,47 @@
+{
+  "generatedAt": "2026-05-08T09:56:30.939Z",
+  "risks": [
+    {
+      "risk": "DB pool exhaustion under burst",
+      "likelihood": "Medium",
+      "impact": "High",
+      "mitigation": "pgBouncer",
+      "priority": "P0"
+    },
+    {
+      "risk": "Redis 3.0 event reliability",
+      "likelihood": "Low",
+      "impact": "Medium",
+      "mitigation": "Redis 7",
+      "priority": "P1"
+    },
+    {
+      "risk": "No graceful shutdown — data loss",
+      "likelihood": "Medium",
+      "impact": "Medium",
+      "mitigation": "SIGTERM handlers",
+      "priority": "P2"
+    },
+    {
+      "risk": "Token replay attack",
+      "likelihood": "Low",
+      "impact": "Medium",
+      "mitigation": "Token rotation",
+      "priority": "P2"
+    },
+    {
+      "risk": "Memory leak from caches (TTL fixed)",
+      "likelihood": "Low",
+      "impact": "Low",
+      "mitigation": "TTL eviction deployed",
+      "priority": "P0 (done)"
+    },
+    {
+      "risk": "No automated rollback",
+      "likelihood": "Medium",
+      "impact": "High",
+      "mitigation": "Documented procedure",
+      "priority": "P1"
+    }
+  ]
+}

@@ -1,0 +1,52 @@
+{
+  "generatedAt": "2026-05-09T03:10:29.835Z",
+  "tenants": [
+    {
+      "id": "tenant-alpha",
+      "email": "alpha-1778296229602@test.com",
+      "userId": "d77b0da0-61be-4bb0-a7d0-0538050d219f",
+      "hasToken": true
+    },
+    {
+      "id": "tenant-beta",
+      "email": "beta-1778296229602@test.com",
+      "userId": "890d5dbc-0dc7-4f00-a95a-ae0c4eed7dc7",
+      "hasToken": true
+    }
+  ],
+  "isolationChecks": [
+    {
+      "test": "tenant_alpha_plan_generation",
+      "status": 200,
+      "passed": true
+    },
+    {
+      "test": "cross_tenant_plan_access_blocked",
+      "status": 200,
+      "passed": false,
+      "note": "LEAK DETECTED"
+    },
+    {
+      "test": "tenant_alpha_ai_hint",
+      "status": 200,
+      "passed": true,
+      "cost": 0.0004
+    },
+    {
+      "test": "token_isolation",
+      "passed": true,
+      "note": "tokens are distinct"
+    },
+    {
+      "test": "queue_isolation",
+      "passed": true,
+      "note": "Queue uses separate Redis lists per type, userId scoping in payload"
+    }
+  ],
+  "summary": {
+    "total": 5,
+    "passed": 4,
+    "failed": 1
+  },
+  "verdict": "LEAK DETECTED"
+}

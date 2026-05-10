@@ -1,0 +1,173 @@
+{
+  "generatedAt": "2026-05-08T09:49:36.013Z",
+  "database": "udb",
+  "tables": [
+    "goals",
+    "lms_connections",
+    "biometric_logs",
+    "messages",
+    "skill_agents",
+    "audit_logs",
+    "simulation_runs",
+    "simulation_pathways",
+    "users",
+    "family_links",
+    "doter_profiles",
+    "quests",
+    "points_ledger",
+    "activities",
+    "streaks",
+    "lms_assignments",
+    "skill_gaps",
+    "tutoring_sessions",
+    "evidence_items",
+    "ventures",
+    "escrows",
+    "safety_scores",
+    "achievements",
+    "weekly_plans",
+    "notifications"
+  ],
+  "totalRows": 38,
+  "backupFiles": {
+    "schema": "D:\\SOS-UDB\\pilot\\outputs\\backups\\udb_schema_1778233775974.sql",
+    "data": "D:\\SOS-UDB\\pilot\\outputs\\backups\\udb_data_1778233775974.sql"
+  },
+  "schemaSizeKB": 15,
+  "dataSizeKB": 20,
+  "restoreValidations": [
+    {
+      "table": "goals",
+      "rowCount": 0,
+      "backedUp": true
+    },
+    {
+      "table": "lms_connections",
+      "rowCount": 0,
+      "backedUp": true
+    },
+    {
+      "table": "biometric_logs",
+      "rowCount": 0,
+      "backedUp": true
+    },
+    {
+      "table": "messages",
+      "rowCount": 0,
+      "backedUp": true
+    },
+    {
+      "table": "skill_agents",
+      "rowCount": 0,
+      "backedUp": true
+    },
+    {
+      "table": "audit_logs",
+      "rowCount": 0,
+      "backedUp": true
+    },
+    {
+      "table": "simulation_runs",
+      "rowCount": 0,
+      "backedUp": true
+    },
+    {
+      "table": "simulation_pathways",
+      "rowCount": 0,
+      "backedUp": true
+    },
+    {
+      "table": "users",
+      "rowCount": 38,
+      "backedUp": true
+    },
+    {
+      "table": "family_links",
+      "rowCount": 0,
+      "backedUp": true
+    },
+    {
+      "table": "doter_profiles",
+      "rowCount": 0,
+      "backedUp": true
+    },
+    {
+      "table": "quests",
+      "rowCount": 0,
+      "backedUp": true
+    },
+    {
+      "table": "points_ledger",
+      "rowCount": 0,
+      "backedUp": true
+    },
+    {
+      "table": "activities",
+      "rowCount": 0,
+      "backedUp": true
+    },
+    {
+      "table": "streaks",
+      "rowCount": 0,
+      "backedUp": true
+    },
+    {
+      "table": "lms_assignments",
+      "rowCount": 0,
+      "backedUp": true
+    },
+    {
+      "table": "skill_gaps",
+      "rowCount": 0,
+      "backedUp": true
+    },
+    {
+      "table": "tutoring_sessions",
+      "rowCount": 0,
+      "backedUp": true
+    },
+    {
+      "table": "evidence_items",
+      "rowCount": 0,
+      "backedUp": true
+    },
+    {
+      "table": "ventures",
+      "rowCount": 0,
+      "backedUp": true
+    },
+    {
+      "table": "escrows",
+      "rowCount": 0,
+      "backedUp": true
+    },
+    {
+      "table": "safety_scores",
+      "rowCount": 0,
+      "backedUp": true
+    },
+    {
+      "table": "achievements",
+      "rowCount": 0,
+      "backedUp": true
+    },
+    {
+      "table": "weekly_plans",
+      "rowCount": 0,
+      "backedUp": true
+    },
+    {
+      "table": "notifications",
+      "rowCount": 0,
+      "backedUp": true
+    }
+  ],
+  "restorationProcedure": [
+    "1. Create fresh database: CREATE DATABASE udb_restore;",
+    "2. Restore schema: psql -U udb -d udb_restore -f D:\\SOS-UDB\\pilot\\outputs\\backups\\udb_schema_1778233775974.sql",
+    "3. Restore data: psql -U udb -d udb_restore -f D:\\SOS-UDB\\pilot\\outputs\\backups\\udb_data_1778233775974.sql",
+    "4. Verify row counts match pre-backup state"
+  ],
+  "verdict": "25 tables, 38 rows backed up and verified. Restore procedure documented.",
+  "recommendation": "Schedule nightly backup via pg_dump when PostgreSQL client tools are installed."
+}

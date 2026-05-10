@@ -1,40 +1,40 @@
 {
-  "generatedAt": "2026-05-08T05:05:19.021Z",
+  "generatedAt": "2026-05-09T15:02:50.970Z",
   "serviceConnectivity": [
     {
       "service": "gateway",
       "status": "healthy",
       "statusCode": 200,
-      "latencyMs": 25,
-      "response": "{\"service\":\"api-gateway\",\"status\":\"healthy\",\"uptime\":23.4120752,\"routes\":[\"auth\",\"planner\",\"ai\",\"monitoring\"],\"timestamp\":\"2026-05-08T05:05:18.866Z\"}"
+      "latencyMs": 39,
+      "response": "{\"service\":\"api-gateway\",\"status\":\"healthy\",\"uptime\":10439.8806103,\"routes\":[\"auth\",\"planner\",\"ai\",\"monitoring\"],\"timestamp\":\"2026-05-09T15:02:50.421Z\"}"
     },
     {
       "service": "auth",
       "status": "healthy",
       "statusCode": 200,
-      "latencyMs": 8,
-      "response": "{\"service\":\"auth-service\",\"status\":\"healthy\",\"timestamp\":\"2026-05-08T05:05:18.866Z\"}"
+      "latencyMs": 17,
+      "response": "{\"service\":\"auth-service\",\"status\":\"healthy\",\"timestamp\":\"2026-05-09T15:02:50.422Z\"}"
     },
     {
       "service": "planner",
       "status": "healthy",
       "statusCode": 200,
-      "latencyMs": 19,
-      "response": "{\"service\":\"planner-service\",\"status\":\"healthy\",\"activePlans\":0,\"timestamp\":\"2026-05-08T05:05:18.874Z\"}"
+      "latencyMs": 17,
+      "response": "{\"service\":\"planner-service\",\"status\":\"healthy\",\"timestamp\":\"2026-05-09T15:02:50.422Z\"}"
     },
     {
       "service": "ai",
       "status": "healthy",
       "statusCode": 200,
-      "latencyMs": 20,
-      "response": "{\"service\":\"ai-service\",\"status\":\"healthy\",\"activeUsers\":0,\"timestamp\":\"2026-05-08T05:05:18.873Z\"}"
+      "latencyMs": 17,
+      "response": "{\"service\":\"ai-service\",\"status\":\"healthy\",\"timestamp\":\"2026-05-09T15:02:50.421Z\"}"
     },
     {
       "service": "monitoring",
       "status": "healthy",
       "statusCode": 200,
-      "latencyMs": 8,
-      "response": "{\"status\":\"healthy\",\"timestamp\":\"2026-05-08T05:05:18.866Z\",\"uptime\":26.4593299,\"version\":\"1.0.0\",\"services\":{\"auth\":\"healthy\",\"planner\":\"healthy\",\"ai\":\"healthy\",\"monitoring\":\"healthy\",\"redis\":\"healthy"
+      "latencyMs": 17,
+      "response": "{\"status\":\"healthy\",\"timestamp\":\"2026-05-09T15:02:50.423Z\",\"uptime\":10442.9131444,\"version\":\"1.0.0\",\"services\":{\"auth\":\"healthy\",\"planner\":\"healthy\",\"ai\":\"healthy\",\"monitoring\":\"healthy\",\"redis\":\"heal"
     }
   ],
   "healthyCount": 5,
@@ -42,31 +42,31 @@
   "saturationResults": [
     {
       "concurrentRequests": 10,
-      "durationMs": 13,
+      "durationMs": 31,
       "successful": 10,
       "failed": 0,
-      "avgLatencyMs": 9
+      "avgLatencyMs": 18
     },
     {
       "concurrentRequests": 25,
-      "durationMs": 20,
+      "durationMs": 99,
       "successful": 25,
       "failed": 0,
-      "avgLatencyMs": 12
+      "avgLatencyMs": 45
     },
     {
       "concurrentRequests": 50,
-      "durationMs": 33,
+      "durationMs": 159,
       "successful": 50,
       "failed": 0,
-      "avgLatencyMs": 19
+      "avgLatencyMs": 83
     },
     {
       "concurrentRequests": 100,
-      "durationMs": 73,
+      "durationMs": 255,
       "successful": 100,
       "failed": 0,
-      "avgLatencyMs": 35
+      "avgLatencyMs": 120
     }
   ],
   "conclusion": "All services reachable",

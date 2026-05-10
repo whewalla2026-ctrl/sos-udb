@@ -1,0 +1,40 @@
+{
+  "generatedAt": "2026-05-08T09:56:30.930Z",
+  "rollbackProcedure": [
+    {
+      "step": 1,
+      "action": "Identify faulty service version",
+      "command": "git log --oneline -5"
+    },
+    {
+      "step": 2,
+      "action": "Revert code",
+      "command": "git revert <faulty-commit> && git push"
+    },
+    {
+      "step": 3,
+      "action": "Stop faulty service",
+      "command": "Stop-Process -Id <PID> -Force"
+    },
+    {
+      "step": 4,
+      "action": "Restart with previous version",
+      "command": "Start-Process -WindowStyle Hidden powershell ... node <previous-service-file>"
+    },
+    {
+      "step": 5,
+      "action": "Verify health",
+      "command": "curl http://localhost:<port>/health"
+    },
+    {
+      "step": 6,
+      "action": "Verify all services",
+      "command": "Check all 5 health endpoints"
+    }
+  ],
+  "rollbackRTO": "60s (detection: 30s, revert + restart: 30s)",
+  "rollbackRPO": "None (DB state preserved)",
+  "validated": true,
+  "note": "Rollback tested via service kill + restart. Git revert documented but not automated.",
+  "automationGap": "No automated canary analysis or rollback trigger. Requires manual SRE decision."
+}

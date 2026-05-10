@@ -1,0 +1,9 @@
+{
+  "generatedAt": "2026-05-09T02:50:42.051Z",
+  "fallbacks": {
+    "triggered": 0,
+    "mechanism": "service returns error 503 when AI unavailable",
+    "tested": false
+  },
+  "recommendation": "Implement cached fallback hints when AI is saturated"
+}

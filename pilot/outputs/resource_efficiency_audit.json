@@ -1,0 +1,62 @@
+{
+  "generatedAt": "2026-05-09T02:48:58.371Z",
+  "memoryEfficiency": {
+    "services": [
+      {
+        "port": 3000,
+        "memory_mb": 86
+      },
+      {
+        "port": 3001,
+        "memory_mb": 55
+      },
+      {
+        "port": 3002,
+        "memory_mb": 50
+      },
+      {
+        "port": 3003,
+        "memory_mb": 49
+      },
+      {
+        "port": 3004,
+        "memory_mb": 46
+      }
+    ],
+    "trend": "stable",
+    "risk": "low"
+  },
+  "cacheEfficiency": {
+    "planner_cache": {
+      "ttl": "10min",
+      "estimated_hit_rate": ">90%",
+      "mode": "in-memory TTL"
+    },
+    "ai_cache": {
+      "ttl": "1hr",
+      "estimated_hit_rate": ">85%",
+      "mode": "in-memory TTL"
+    },
+    "recommendation": "Add Redis-backed cache layer for multi-instance cache sharing"
+  },
+  "dbConnectionEfficiency": {
+    "pool_size": 20,
+    "max_connections": 20,
+    "idle_timeout": "30s",
+    "saturation_point": "~10 concurrent queries",
+    "pgBouncer_recommended": true,
+    "pgBouncer_mode": "transaction pooling"
+  },
+  "queueEfficiency": {
+    "type": "BRPOP blocking pop",
+    "throughput_push": "181,818 ops/s",
+    "throughput_pop": "8,658 ops/s",
+    "latency_p99": "<50ms",
+    "aof_enabled": true
+  },
+  "recommendations": [
+    "Add Redis cache layer for cross-instance cache",
+    "Deploy pgBouncer for connection pooling",
+    "Monitor memory growth weekly"
+  ]
+}

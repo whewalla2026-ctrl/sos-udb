@@ -1,0 +1,52 @@
+{
+  "generatedAt": "2026-05-09T02:48:46.533Z",
+  "services": [
+    {
+      "name": "Gateway",
+      "monthly_cost": 75,
+      "cost_share": "17%",
+      "dependencies": [
+        "Auth",
+        "Planner",
+        "AI",
+        "Monitoring",
+        "Redis"
+      ]
+    },
+    {
+      "name": "Auth",
+      "monthly_cost": 75,
+      "cost_share": "17%",
+      "dependencies": [
+        "PostgreSQL",
+        "Redis"
+      ]
+    },
+    {
+      "name": "Planner",
+      "monthly_cost": 75,
+      "cost_share": "17%",
+      "dependencies": [
+        "Redis"
+      ]
+    },
+    {
+      "name": "AI",
+      "monthly_cost": 75,
+      "cost_share": "17%",
+      "dependencies": [
+        "Redis",
+        "PostgreSQL"
+      ]
+    },
+    {
+      "name": "Monitoring",
+      "monthly_cost": 75,
+      "cost_share": "17%",
+      "dependencies": [
+        "Redis",
+        "PostgreSQL"
+      ]
+    }
+  ]
+}

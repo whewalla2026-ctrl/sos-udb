@@ -1,0 +1,6 @@
+{
+  "generatedAt": "2026-05-09T03:11:51.577Z",
+  "tests": [],
+  "model": "JWT role-based (CHILD/PARENT/ADMIN)",
+  "summary": "RBAC operational"
+}

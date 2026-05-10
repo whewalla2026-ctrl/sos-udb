@@ -1,0 +1,34 @@
+{
+  "title": "UDB Runtime Details",
+  "panels": [
+    {
+      "title": "Event Loop Lag",
+      "type": "graph",
+      "targets": [
+        { "expr": "udb_nodejs_eventloop_lag_seconds", "legendFormat": "{{service}}" }
+      ]
+    },
+    {
+      "title": "Redis Latency",
+      "type": "graph",
+      "targets": [
+        { "expr": "rate(udb_redis_latency_seconds_sum[1m]) / rate(udb_redis_latency_seconds_count[1m])", "legendFormat": "avg latency" }
+      ]
+    },
+    {
+      "title": "DB Pool Usage",
+      "type": "graph",
+      "targets": [
+        { "expr": "udb_db_pool_usage", "legendFormat": "pool" }
+      ]
+    },
+    {
+      "title": "Queue Depth",
+      "type": "graph",
+      "targets": [
+        { "expr": "udb_queue_depth", "legendFormat": "{{queue}}" }
+      ]
+    }
+  ],
+  "schemaVersion": 27
+}

@@ -1,0 +1,73 @@
+{
+  "generatedAt": "2026-05-08T05:48:59.496Z",
+  "criticalPaths": [
+    {
+      "path": "Gateway → Auth (register)",
+      "avgMs": 68,
+      "bottleneck": "scrypt password hashing (CPU-bound)"
+    },
+    {
+      "path": "Gateway → Auth (login)",
+      "avgMs": 52,
+      "bottleneck": "scrypt verification + Redis HMSET read"
+    },
+    {
+      "path": "Gateway → Planner (generate)",
+      "avgMs": 3,
+      "bottleneck": "Minimal — in-memory object creation"
+    },
+    {
+      "path": "Gateway → AI (hint)",
+      "avgMs": 2,
+      "bottleneck": "Minimal — in-memory map lookup"
+    },
+    {
+      "path": "Gateway → Monitoring (health)",
+      "avgMs": 8,
+      "bottleneck": "Minimal — Redis ping"
+    }
+  ],
+  "concurrencyLatency": [
+    {
+      "concurrency": 10,
+      "p50": 2,
+      "p95": 4,
+      "p99": 6
+    },
+    {
+      "concurrency": 25,
+      "p50": 4,
+      "p95": 9,
+      "p99": 9
+    },
+    {
+      "concurrency": 50,
+      "p50": 13,
+      "p95": 25,
+      "p99": 26
+    },
+    {
+      "concurrency": 100,
+      "p50": 23,
+      "p95": 44,
+      "p99": 48
+    },
+    {
+      "concurrency": 200,
+      "p50": 44,
+      "p95": 83,
+      "p99": 91
+    },
+    {
+      "concurrency": 300,
+      "p50": 58,
+      "p95": 113,
+      "p99": 126
+    }
+  ],
+  "recommendations": [
+    "Move scrypt hashing to a dedicated worker thread to avoid blocking event loop",
+    "Replace in-memory caches with Redis-backed TTL caches",
+    "Deploy pgBouncer to eliminate DB connection contention"
+  ]
+}

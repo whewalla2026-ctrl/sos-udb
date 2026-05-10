@@ -1,0 +1,35 @@
+{
+  "generatedAt": "2026-05-08T09:14:11.389Z",
+  "currentState": {
+    "auditLogging": "Implemented via logAudit() in shared/security.js — logs to console (structured JSON)",
+    "events": [
+      "user.login",
+      "user.register",
+      "user.password_reset",
+      "plan.generate",
+      "ai.hint",
+      "budget.threshold"
+    ],
+    "storage": "Application logs only — no persistent audit log storage",
+    "format": {
+      "timestamp": "ISO8601",
+      "event": "string",
+      "userId": "string",
+      "metadata": "object",
+      "severity": "INFO|WARN|ERROR"
+    }
+  },
+  "gaps": [
+    "No immutable audit log (logs rotate with application)",
+    "No audit log retention policy",
+    "No centralized audit log aggregation",
+    "No tamper detection for audit records"
+  ],
+  "recommendations": [
+    "Add file-based audit log (audit.log) written in append-only mode",
+    "Ship logs to centralized logging (ELK, Loki, or DataDog)",
+    "Add digital signature to audit entries for tamper detection",
+    "Define 90-day retention policy"
+  ],
+  "verdict": "BASIC AUDIT LOGGING ACTIVE — Enterprise audit (immutable, centralized) not yet implemented"
+}

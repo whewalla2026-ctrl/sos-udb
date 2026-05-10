@@ -1,0 +1,28 @@
+{
+  "generatedAt": "2026-05-09T04:02:22.295Z",
+  "checks": [
+    {
+      "test": "Metrics endpoint",
+      "status": "PASS"
+    },
+    {
+      "test": "Correlation ID middleware",
+      "status": "ACTIVE",
+      "detail": "x-correlation-id in all proxied requests"
+    },
+    {
+      "test": "Structured JSON logging",
+      "status": "WARN",
+      "detail": "0 JSON log entries found"
+    },
+    {
+      "test": "Circuit breaker observability",
+      "status": "ACTIVE",
+      "detail": "GET /gateway/circuit-breakers exposes live state"
+    },
+    {
+      "test": "Service health endpoints",
+      "status": "ALL RESPONSIVE"
+    }
+  ]
+}

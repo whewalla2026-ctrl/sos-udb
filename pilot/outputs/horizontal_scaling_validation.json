@@ -1,0 +1,90 @@
+{
+  "generatedAt": "2026-05-09T03:35:35.915Z",
+  "statelessServices": [
+    {
+      "service": "gateway",
+      "status": 200,
+      "stateless": true,
+      "note": "minimal state (circuit breakers in-memory)"
+    },
+    {
+      "service": "auth",
+      "status": 200,
+      "stateless": true,
+      "note": "fully stateless"
+    },
+    {
+      "service": "planner",
+      "status": 200,
+      "stateless": true,
+      "note": "fully stateless"
+    },
+    {
+      "service": "ai",
+      "status": 200,
+      "stateless": true,
+      "note": "fully stateless"
+    },
+    {
+      "service": "monitoring",
+      "status": 200,
+      "stateless": true,
+      "note": "fully stateless"
+    }
+  ],
+  "allStateless": true,
+  "redisClusterReadiness": {
+    "currentVersion": "3.0.504",
+    "targetVersion": "7.x",
+    "clusterMode": "Not available in 3.0.504",
+    "recommendation": "Upgrade to Redis 7 Docker image for Cluster/ACL/Streams",
+    "estimatedEffort": "2 hours — swap Docker image, reconnect config",
+    "readReplicaStrategy": "Redis Cluster with master/replicas in different AZs"
+  },
+  "dbReadReplicaStrategy": {
+    "currentSetup": "Single PostgreSQL 16 instance",
+    "readReplicaPlan": "Streaming replication to 1-2 read replicas",
+    "queryRouting": "Application-level read/write splitting or pgpool-II",
+    "estimatedConnections": 7,
+    "maxPoolSize": 10,
+    "recommendation": "Deploy pgBouncer + read replicas for 10k+ users",
+    "scalingLimit": "Single writer bottleneck at ~5k concurrent writes"
+  },
+  "queuePartitioning": {
+    "currentSetup": "Redis BRPOP-based queues with AOF persistence",
+    "queues": [
+      "ai-hints",
+      "analytics",
+      "notifications",
+      "cleanup"
+    ],
+    "partitionStrategy": "By queue name — each queue is a Redis list",
+    "throughput": "Single Redis instance bottleneck at ~10k msg/s",
+    "recommendation": "Partition high-volume queues (analytics) across Redis Cluster nodes"
+  },
+  "eventThroughput": {
+    "currentBus": "Redis Pub/Sub (event-bus.js)",
+    "estimatedMaxThroughput": "~5k events/sec on single Redis",
+    "scalingApproach": "Multiple Redis channels or migrate to Kafka/NATS",
+    "currentEventVolume": "Low (<100 events/min)"
+  },
+  "overallReadiness": {
+    "score": 60,
+    "max": 100,
+    "immediateGates": [
+      "Redis 7 upgrade",
+      "pgBouncer",
+      "Docker Compose production"
+    ],
+    "mediumGates": [
+      "K8s deployment",
+      "Read replicas",
+      "Redis Cluster"
+    ],
+    "longTermGates": [
+      "Multi-region",
+      "Kafka for event bus",
+      "Database sharding"
+    ]
+  }
+}

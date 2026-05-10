@@ -1,0 +1,20 @@
+{
+  "generatedAt": "2026-05-09T02:50:11.555Z",
+  "mesh": {
+    "communication_model": "HTTP/REST via gateway proxy",
+    "retry_policies": {
+      "default": "3 retries, exponential backoff 200-2000ms",
+      "circuit_breaker": "5 failures opens circuit, 30s cooldown"
+    },
+    "trace_propagation": {
+      "correlation_id_header": "x-correlation-id",
+      "trace_layers": 5,
+      "validated": true
+    },
+    "mtls_readiness": {
+      "status": "not implemented",
+      "recommendation": "Enable mTLS via Istio or Linkerd sidecar injection",
+      "effort": "2-3 days"
+    }
+  }
+}

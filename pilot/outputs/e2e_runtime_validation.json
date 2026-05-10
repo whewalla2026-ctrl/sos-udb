@@ -1,0 +1,47 @@
+{
+  "generatedAt": "2026-05-09T03:12:37.315Z",
+  "e2eResults": [
+    {
+      "step": "signup",
+      "status": 201,
+      "passed": true
+    },
+    {
+      "step": "login",
+      "status": 200,
+      "passed": true
+    },
+    {
+      "step": "token_refresh",
+      "status": 200,
+      "passed": true
+    },
+    {
+      "step": "plan_generation",
+      "status": 200,
+      "passed": true
+    },
+    {
+      "step": "ai_hint",
+      "status": 200,
+      "passed": true
+    },
+    {
+      "step": "gateway_health",
+      "status": 200,
+      "passed": true
+    },
+    {
+      "step": "password_rotation",
+      "status": 404,
+      "passed": false
+    }
+  ],
+  "summary": {
+    "total": 7,
+    "passed": 6,
+    "failed": 1
+  },
+  "flow": "signup → login → refresh → plan → AI hint → health → password change",
+  "verdict": "E2E FAILURES DETECTED"
+}

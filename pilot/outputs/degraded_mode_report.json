@@ -1,0 +1,14 @@
+{
+  "generatedAt": "2026-05-08T09:51:21.179Z",
+  "currentDegradedBehavior": {
+    "singleServiceFailure": "Gateway returns 502. Other services continue.",
+    "redisFailure": "Queue falls back to in-memory. Events lost. Services continue.",
+    "dbFailure": "Auth service down. Gateway returns 502 for auth routes.",
+    "gatewayFailure": "Complete API outage."
+  },
+  "recommendations": [
+    "Add circuit breaker to gateway (e.g., require(\"cockatiel\") or opossum)",
+    "Implement health endpoint caching — /gateway/health should not proxy through all services",
+    "Add startup dependency check — fail fast if dependent service unavailable"
+  ]
+}

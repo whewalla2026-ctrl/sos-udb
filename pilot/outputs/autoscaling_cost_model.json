@@ -1,0 +1,19 @@
+{
+  "generatedAt": "2026-05-09T02:48:58.374Z",
+  "model": {
+    "strategy": "HPA with CPU thresholds",
+    "ai_service": {
+      "min": 3,
+      "max": 20,
+      "threshold": 50,
+      "cost_savings_vs_fixed": "40% at low traffic"
+    },
+    "gateway": {
+      "min": 2,
+      "max": 10,
+      "threshold": 70,
+      "cost_savings_vs_fixed": "50% at low traffic"
+    }
+  },
+  "summary": "Autoscaling reduces idle compute costs by 40-50% at low traffic"
+}

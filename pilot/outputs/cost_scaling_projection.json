@@ -1,0 +1,48 @@
+{
+  "generatedAt": "2026-05-08T05:49:01.074Z",
+  "projections": [
+    {
+      "users": 100,
+      "totalMonthly": 436.458,
+      "costPerUser": 4.365,
+      "infraShare": 0.9966594723890958,
+      "aiShare": 0.0027494054410733674
+    },
+    {
+      "users": 500,
+      "totalMonthly": 442.29,
+      "costPerUser": 0.885,
+      "infraShare": 0.9835176015736281,
+      "aiShare": 0.013565760021705215
+    },
+    {
+      "users": 1000,
+      "totalMonthly": 449.58,
+      "costPerUser": 0.45,
+      "infraShare": 0.967569731749633,
+      "aiShare": 0.02669157880688643
+    },
+    {
+      "users": 5000,
+      "totalMonthly": 507.9,
+      "costPerUser": 0.102,
+      "infraShare": 0.8564678086237448,
+      "aiShare": 0.11813349084465447
+    },
+    {
+      "users": 10000,
+      "totalMonthly": 580.8,
+      "costPerUser": 0.058,
+      "infraShare": 0.7489669421487604,
+      "aiShare": 0.2066115702479339
+    }
+  ],
+  "breakevenAnalysis": {
+    "infraVsOperational": "At >10000 users, operational costs exceed infrastructure costs",
+    "perUserBreakdown": {
+      "infra": "$3-5/user/mo at 1,000 users, $0.5-1/user/mo at 10,000 users",
+      "ai": "$0.004/user/mo (light) to $0.032/user/mo (heavy)",
+      "compute": "$0.015/user/mo at 1,000 users"
+    }
+  }
+}

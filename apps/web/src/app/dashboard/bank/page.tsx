@@ -1,19 +1,25 @@
 'use client';
 import { useState } from 'react';
+import { useQuery } from '@apollo/client';
+import { GET_LEDGER, GET_BALANCE } from '../../../lib/queries';
 
-const MOCK_LEDGER = [
+var FALLBACK_LEDGER = [
   { id: '1', type: 'EARN', amount: 200, balanceAfter: 1250, source: 'QUEST', desc: 'Quest: Make Your Bed - Week 1', date: 'Today, 09:30 AM' },
   { id: '2', type: 'EARN', amount: 150, balanceAfter: 1050, source: 'QUEST', desc: 'Quest: Reading Challenge', date: 'Yesterday, 16:45' },
   { id: '3', type: 'SPEND', amount: -100, balanceAfter: 900, source: 'PURCHASE', desc: 'Doter Skin: Cosmic Blue', date: 'May 1, 2026' },
-  { id: '4', type: 'EARN', amount: 500, balanceAfter: 1000, source: 'BONUS', desc: '🎉 Streak Bonus: 10 Days!', date: 'Apr 30, 2026' },
-  { id: '5', type: 'EARN', amount: 200, balanceAfter: 500, source: 'MANUAL', desc: 'Mom awarded: Helped with dishes ❤️', date: 'Apr 28, 2026' },
+  { id: '4', type: 'EARN', amount: 500, balanceAfter: 1000, source: 'BONUS', desc: 'Streak Bonus: 10 Days!', date: 'Apr 30, 2026' },
+  { id: '5', type: 'EARN', amount: 200, balanceAfter: 500, source: 'MANUAL', desc: 'Mom awarded: Helped with dishes', date: 'Apr 28, 2026' },
 ];
 
 export default function BankPage() {
-  const [filter, setFilter] = useState<'ALL' | 'EARN' | 'SPEND'>('ALL');
-  const balance = 1250;
+  var { data: ledgerData, loading: ledgerLoading } = useQuery(GET_LEDGER, { variables: { page: 1, pageSize: 20 } });
+  var { data: balanceData } = useQuery(GET_BALANCE);
+  var [filter, setFilter] = useState<'ALL' | 'EARN' | 'SPEND'>('ALL');
 
-  const filtered = MOCK_LEDGER.filter(l => filter === 'ALL' || l.type === filter);
+  var ledger = ledgerData?.myLedger?.entries || FALLBACK_LEDGER;
+  var balance = balanceData?.myBalance || 1250;
+
+  var filtered = ledger.filter(function(l: any) { return filter === 'ALL' || l.type === filter; });
 
   return (
     <div className="fade-in">

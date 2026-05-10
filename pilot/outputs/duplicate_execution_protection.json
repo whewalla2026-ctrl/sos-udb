@@ -1,0 +1,31 @@
+{
+  "timestamp": "2026-05-09T02:27:40.922Z",
+  "summary": "DUPLICATE EXECUTION PROTECTION VALIDATED",
+  "protectedOperations": [
+    {
+      "operation": "Planner Generate",
+      "protection": "Idempotency-Key header",
+      "status": "ACTIVE"
+    },
+    {
+      "operation": "AI Hint Generation",
+      "protection": "Idempotency-Key header",
+      "status": "ACTIVE"
+    },
+    {
+      "operation": "Refresh Token Rotation",
+      "protection": "SHA-256 hash per token",
+      "status": "ACTIVE"
+    },
+    {
+      "operation": "Password Change",
+      "protection": "All refresh tokens revoked",
+      "status": "ACTIVE"
+    },
+    {
+      "operation": "Queue Replay",
+      "protection": "SHA-256 dedup + dead letter",
+      "status": "ACTIVE"
+    }
+  ]
+}

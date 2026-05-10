@@ -1,0 +1,156 @@
+{
+  "timestamp": "2026-05-09T12:12:41.393Z",
+  "score": 10,
+  "maxScore": 10,
+  "passed": 23,
+  "failed": 0,
+  "weightedPoints": 127,
+  "maxWeightedPoints": 127,
+  "elapsed_seconds": 0.8,
+  "evidence": [
+    {
+      "check": "Gateway is healthy",
+      "weight": 5,
+      "pass": true,
+      "detail": "healthy"
+    },
+    {
+      "check": "Auth service is healthy",
+      "weight": 5,
+      "pass": true,
+      "detail": "healthy"
+    },
+    {
+      "check": "NestJS GraphQL is running",
+      "weight": 5,
+      "pass": true,
+      "detail": "HTTP 200"
+    },
+    {
+      "check": "User registration works",
+      "weight": 5,
+      "pass": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJlNzA3NTg4Yi01ZDQzLTQ5YmQtOWIyYS01MzU5Yzk1YTdiOWMiLCJyb2xlIjoiQ0hJTEQiLCJlbWFpbCI6ImF1ZGl0LTE3NzgzMjg3NjA2MTNAdGVzdC5jb20iLCJzdWIiOiJlNzA3NTg4Yi01ZDQzLTQ5YmQtOWIyYS01MzU5Yzk1YTdiOWMiLCJqdGkiOiIwZDEzM2Q4Zi0wOWM1LTQzMTktOTgxZC1iOWIxYzFhNzc4ZDAiLCJpYXQiOjE3NzgzMjg3NjAsImV4cCI6MTc3ODMyOTA2MH0.YZmYKsHaPPr6Oykgx807hWDJkzAYFp3T5d9NlZCJHeM",
+      "detail": "audit-1778328760613@test.com"
+    },
+    {
+      "check": "Login works",
+      "weight": 5,
+      "pass": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJlNzA3NTg4Yi01ZDQzLTQ5YmQtOWIyYS01MzU5Yzk1YTdiOWMiLCJyb2xlIjoiQ0hJTEQiLCJlbWFpbCI6ImF1ZGl0LTE3NzgzMjg3NjA2MTNAdGVzdC5jb20iLCJzdWIiOiJlNzA3NTg4Yi01ZDQzLTQ5YmQtOWIyYS01MzU5Yzk1YTdiOWMiLCJqdGkiOiJiZTc3NmRhMy03OWE3LTQwOGUtOGQ3Mi02MzA1NmRjZDNiODAiLCJpYXQiOjE3NzgzMjg3NjAsImV4cCI6MTc3ODMyOTA2MH0.W1f9cLeYxlrB5LVcbFAd6lyIV7nAPhJwxUpul5DC72k",
+      "detail": "audit-1778328760613@test.com"
+    },
+    {
+      "check": "Invalid login rejected",
+      "weight": 3,
+      "pass": true,
+      "detail": "Invalid credentials"
+    },
+    {
+      "check": "Mass assignment: role hardcoded to CHILD",
+      "weight": 10,
+      "pass": true,
+      "detail": "role=CHILD"
+    },
+    {
+      "check": "GraphQL me query returns data (JWT sub fix)",
+      "weight": 10,
+      "pass": {
+        "id": "e707588b-5d43-49bd-9b2a-5359c95a7b9c",
+        "email": "audit-1778328760613@test.com",
+        "displayName": "audit-1778328760613",
+        "role": "CHILD"
+      },
+      "detail": "{\"me\":{\"id\":\"e707588b-5d43-49bd-9b2a-5359c95a7b9c\",\"email\":\"audit-1778328760613@test.com\",\"displayName\":\"audit-1778328760613\",\"role\":\"CHILD\"}}"
+    },
+    {
+      "check": "Forgot password endpoint works",
+      "weight": 8,
+      "pass": "If the email exists, a password reset link has been sent.",
+      "detail": "If the email exists, a password reset link has been sent."
+    },
+    {
+      "check": "Reset password with valid token works",
+      "weight": 10,
+      "pass": "Password reset successfully",
+      "detail": "Password reset successfully"
+    },
+    {
+      "check": "Marketplace items query returns data",
+      "weight": 8,
+      "pass": true,
+      "detail": "6 items"
+    },
+    {
+      "check": "FutureSelfNarrative query works",
+      "weight": 5,
+      "pass": true,
+      "detail": "narrative length=75"
+    },
+    {
+      "check": "Inbox query works",
+      "weight": 5,
+      "pass": true,
+      "detail": "{\"inbox\":[]}"
+    },
+    {
+      "check": "Unread notifications query works",
+      "weight": 5,
+      "pass": true,
+      "detail": "notifications=0"
+    },
+    {
+      "check": "Safety score query works",
+      "weight": 5,
+      "pass": true,
+      "detail": "{\"mySafetyScore\":null}"
+    },
+    {
+      "check": "Backup files exist",
+      "weight": 5,
+      "pass": true,
+      "detail": "2 backup files in D:\\SOS-UDB\\backups\\daily"
+    },
+    {
+      "check": "Backup data is valid SQL",
+      "weight": 5,
+      "pass": true,
+      "detail": "Backup content: 64 KB, valid=true"
+    },
+    {
+      "check": "E2E Playwright tests exist",
+      "weight": 3,
+      "pass": true,
+      "detail": "1 test files: core-validation.spec.ts"
+    },
+    {
+      "check": "Token contains role claim",
+      "weight": 3,
+      "pass": true,
+      "detail": "role=CHILD"
+    },
+    {
+      "check": "Token contains sub claim",
+      "weight": 3,
+      "pass": true,
+      "detail": "sub=e707588b-5d43-49bd-9b2a-5359c95a7b9c"
+    },
+    {
+      "check": "Prometheus metrics endpoint works",
+      "weight": 3,
+      "pass": true,
+      "detail": "HTTP 200"
+    },
+    {
+      "check": "x-correlation-id on responses",
+      "weight": 3,
+      "pass": true,
+      "detail": "ad1569cd-3047-4298-b160-73626aee9828"
+    },
+    {
+      "check": "Rate limit blocks brute force",
+      "weight": 8,
+      "pass": true,
+      "detail": "9/15 requests blocked (429)"
+    }
+  ],
+  "verdict": "BETA READY ✅"
+}

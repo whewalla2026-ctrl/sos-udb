@@ -1,0 +1,20 @@
+{
+  "timestamp": "2026-05-09T02:27:38.951Z",
+  "summary": "RETRY GOVERNANCE VALIDATED",
+  "queue": {
+    "defaultRetries": 3,
+    "backoff": "exponential",
+    "dlqEnabled": true
+  },
+  "eventBus": {
+    "maxRetries": 3,
+    "backoff": "linear 200-2000ms",
+    "dlqEnabled": true
+  },
+  "circuitBreaker": {
+    "failureThreshold": 5,
+    "cooldownMs": 30000,
+    "halfOpenMaxRequests": 1
+  },
+  "retryStormPrevention": "circuit breaker OPEN state rejects immediately"
+}

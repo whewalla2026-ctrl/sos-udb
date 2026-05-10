@@ -1,0 +1,92 @@
+{
+  "generatedAt": "2026-05-09T04:02:22.296Z",
+  "sections": [
+    "E:Integration",
+    "F:E2E",
+    "G:Performance",
+    "H:Security",
+    "I:Observability"
+  ],
+  "results": [
+    {
+      "test": "Gateway->Auth registration",
+      "status": "PASS",
+      "detail": "201 created"
+    },
+    {
+      "test": "Gateway->Planner generate",
+      "status": "PASS",
+      "detail": "200 OK"
+    },
+    {
+      "test": "Gateway->AI hint",
+      "status": "PASS",
+      "detail": "200 with hint"
+    },
+    {
+      "test": "Gateway->Monitoring signals",
+      "status": "PASS",
+      "detail": "200 OK"
+    },
+    {
+      "test": "Event bus accessible",
+      "status": "PASS",
+      "detail": "{\"user_created\":{\"count\":63,\"dlq\":4},\"user_logged_in\":{\"count\":51,\"dlq\":0},\"planner_created\":{\"count"
+    },
+    {
+      "test": "Queue/circuit-breaker system",
+      "status": "PASS",
+      "detail": "All CLOSED"
+    },
+    {
+      "test": "Prometheus metrics endpoint",
+      "status": "PASS",
+      "detail": "200 OK"
+    },
+    {
+      "test": "Correlation ID via /gateway/health",
+      "status": "PASS",
+      "detail": "200 OK"
+    },
+    {
+      "test": "E2E Flow 1: Register->Login->Plan->AI->Get",
+      "status": "PASS",
+      "detail": "5/5 steps OK"
+    },
+    {
+      "test": "E2E Flow 3: Metrics->Alerts",
+      "status": "PASS",
+      "detail": "3/3 steps OK"
+    },
+    {
+      "test": "E2E Flow 4",
+      "status": "FAIL",
+      "detail": "Status: 404"
+    },
+    {
+      "test": "E2E Flow 5: Circuit breakers all CLOSED",
+      "status": "PASS",
+      "detail": "Recovery nominal"
+    },
+    {
+      "test": "E2E Flow 6: Cross-tenant isolation",
+      "status": "PASS",
+      "detail": "403 blocked"
+    },
+    {
+      "test": "Performance: p95 latency",
+      "status": "PASS",
+      "detail": "2ms (target <200ms)"
+    },
+    {
+      "test": "Performance: zero errors during burst",
+      "status": "PASS",
+      "detail": "50 requests, 0 errors"
+    },
+    {
+      "test": "Performance: Concurrent stress",
+      "status": "PASS",
+      "detail": "[{\"concurrency\":5,\"p50\":7,\"p95\":10,\"errors\":0,\"throughput\":\"143 rps\"},{\"concurrency\":10,\"p50\":11,\"p95\":16,\"errors\":0,\"throughput\":\"91 rps\"},{\"concurrency\":20,\"p50\":18,\"p95\":22,\"errors\":0,\"throughput\":\"56 rps\"}]"
+    }
+  ]
+}

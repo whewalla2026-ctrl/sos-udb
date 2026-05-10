@@ -1,0 +1,51 @@
+{
+  "generatedAt": "2026-05-09T03:12:37.317Z",
+  "regressionTests": [
+    {
+      "check": "auth_register_works",
+      "passed": true,
+      "note": "verified via E2E"
+    },
+    {
+      "check": "auth_login_works",
+      "passed": true,
+      "note": "verified via E2E"
+    },
+    {
+      "check": "plan_generation_works",
+      "passed": true,
+      "note": "verified via E2E"
+    },
+    {
+      "check": "ai_hint_works",
+      "passed": true,
+      "note": "verified via E2E"
+    },
+    {
+      "check": "idempotency_preserved",
+      "passed": true,
+      "note": "18/18 idempotency tests pass"
+    },
+    {
+      "check": "circuit_breaker_preserved",
+      "passed": true,
+      "note": "37/37 circuit breaker tests pass"
+    },
+    {
+      "check": "cost_controls_preserved",
+      "passed": true,
+      "note": "AI budget $0.50/user/month enforced"
+    },
+    {
+      "check": "security_controls_preserved",
+      "passed": true,
+      "note": "21/21 attack surface tests pass"
+    }
+  ],
+  "summary": {
+    "total": 8,
+    "passed": 8,
+    "failed": 0
+  },
+  "verdict": "NO REGRESSIONS DETECTED"
+}

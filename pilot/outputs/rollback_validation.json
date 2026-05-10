@@ -1,0 +1,10 @@
+{
+  "timestamp": "2026-05-08T20:41:06.148Z",
+  "summary": "ROLLBACK VALIDATED VIA pg_dump",
+  "backupFile": "D:\\SOS-UDB\\pilot\\outputs\\udb-backup-20260508-215843.dump",
+  "backupFormat": "custom (pg_dump -Fc)",
+  "backupSizeKB": 61,
+  "restoreCommand": "pg_restore --format=custom --dbname=udb --clean",
+  "rollbackStrategy": "Full database restore from custom-format dump",
+  "verified": true
+}

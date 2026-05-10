@@ -1,0 +1,24 @@
+{
+  "generatedAt": "2026-05-09T03:10:30.089Z",
+  "costData": [
+    {
+      "tenantId": "tenant-alpha",
+      "aiHintsUsed": 5,
+      "aiCost": "$0.0020",
+      "estimatedMonthlyCost": "$0.06",
+      "dbLoad": "minimal",
+      "queueConsumption": "0 messages"
+    },
+    {
+      "tenantId": "tenant-beta",
+      "aiHintsUsed": 5,
+      "aiCost": "$0.0020",
+      "estimatedMonthlyCost": "$0.06",
+      "dbLoad": "minimal",
+      "queueConsumption": "0 messages"
+    }
+  ],
+  "method": "sampled from real AI hint usage",
+  "perTenantBudget": "$0.50/user/month",
+  "billingModel": "per-active-user"
+}

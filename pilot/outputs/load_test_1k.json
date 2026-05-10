@@ -1,0 +1,70 @@
+[
+  {
+    "label": "health_1000",
+    "concurrency": 1000,
+    "total": 500,
+    "success": 500,
+    "errors": 0,
+    "dur_ms": 580,
+    "throughput_rps": 862,
+    "latency": {
+      "min": 49,
+      "p50": 449,
+      "p95": 536,
+      "p99": 545,
+      "max": 546,
+      "avg": 462
+    }
+  },
+  {
+    "label": "plan_1000",
+    "concurrency": 1000,
+    "total": 300,
+    "success": 300,
+    "errors": 0,
+    "dur_ms": 96,
+    "throughput_rps": 3125,
+    "latency": {
+      "min": 46,
+      "p50": 67,
+      "p95": 83,
+      "p99": 84,
+      "max": 84,
+      "avg": 67
+    }
+  },
+  {
+    "label": "plan_cached_1000",
+    "concurrency": 1000,
+    "total": 200,
+    "success": 200,
+    "errors": 0,
+    "dur_ms": 52,
+    "throughput_rps": 3846,
+    "latency": {
+      "min": 23,
+      "p50": 29,
+      "p95": 42,
+      "p99": 43,
+      "max": 43,
+      "avg": 30
+    }
+  },
+  {
+    "label": "ai_1000",
+    "concurrency": 1000,
+    "total": 300,
+    "success": 300,
+    "errors": 0,
+    "dur_ms": 114,
+    "throughput_rps": 2632,
+    "latency": {
+      "min": 22,
+      "p50": 86,
+      "p95": 101,
+      "p99": 109,
+      "max": 110,
+      "avg": 82
+    }
+  }
+]

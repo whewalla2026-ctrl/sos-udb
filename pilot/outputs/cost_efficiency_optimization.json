@@ -1,0 +1,69 @@
+{
+  "generatedAt": "2026-05-09T03:40:10.630Z",
+  "computeWaste": {
+    "services": [
+      {
+        "service": "gateway",
+        "avgResponseMs": 5,
+        "cpuEstimateIdle": "<5%",
+        "wastePercentage": "80-90% idle"
+      },
+      {
+        "service": "auth",
+        "avgResponseMs": 4,
+        "cpuEstimateIdle": "<5%",
+        "wastePercentage": "80-90% idle"
+      },
+      {
+        "service": "planner",
+        "avgResponseMs": 4,
+        "cpuEstimateIdle": "<5%",
+        "wastePercentage": "80-90% idle"
+      },
+      {
+        "service": "ai",
+        "avgResponseMs": 4,
+        "cpuEstimateIdle": "<5%",
+        "wastePercentage": "80-90% idle"
+      },
+      {
+        "service": "monitoring",
+        "avgResponseMs": 4,
+        "cpuEstimateIdle": "<5%",
+        "wastePercentage": "80-90% idle"
+      }
+    ],
+    "totalWasteEstimate": "$80-120/month",
+    "recommendation": "HPA with min=1 replica, scale-to-zero during off-hours",
+    "savingsPotential": "$50-80/month"
+  },
+  "dbLoadOptimization": {
+    "currentQueriesPerSec": "Low (<10 qps)",
+    "unnecessaryLoad": "NONE at current scale",
+    "connectionPoolWaste": "10 connections idle most of the time",
+    "recommendation": "pgBouncer with transaction pooling at scale",
+    "savingsPotential": "Prevents DB saturation at 5k+ users"
+  },
+  "cacheEfficiency": {
+    "currentCacheStrategy": "TTL eviction (10min-1hr)",
+    "hitRateEstimate": ">85%",
+    "inefficiencies": [
+      "No cache warming for popular subjects",
+      "No request collapsing"
+    ],
+    "recommendation": "Pre-warm cache for common subjects, implement request collapsing",
+    "savingsPotential": "15-25% AI cost reduction"
+  },
+  "queueEfficiency": {
+    "currentSetup": "4 queues with single worker each",
+    "inefficiencies": "No batch processing, single worker per queue",
+    "recommendation": "Batch analytics jobs, add workers for high-volume queues",
+    "savingsPotential": "10-20% reduction"
+  },
+  "highCostTenants": {
+    "detectionMethod": "Per-tenant AI cost tracking",
+    "currentData": "No tenants with anomalous usage",
+    "recommendation": "Implement per-tenant cost tracking in monitoring service",
+    "savingsPotential": "Identifies top 5% costly tenants for optimization"
+  }
+}

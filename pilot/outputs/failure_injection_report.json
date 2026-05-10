@@ -1,0 +1,11 @@
+{
+  "timestamp": "2026-05-09T22:48:00Z",
+  "tests": [
+    { "test": "Redis failure and recovery", "recovered": true, "degraded": true },
+    { "test": "Auth service restart", "recovered": true },
+    { "test": "Gateway restart", "recovered": true },
+    { "test": "pgBouncer restart", "recovered": true },
+    { "test": "Auth flow after recovery", "ok": true },
+    { "test": "Observability survived restarts", "recovered": true }
+  ]
+}

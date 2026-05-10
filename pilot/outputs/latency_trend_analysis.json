@@ -1,0 +1,58 @@
+{
+  "generatedAt": "2026-05-09T02:48:13.520Z",
+  "trends": [
+    {
+      "service": "gateway",
+      "first_avg": 1,
+      "second_avg": 1,
+      "trend": "stable"
+    },
+    {
+      "service": "auth",
+      "first_avg": 3,
+      "second_avg": 2,
+      "trend": "decreasing"
+    },
+    {
+      "service": "planner",
+      "first_avg": 2,
+      "second_avg": 2,
+      "trend": "stable"
+    },
+    {
+      "service": "ai",
+      "first_avg": 3,
+      "second_avg": 3,
+      "trend": "stable"
+    },
+    {
+      "service": "monitoring",
+      "first_avg": 2,
+      "second_avg": 3,
+      "trend": "increasing"
+    }
+  ],
+  "baselines": {
+    "gateway": {
+      "p50": 15,
+      "p95": 120
+    },
+    "auth": {
+      "p50": 20,
+      "p95": 100
+    },
+    "planner": {
+      "p50": 80,
+      "p95": 200
+    },
+    "ai": {
+      "p50": 85,
+      "p95": 150
+    },
+    "monitoring": {
+      "p50": 15,
+      "p95": 100
+    }
+  },
+  "method": "real-time sampling against baselines"
+}

@@ -1,0 +1,15 @@
+{
+  "generatedAt": "2026-05-09T02:49:32.918Z",
+  "anomalies": {
+    "brute_force_protection": "10/min/IP rate limit active",
+    "credential_stuffing": "rate limiting + 401 on invalid credentials",
+    "token_replay": "SHA-256 hashed tokens in Redis + rotation",
+    "geo_anomaly": "not implemented (requires IP geolocation)"
+  },
+  "methods": [
+    "Rate limiting analysis",
+    "Token replay detection",
+    "Invalid credential tracking"
+  ],
+  "active": true
+}

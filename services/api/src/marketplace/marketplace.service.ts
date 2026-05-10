@@ -56,6 +56,19 @@ export class MarketplaceService {
     });
   }
 
+  async getMarketplaceItems(userId: string) {
+    const user = await this.prisma.user.findUnique({ where: { id: userId }, include: { doterProfile: true } });
+    var items = [
+      { id: '1', name: 'Custom Avatar Skin', description: 'Unique look for your Doter', cost: 500, category: 'Cosmetic', icon: '🎨' },
+      { id: '2', name: 'Premium Sound Pack', description: 'Exclusive sound effects', cost: 300, category: 'Audio', icon: '🎵' },
+      { id: '3', name: 'Doter Habitat Theme', description: 'Custom environment for your Doter', cost: 800, category: 'Themes', icon: '🏠' },
+      { id: '4', name: 'XP Boost (24h)', description: 'Double XP for 24 hours', cost: 200, category: 'Boosts', icon: '⚡' },
+      { id: '5', name: 'Study Kit Bundle', description: 'Premium study resources', cost: 1000, category: 'Education', icon: '📚' },
+      { id: '6', name: 'Mini-Game Pass', description: 'Unlock all mini-games', cost: 400, category: 'Games', icon: '🎮' },
+    ];
+    return items;
+  }
+
   async mintAchievement(userId: string, title: string, description: string, pillar: any) {
     const achievement = await this.prisma.achievement.create({
       data: {

@@ -8,6 +8,7 @@ import { MessagingService } from '../src/messaging/messaging.service';
 import { SafetyService } from '../src/safety/safety.service';
 import { REDIS_CLIENT } from '../src/redis/redis.module';
 import { PointsService } from '../src/points/points.service';
+import { MockHealthController } from './test-health.controller';
 
 describe('UDB API End-to-End Tests (e2e)', () => {
   let app: INestApplication;
@@ -49,6 +50,7 @@ describe('UDB API End-to-End Tests (e2e)', () => {
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
+      controllers: [MockHealthController],
     })
       .overrideProvider(PrismaService).useValue(mockPrismaService)
       .overrideProvider(REDIS_CLIENT).useValue(mockRedisClient)

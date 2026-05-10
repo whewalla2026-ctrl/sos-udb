@@ -1,0 +1,133 @@
+{
+  "generatedAt": "2026-05-09T02:48:13.576Z",
+  "runtimeRiskScores": [
+    {
+      "service": "gateway",
+      "health_score": 10,
+      "latency_score": 10,
+      "risk_score": 0,
+      "risk_level": "low"
+    },
+    {
+      "service": "auth",
+      "health_score": 10,
+      "latency_score": 10,
+      "risk_score": 0,
+      "risk_level": "low"
+    },
+    {
+      "service": "planner",
+      "health_score": 10,
+      "latency_score": 10,
+      "risk_score": 0,
+      "risk_level": "low"
+    },
+    {
+      "service": "ai",
+      "health_score": 10,
+      "latency_score": 10,
+      "risk_score": 0,
+      "risk_level": "low"
+    },
+    {
+      "service": "monitoring",
+      "health_score": 10,
+      "latency_score": 10,
+      "risk_score": 0,
+      "risk_level": "low"
+    }
+  ],
+  "averageRiskScore": 0,
+  "overallRiskLevel": "low",
+  "deploymentSafety": {
+    "service_startup_order": "postgres → redis → auth → planner → ai → monitoring → gateway",
+    "startup_timeout": "30s per service",
+    "health_check_required": true,
+    "rollback_capability": "documented 6-step procedure",
+    "safety_score": 8.5,
+    "max_score": 10,
+    "risk_factors": [
+      "manual restart required",
+      "no zero-downtime deployment",
+      "no K8s auto-heal"
+    ]
+  },
+  "autoscalingRecommendations": [
+    {
+      "service": "gateway",
+      "current_replicas": 1,
+      "recommended_min": 2,
+      "recommended_max": 10,
+      "trigger_metric": "CPU > 70%",
+      "cooldown_seconds": 300,
+      "rationale": "Entry point for all traffic"
+    },
+    {
+      "service": "auth",
+      "current_replicas": 1,
+      "recommended_min": 2,
+      "recommended_max": 8,
+      "trigger_metric": "CPU > 70%",
+      "cooldown_seconds": 300,
+      "rationale": "Standard HA configuration"
+    },
+    {
+      "service": "planner",
+      "current_replicas": 1,
+      "recommended_min": 2,
+      "recommended_max": 10,
+      "trigger_metric": "CPU > 70%",
+      "cooldown_seconds": 300,
+      "rationale": "Standard HA configuration"
+    },
+    {
+      "service": "ai",
+      "current_replicas": 1,
+      "recommended_min": 3,
+      "recommended_max": 20,
+      "trigger_metric": "CPU > 70%",
+      "cooldown_seconds": 300,
+      "rationale": "AI is dominant cost driver — scale proactively"
+    },
+    {
+      "service": "monitoring",
+      "current_replicas": 1,
+      "recommended_min": 2,
+      "recommended_max": 3,
+      "trigger_metric": "CPU > 70%",
+      "cooldown_seconds": 300,
+      "rationale": "Standard HA configuration"
+    }
+  ],
+  "alertClassification": {
+    "p0_critical": {
+      "criteria": "DB down, Redis down, gateway unreachable",
+      "response_time": "<5min",
+      "auto_escalate": true
+    },
+    "p1_high": {
+      "criteria": "p95 > 1s, error rate > 5%, service degraded",
+      "response_time": "<15min",
+      "auto_escalate": true
+    },
+    "p2_medium": {
+      "criteria": "p95 > 500ms, queue depth > 500, AI cost spike",
+      "response_time": "<1hr",
+      "auto_escalate": false
+    },
+    "p3_low": {
+      "criteria": "cache hit rate < 50%, memory > 200MB",
+      "response_time": "<24hr",
+      "auto_escalate": false
+    }
+  },
+  "decisionEngine": {
+    "method": "multi-factor scoring (health + latency + saturation)",
+    "thresholds": {
+      "low_risk": "0-2",
+      "medium_risk": "2.1-5",
+      "high_risk": "5.1-10"
+    },
+    "next_auto_review": "2026-05-09T03:48:13.576Z"
+  }
+}

@@ -1,0 +1,34 @@
+{
+  "generatedAt": "2026-05-09T04:02:22.151Z",
+  "burst": {
+    "samples": 50,
+    "p50": 1,
+    "p95": 2,
+    "p99": 4,
+    "avg": 1,
+    "errors": 0
+  },
+  "concurrent": [
+    {
+      "concurrency": 5,
+      "p50": 7,
+      "p95": 10,
+      "errors": 0,
+      "throughput": "143 rps"
+    },
+    {
+      "concurrency": 10,
+      "p50": 11,
+      "p95": 16,
+      "errors": 0,
+      "throughput": "91 rps"
+    },
+    {
+      "concurrency": 20,
+      "p50": 18,
+      "p95": 22,
+      "errors": 0,
+      "throughput": "56 rps"
+    }
+  ]
+}

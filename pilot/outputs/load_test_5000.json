@@ -1,0 +1,53 @@
+[
+  {
+    "label": "health_1000",
+    "concurrency": 1000,
+    "total": 1000,
+    "success": 1000,
+    "errors": 0,
+    "dur_ms": 1156,
+    "throughput_rps": 865,
+    "latency": {
+      "min": 61,
+      "p50": 1054,
+      "p95": 1107,
+      "p99": 1108,
+      "max": 1109,
+      "avg": 898
+    }
+  },
+  {
+    "label": "plan_1000",
+    "concurrency": 1000,
+    "total": 200,
+    "success": 200,
+    "errors": 0,
+    "dur_ms": 93,
+    "throughput_rps": 2151,
+    "latency": {
+      "min": 55,
+      "p50": 76,
+      "p95": 90,
+      "p99": 91,
+      "max": 91,
+      "avg": 75
+    }
+  },
+  {
+    "label": "ai_1000",
+    "concurrency": 1000,
+    "total": 200,
+    "success": 200,
+    "errors": 0,
+    "dur_ms": 91,
+    "throughput_rps": 2198,
+    "latency": {
+      "min": 52,
+      "p50": 71,
+      "p95": 86,
+      "p99": 87,
+      "max": 87,
+      "avg": 72
+    }
+  }
+]

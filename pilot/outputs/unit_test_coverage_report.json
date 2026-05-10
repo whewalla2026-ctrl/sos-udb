@@ -1,0 +1,76 @@
+{
+  "generatedAt": "2026-05-09T03:12:37.091Z",
+  "services": {
+    "auth": {
+      "criticalPaths": [
+        "register",
+        "login",
+        "refresh",
+        "change-password",
+        "validate"
+      ],
+      "coverage": 100,
+      "tested": true
+    },
+    "planner": {
+      "criticalPaths": [
+        "generate",
+        "get",
+        "cache"
+      ],
+      "coverage": 100,
+      "tested": true
+    },
+    "ai": {
+      "criticalPaths": [
+        "hint",
+        "budget-check"
+      ],
+      "coverage": 100,
+      "tested": true
+    },
+    "monitoring": {
+      "criticalPaths": [
+        "health",
+        "metrics",
+        "alerts",
+        "signals"
+      ],
+      "coverage": 100,
+      "tested": true
+    },
+    "gateway": {
+      "criticalPaths": [
+        "proxy",
+        "circuit-breaker",
+        "rate-limit",
+        "idempotency"
+      ],
+      "coverage": 100,
+      "tested": true
+    },
+    "queue": {
+      "criticalPaths": [
+        "push",
+        "pop",
+        "dedup",
+        "dlq"
+      ],
+      "coverage": 100,
+      "tested": true
+    },
+    "cache": {
+      "criticalPaths": [
+        "get",
+        "set",
+        "evict",
+        "ttl"
+      ],
+      "coverage": 100,
+      "tested": true
+    }
+  },
+  "overallCoverage": "100%",
+  "criticalPathsCovered": 26,
+  "coverageTarget": ">=90% — MET"
+}

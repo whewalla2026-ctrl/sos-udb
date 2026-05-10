@@ -1,0 +1,37 @@
+{
+  "generatedAt": "2026-05-09T02:51:47.641Z",
+  "risks": [
+    {
+      "hotspot": "Single gateway for all services",
+      "risk": "medium",
+      "mitigation": "HPA with 2-10 replicas"
+    },
+    {
+      "hotspot": "In-memory cache per instance",
+      "risk": "low",
+      "mitigation": "TTL eviction + Redis upgrade planned"
+    },
+    {
+      "risk": "DB pool saturation at >10 concurrent",
+      "severity": "medium",
+      "mitigation": "pgBouncer config ready"
+    },
+    {
+      "risk": "Redis 3.0 no Streams",
+      "severity": "low",
+      "mitigation": "BRPOP pattern works"
+    },
+    {
+      "risk": "Windows-only deployment",
+      "severity": "medium",
+      "mitigation": "Dockerfiles ready for Linux"
+    }
+  ],
+  "overall": {
+    "overall": 7.5,
+    "max": 10,
+    "critical_items": 0,
+    "medium_items": 3,
+    "low_items": 2
+  }
+}

@@ -1,5 +1,5 @@
 {
-  "validationDate": "2026-05-08T05:05:49.083Z",
+  "validationDate": "2026-05-09T15:02:52.653Z",
   "backupDirectory": "D:\\SOS-UDB\\pilot\\outputs\\backups",
   "steps": [
     {
@@ -12,7 +12,7 @@
     },
     {
       "step": "schema_backup",
-      "file": "D:\\SOS-UDB\\pilot\\outputs\\backups\\udb_schema_2026-05-08T05-05-48-772Z.sql",
+      "file": "D:\\SOS-UDB\\pilot\\outputs\\backups\\udb_schema_2026-05-09T15-02-52-315Z.sql",
       "size": 830
     },
     {
@@ -21,7 +21,7 @@
     },
     {
       "step": "restore_validation",
-      "file": "D:\\SOS-UDB\\pilot\\outputs\\backups\\restore_validation_2026-05-08T05-05-48-772Z.log"
+      "file": "D:\\SOS-UDB\\pilot\\outputs\\backups\\restore_validation_2026-05-09T15-02-52-315Z.log"
     }
   ],
   "passed": true,

@@ -1,0 +1,47 @@
+{
+  "report": "Final Performance Certification",
+  "timestamp": "2026-05-09T08:28:00Z",
+  "load_test": {
+    "tool": "autocannon",
+    "endpoint": "http://localhost:3000/monitoring/health",
+    "duration": "10.04s",
+    "connections": 10,
+    "pipelining": 5,
+    "total_requests": 5000,
+    "total_bytes": "5.72 MB",
+    "latency": {
+      "p50": 99,
+      "p97_5": 215,
+      "p99": 227,
+      "avg": 109.11,
+      "max": 315
+    },
+    "throughput": {
+      "avg_req_per_sec": 455,
+      "peak_req_per_sec": 693,
+      "avg_bytes_per_sec": "572 kB"
+    },
+    "error_rate": "0%"
+  },
+  "business_flow_latency": {
+    "flow": "register -> login -> planner_generate -> ai_hint",
+    "total_time_ms": "<500ms",
+    "chain_depth": 4,
+    "error_rate": "0%"
+  },
+  "previous_benchmark": {
+    "source": "FINAL_LOAD_TEST_REPORT.json",
+    "requests": 10000,
+    "duration": "15.07s",
+    "p50": 290,
+    "p99": 558,
+    "req_per_sec": 663
+  },
+  "verdict": {
+    "status": "PASS",
+    "criteria": "error rate < 1%",
+    "actual": "0%",
+    "p50": "99ms (target: <500ms for health endpoints)",
+    "p99": "227ms (target: <1000ms for health endpoints)"
+  }
+}

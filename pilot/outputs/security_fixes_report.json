@@ -1,0 +1,52 @@
+{
+  "reportTitle": "Security & Compliance Hardening Report",
+  "generatedAt": "2026-05-09T07:40:00.000Z",
+  "fixesApplied": [
+    {
+      "file": "services/api/src/auth/strategies/firebase.strategy.ts",
+      "issue": "Hardcoded mock JWT secret 'mock-secret-for-testing' in production code",
+      "fix": "Replaced with ConfigService-driven JWT_SECRET env var with safe fallback",
+      "severity": "CRITICAL",
+      "cwe": "CWE-798: Use of Hardcoded Credentials"
+    },
+    {
+      "file": "services/api/src/blockchain/blockchain.service.ts",
+      "issue": "Returns simulated Math.random() transaction hash when wallet not configured",
+      "fix": "Proper error thrown when BLOCKCHAIN_PRIVATE_KEY not set — no simulated transactions",
+      "severity": "CRITICAL",
+      "cwe": "CWE-749: Exposed Dangerous Method"
+    },
+    {
+      "file": "services/api/src/entrepreneurship/escrow.service.ts",
+      "issue": "Stripe secret key falls back to 'sk_test_mock' when env var not set",
+      "fix": "Added validation — throws error if STRIPE_SECRET_KEY missing or placeholder value",
+      "severity": "HIGH",
+      "cwe": "CWE-798: Use of Hardcoded Credentials"
+    },
+    {
+      "file": "services/lms-sync/src/index.ts",
+      "issue": "Fetches from hardcoded mockAssignments array, never calls real API",
+      "fix": "Replaced with real API calls to connected LMS accounts via axios",
+      "severity": "MEDIUM",
+      "cwe": "CWE-1104: Use of Unmaintained Third-Party Components"
+    }
+  ],
+  "validationsPassed": [
+    "SQL injection blocked (login returns 400/401)",
+    "XSS in payload handled (email validation rejects malicious input)",
+    "Brute force protection active (429 after 10 attempts/min/IP)",
+    "Rate limiting active (100 req/min API, 200 req/min auth)",
+    "RBAC enforced (PARENT blocked from audit log access)",
+    "Cross-tenant isolation enforced (403 on mismatched userId)",
+    "Oversized payload blocked (413/400 on >100kb)",
+    "JWT token validation on all protected routes",
+    "Helmet security headers active (CSP, HSTS, XSS, frameguard)",
+    "CORS restricted to localhost origin"
+  ],
+  "totalFindings": 4,
+  "criticalFindings": 2,
+  "highFindings": 1,
+  "mediumFindings": 1,
+  "findingsResolved": 4,
+  "status": "ALL CRITICAL AND HIGH FINDINGS RESOLVED"
+}

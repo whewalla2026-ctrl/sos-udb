@@ -1,0 +1,34 @@
+{
+  "timestamp": "2026-05-08T12:00:22.370Z",
+  "tests": [
+    {
+      "test": "Rate Limit - Gateway Health (250 rapid GETs)",
+      "passed": true,
+      "detail": "Sent 250 GETs to http://localhost:3000/gateway/health in 388ms - 250 OK, 0 non-200 (expect 0 rate-limited)",
+      "statusCodes": [
+        200
+      ]
+    },
+    {
+      "test": "Rate Limit - Auth Login (250 rapid POSTs, expect 429)",
+      "passed": true,
+      "detail": "Sent 250 POSTs to http://localhost:3001/auth/login in 321ms - 220 got 429, 30 other (expect some 429)",
+      "statusCodes": [
+        401,
+        429
+      ]
+    },
+    {
+      "test": "Invalid Auth Spam - /planning/generate (20 requests, random tokens)",
+      "passed": true,
+      "detail": "Sent 20 POSTs with random auth tokens to http://localhost:3002/planning/generate - 20 got 401, 0 other (expect >= 18 401)",
+      "statusCodes": [
+        401
+      ]
+    }
+  ],
+  "summary": {
+    "passed": 3,
+    "failed": 0
+  }
+}

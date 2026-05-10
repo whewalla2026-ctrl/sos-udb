@@ -28,6 +28,10 @@ import { AuditModule } from './audit/audit.module';
 import { AiModule } from './ai/ai.module';
 import { BlockchainModule } from './blockchain/blockchain.module';
 import { MarketplaceModule } from './marketplace/marketplace.module';
+import { OnboardingModule } from './onboarding/onboarding.module';
+import { AnalyticsModule } from './analytics/analytics.module';
+import { MonitoringModule } from './monitoring/monitoring.module';
+import { MetricsModule } from './shared/metrics.module';
 
 @Module({
   imports: [
@@ -70,6 +74,10 @@ import { MarketplaceModule } from './marketplace/marketplace.module';
     AiModule,
     BlockchainModule,
     MarketplaceModule,
+    OnboardingModule,
+    AnalyticsModule,
+    MonitoringModule,
+    MetricsModule,
   ],
 })
 export class AppModule {}

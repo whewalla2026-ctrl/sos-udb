@@ -1,0 +1,172 @@
+{
+  "generatedAt": "2026-05-09T04:00:48.378Z",
+  "totalRoutes": 20,
+  "passed": 20,
+  "failed": 0,
+  "routes": [
+    {
+      "route": "/",
+      "status": 200,
+      "size": 15222,
+      "hasContent": true,
+      "preview": "<!DOCTYPE html><html lang=\"en\"><head><meta charSet=\"utf-8\"/><meta name=\"viewport\" content=\"width=dev"
+    },
+    {
+      "route": "/auth/login",
+      "status": 200,
+      "size": 10109,
+      "hasContent": true,
+      "preview": "<!DOCTYPE html><html lang=\"en\"><head><meta charSet=\"utf-8\"/><meta name=\"viewport\" content=\"width=dev"
+    },
+    {
+      "route": "/auth/register",
+      "status": 200,
+      "size": 10740,
+      "hasContent": true,
+      "preview": "<!DOCTYPE html><html lang=\"en\"><head><meta charSet=\"utf-8\"/><meta name=\"viewport\" content=\"width=dev"
+    },
+    {
+      "route": "/dashboard",
+      "status": 200,
+      "size": 26708,
+      "hasContent": true,
+      "preview": "<!DOCTYPE html><html lang=\"en\"><head><meta charSet=\"utf-8\"/><meta name=\"viewport\" content=\"width=dev"
+    },
+    {
+      "route": "/dashboard/doter",
+      "status": 200,
+      "size": 19683,
+      "hasContent": true,
+      "preview": "<!DOCTYPE html><html lang=\"en\"><head><meta charSet=\"utf-8\"/><meta name=\"viewport\" content=\"width=dev"
+    },
+    {
+      "route": "/dashboard/notifications",
+      "status": 200,
+      "size": 15956,
+      "hasContent": true,
+      "preview": "<!DOCTYPE html><html lang=\"en\"><head><meta charSet=\"utf-8\"/><meta name=\"viewport\" content=\"width=dev"
+    },
+    {
+      "route": "/dashboard/quests",
+      "status": 200,
+      "size": 23085,
+      "hasContent": true,
+      "preview": "<!DOCTYPE html><html lang=\"en\"><head><meta charSet=\"utf-8\"/><meta name=\"viewport\" content=\"width=dev"
+    },
+    {
+      "route": "/dashboard/goals",
+      "status": 200,
+      "size": 16078,
+      "hasContent": true,
+      "preview": "<!DOCTYPE html><html lang=\"en\"><head><meta charSet=\"utf-8\"/><meta name=\"viewport\" content=\"width=dev"
+    },
+    {
+      "route": "/dashboard/weekly-plan",
+      "status": 200,
+      "size": 23463,
+      "hasContent": true,
+      "preview": "<!DOCTYPE html><html lang=\"en\"><head><meta charSet=\"utf-8\"/><meta name=\"viewport\" content=\"width=dev"
+    },
+    {
+      "route": "/dashboard/academic",
+      "status": 200,
+      "size": 16186,
+      "hasContent": true,
+      "preview": "<!DOCTYPE html><html lang=\"en\"><head><meta charSet=\"utf-8\"/><meta name=\"viewport\" content=\"width=dev"
+    },
+    {
+      "route": "/dashboard/tutor",
+      "status": 200,
+      "size": 17538,
+      "hasContent": true,
+      "preview": "<!DOCTYPE html><html lang=\"en\"><head><meta charSet=\"utf-8\"/><meta name=\"viewport\" content=\"width=dev"
+    },
+    {
+      "route": "/dashboard/evidence",
+      "status": 200,
+      "size": 17268,
+      "hasContent": true,
+      "preview": "<!DOCTYPE html><html lang=\"en\"><head><meta charSet=\"utf-8\"/><meta name=\"viewport\" content=\"width=dev"
+    },
+    {
+      "route": "/dashboard/biometric",
+      "status": 200,
+      "size": 21536,
+      "hasContent": true,
+      "preview": "<!DOCTYPE html><html lang=\"en\"><head><meta charSet=\"utf-8\"/><meta name=\"viewport\" content=\"width=dev"
+    },
+    {
+      "route": "/dashboard/bank",
+      "status": 200,
+      "size": 18972,
+      "hasContent": true,
+      "preview": "<!DOCTYPE html><html lang=\"en\"><head><meta charSet=\"utf-8\"/><meta name=\"viewport\" content=\"width=dev"
+    },
+    {
+      "route": "/dashboard/ventures",
+      "status": 200,
+      "size": 17395,
+      "hasContent": true,
+      "preview": "<!DOCTYPE html><html lang=\"en\"><head><meta charSet=\"utf-8\"/><meta name=\"viewport\" content=\"width=dev"
+    },
+    {
+      "route": "/dashboard/family",
+      "status": 200,
+      "size": 15082,
+      "hasContent": true,
+      "preview": "<!DOCTYPE html><html lang=\"en\"><head><meta charSet=\"utf-8\"/><meta name=\"viewport\" content=\"width=dev"
+    },
+    {
+      "route": "/dashboard/messages",
+      "status": 200,
+      "size": 14646,
+      "hasContent": true,
+      "preview": "<!DOCTYPE html><html lang=\"en\"><head><meta charSet=\"utf-8\"/><meta name=\"viewport\" content=\"width=dev"
+    },
+    {
+      "route": "/dashboard/safety",
+      "status": 200,
+      "size": 14736,
+      "hasContent": true,
+      "preview": "<!DOCTYPE html><html lang=\"en\"><head><meta charSet=\"utf-8\"/><meta name=\"viewport\" content=\"width=dev"
+    },
+    {
+      "route": "/dashboard/future-self",
+      "status": 200,
+      "size": 15143,
+      "hasContent": true,
+      "preview": "<!DOCTYPE html><html lang=\"en\"><head><meta charSet=\"utf-8\"/><meta name=\"viewport\" content=\"width=dev"
+    },
+    {
+      "route": "/dashboard/joon-world",
+      "status": 200,
+      "size": 14191,
+      "hasContent": true,
+      "preview": "<!DOCTYPE html><html lang=\"en\"><head><meta charSet=\"utf-8\"/><meta name=\"viewport\" content=\"width=dev"
+    }
+  ],
+  "allLoad": true,
+  "warnings": [
+    {
+      "issue": "All pages use mock/static data — no real API integration",
+      "severity": "high",
+      "impact": "Dashboards show sample data, not real user data"
+    },
+    {
+      "issue": "5 routes referenced in sidebar but not implemented",
+      "severity": "medium",
+      "impact": "calendar, achievements, marketplace, settings, child-detail pages"
+    },
+    {
+      "issue": "No Firebase auth connected",
+      "severity": "medium",
+      "impact": "Login/register forms are UI-only"
+    },
+    {
+      "issue": "Apollo Client installed but not used",
+      "severity": "low",
+      "impact": "GraphQL resolvers ready but frontend never calls them"
+    }
+  ],
+  "criticalIssues": []
+}

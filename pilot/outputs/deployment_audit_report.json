@@ -1,0 +1,60 @@
+{
+  "generatedAt": "2026-05-08T09:56:30.929Z",
+  "deploymentModel": "Manual (Start-Process) with documented ordering",
+  "auditTrail": {
+    "logs": "Service logs include deployment timestamp, env, and version",
+    "format": {
+      "timestamp": "ISO8601",
+      "action": "deploy|restart|rollback",
+      "service": "name",
+      "version": "semver",
+      "user": "operator"
+    },
+    "storedIn": "Application logs (console). Not persisted to audit table."
+  },
+  "approvalFlow": [
+    {
+      "step": 1,
+      "action": "Code review",
+      "approver": "Senior developer",
+      "automated": false
+    },
+    {
+      "step": 2,
+      "action": "Load test",
+      "approver": "CI pipeline",
+      "automated": true
+    },
+    {
+      "step": 3,
+      "action": "Security validation",
+      "approver": "CI pipeline",
+      "automated": true
+    },
+    {
+      "step": 4,
+      "action": "Release sign-off",
+      "approver": "SRE Lead",
+      "automated": false
+    },
+    {
+      "step": 5,
+      "action": "Deploy to canary",
+      "approver": "Automated",
+      "automated": true
+    },
+    {
+      "step": 6,
+      "action": "Canary validation (15min)",
+      "approver": "Automated metrics",
+      "automated": true
+    },
+    {
+      "step": 7,
+      "action": "Deploy to production",
+      "approver": "SRE Lead",
+      "automated": false
+    }
+  ],
+  "recommendation": "Add deployment audit table to PostgreSQL for immutable deployment history"
+}

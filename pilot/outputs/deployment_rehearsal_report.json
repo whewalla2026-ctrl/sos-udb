@@ -1,0 +1,30 @@
+{
+  "report": "Deployment Rehearsal Report",
+  "timestamp": "2026-05-09T08:28:00Z",
+  "tests": {
+    "graceful_service_stop": {
+      "status": "PASS",
+      "detail": "Monitoring and planner services stopped cleanly"
+    },
+    "gateway_degraded_mode": {
+      "status": "PASS",
+      "detail": "Gateway returned 502 'Service unavailable' — correct degraded behavior"
+    },
+    "service_restart": {
+      "status": "PASS",
+      "detail": "Services restarted and reconnected to PostgreSQL + Redis + EventBus"
+    },
+    "health_recovery": {
+      "status": "PASS",
+      "detail": "All services healthy within 8 seconds of restart"
+    },
+    "startup_order": {
+      "status": "PASS",
+      "detail": "Monitoring service logs: 'Connected to PostgreSQL, Redis, and EventBus' on startup"
+    }
+  },
+  "recovery_time_seconds": 8,
+  "recovery_target_seconds": 60,
+  "recovery_met_target": true,
+  "verdict": "PASS — deployment rollback validated, recovery < 60s"
+}

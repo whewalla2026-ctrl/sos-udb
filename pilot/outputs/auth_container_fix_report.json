@@ -1,0 +1,46 @@
+{
+  "fix_id": "AUTH-CONTAINER-P0-001",
+  "timestamp": "2026-05-09T18:15:00Z",
+  "engineer": "Principal Platform Engineer",
+  "root_cause": "Prisma engine binary incompatibility with Alpine 3.23 musl libc + OpenSSL 3.x",
+  "symptom": "libssl.so.1.1 missing for libquery_engine-linux-musl.so.node; symlink workaround failed",
+  "resolution": {
+    "approach": "Migrated from node:20-alpine to node:20-slim (Debian/glibc) for all Prisma-using containers",
+    "changed_files": [
+      "services/api/prisma/phase3/Dockerfile.auth",
+      "services/api/Dockerfile"
+    ],
+    "base_image": "node:20-slim (bookworm, glibc)",
+    "openssl_version": "3.0.x (libssl3 via apt)",
+    "prisma_binary_target": "debian-openssl-3.0.x (auto-detected by Prisma)",
+    "previous_base": "node:20-alpine (musl, OpenSSL 3.x, missing libssl.so.1.1 compat)",
+    "broken_workaround_removed": "apk add curl && ln -s /usr/lib/libssl.so.3 /usr/lib/libssl.so.1.1"
+  },
+  "cascading_fixes": [
+    {
+      "service": "pgbouncer",
+      "issue": "PgBouncer should not run as root (newer versions refuse)",
+      "fix": "Added pgbouncer user, USER directive, postgresql-client for healthcheck"
+    },
+    {
+      "service": "pgbouncer",
+      "issue": "Unsupported startup parameter: search_path (Prisma vs pgBouncer 1.21)",
+      "fix": "Upgraded pgbouncer to 1.22.1 (Alpine 3.20) and added ignore_startup_parameters"
+    },
+    {
+      "service": "nestjs-graphql",
+      "issue": "Missing REDIS_URL env var, JWT_SECRET not set in shell",
+      "fix": "Added REDIS_URL to docker-compose, created .env with JWT_SECRET"
+    }
+  ],
+  "validation": {
+    "auth_container": "healthy",
+    "nestjs_container": "healthy",
+    "pgbouncer_container": "healthy",
+    "all_10_containers": "healthy",
+    "prisma_generate": "passes on glibc",
+    "prisma_db_push": "passes",
+    "database_synced": true
+  },
+  "certification": "PASS"
+}

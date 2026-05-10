@@ -1,0 +1,64 @@
+{
+  "generatedAt": "2026-05-09T02:48:46.533Z",
+  "costAttribution": [
+    {
+      "users": 100,
+      "infrastructure": 435,
+      "ai_cost": 20,
+      "total": 455,
+      "cost_per_user": 4.55
+    },
+    {
+      "users": 1000,
+      "infrastructure": 435,
+      "ai_cost": 200,
+      "total": 635,
+      "cost_per_user": 0.64
+    },
+    {
+      "users": 10000,
+      "infrastructure": 635,
+      "ai_cost": 2000,
+      "total": 2635,
+      "cost_per_user": 0.26
+    },
+    {
+      "users": 50000,
+      "infrastructure": 1035,
+      "ai_cost": 10000,
+      "total": 11035,
+      "cost_per_user": 0.22
+    },
+    {
+      "users": 100000,
+      "infrastructure": 1935,
+      "ai_cost": 20000,
+      "total": 21935,
+      "cost_per_user": 0.22
+    }
+  ],
+  "perTenantCost": {
+    "cost_per_tenant": 0.5,
+    "ai_budget_cap": 0.5,
+    "billing_model": "per-active-user/month",
+    "currency": "USD"
+  },
+  "costDrivers": [
+    {
+      "driver": "AI hints",
+      "percentage": "46-65% at scale",
+      "cost_per_hint": 0.0004
+    },
+    {
+      "driver": "Compute instances",
+      "percentage": "25-35%",
+      "cost_per_instance": 75
+    },
+    {
+      "driver": "Database",
+      "percentage": "3-8%",
+      "cost_per_db": 15
+    }
+  ],
+  "method": "real cost model derived from operational data"
+}

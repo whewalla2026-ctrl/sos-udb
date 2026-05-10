@@ -1,0 +1,22 @@
+﻿{
+    "images":  [
+                   "sos-udb-gateway|latest|442MB",
+                   "sos-udb-monitoring-service|latest|444MB",
+                   "sos-udb-auth-service|latest|444MB",
+                   "sos-udb-planner-service|latest|444MB",
+                   "sos-udb-ai-service|latest|444MB",
+                   "ai-company-os-frontend|latest|3.06GB",
+                   "ai-company-os-backend|latest|1.97GB",
+                   "postgres|16|641MB",
+                   "qdrant/qdrant|latest|275MB",
+                   "langfuse/langfuse|latest|1.37GB"
+               ],
+    "build_status":  {
+                         "ai":  "built",
+                         "auth":  "built",
+                         "monitoring":  "built",
+                         "planner":  "built",
+                         "gateway":  "built"
+                     },
+    "timestamp":  "2026-05-09T18:14:56.4908963+03:00"
+}

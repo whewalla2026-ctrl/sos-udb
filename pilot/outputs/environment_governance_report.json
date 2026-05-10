@@ -1,0 +1,44 @@
+{
+  "generatedAt": "2026-05-09T02:50:11.557Z",
+  "governance": {
+    "environments": {
+      "local": {
+        "config": ".env.development",
+        "db": "localhost:5432",
+        "redis": "localhost:6379",
+        "secrets": "none"
+      },
+      "staging": {
+        "config": ".env.staging",
+        "db": "staging:5432",
+        "redis": "staging:6379",
+        "secrets": "K8s Secrets"
+      },
+      "production": {
+        "config": ".env.production",
+        "db": "prod:5432",
+        "redis": "prod:6379",
+        "secrets": "K8s Secrets + Vault"
+      },
+      "dr": {
+        "config": ".env.production",
+        "db": "dr:5432",
+        "redis": "dr:6379",
+        "secrets": "K8s Secrets + Vault"
+      }
+    },
+    "configIsolation": {
+      "validated": true,
+      "method": "per-environment .env files, no cross-contamination"
+    },
+    "secretIsolation": {
+      "validated": false,
+      "recommendation": "Use K8s Secrets + HashiCorp Vault for production secrets"
+    },
+    "schemaConsistency": {
+      "validated": true,
+      "method": "Prisma migrations applied consistently",
+      "risk": "Windows Defender blocks Prisma engine"
+    }
+  }
+}

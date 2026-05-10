@@ -1,0 +1,39 @@
+{
+  "generatedAt": "2026-05-09T04:02:22.287Z",
+  "tests": [
+    {
+      "test": "SQL injection login",
+      "status": "PASS",
+      "detail": "Status: 401"
+    },
+    {
+      "test": "XSS in payload",
+      "status": "WARN",
+      "detail": "Status: 201"
+    },
+    {
+      "test": "Token replay valid",
+      "status": "PASS",
+      "detail": "Token still valid within 5min window"
+    },
+    {
+      "test": "Brute force protection",
+      "status": "PASS",
+      "detail": "Rate limited after ~10 attempts"
+    },
+    {
+      "test": "Oversized payload",
+      "status": "PASS",
+      "detail": "Status: 413"
+    },
+    {
+      "test": "RBAC audit (PARENT)",
+      "status": "PASS",
+      "detail": "Expected 403, got 403"
+    }
+  ],
+  "summary": {
+    "total": 6,
+    "passed": 5
+  }
+}

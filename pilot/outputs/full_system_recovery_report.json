@@ -1,0 +1,56 @@
+{
+  "generatedAt": "2026-05-08T09:52:32.781Z",
+  "scenarios": [
+    {
+      "scenario": "Total API crash + full recovery",
+      "pidsKilled": 4,
+      "startupTimes": {
+        "auth": {
+          "ms": 1044,
+          "healthy": true
+        },
+        "planner": {
+          "ms": 518,
+          "healthy": true
+        },
+        "ai": {
+          "ms": 531,
+          "healthy": true
+        },
+        "monitoring": {
+          "ms": 532,
+          "healthy": true
+        },
+        "gateway": {
+          "ms": 532,
+          "healthy": true
+        }
+      },
+      "totalRecoveryTimeMs": 3157,
+      "allServicesHealthy": false,
+      "verdict": "FAIL"
+    },
+    {
+      "scenario": "Queue continuity",
+      "queueDepthAfterRecovery": 0,
+      "verdict": "PASS (all jobs processed)"
+    }
+  ],
+  "summary": {
+    "totalScenarios": 2,
+    "passed": 1,
+    "failed": 1
+  },
+  "totalSystemRecoveryTimeMs": 3157,
+  "averageServiceStartupMs": 631,
+  "recoveryProcedure": [
+    "1. Start PostgreSQL (if down): Start-Service postgresql-16",
+    "2. Start Redis: redis-server",
+    "3. Start Auth service (depends on DB + Redis)",
+    "4. Start Planner service (depends on Redis)",
+    "5. Start AI service (depends on Redis)",
+    "6. Start Monitoring service (depends on Redis)",
+    "7. Start Gateway service (depends on all services + Redis)",
+    "8. Verify: curl to each health endpoint"
+  ]
+}

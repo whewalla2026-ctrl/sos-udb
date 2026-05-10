@@ -1,0 +1,79 @@
+{
+  "timestamp": "2026-05-08T11:51:24.405Z",
+  "checks": [
+    {
+      "test": "Correlation ID propagation through gateway",
+      "sentId": "test-corr-1778241084406",
+      "receivedId": "test-corr-1778241084406",
+      "passed": true
+    },
+    {
+      "test": "gateway-health JSON response",
+      "hasTimestamp": true,
+      "hasStatus": true,
+      "service": "api-gateway",
+      "passed": true
+    },
+    {
+      "test": "auth-health JSON response",
+      "hasTimestamp": true,
+      "hasStatus": true,
+      "service": "auth-service",
+      "passed": true
+    },
+    {
+      "test": "planner-health JSON response",
+      "hasTimestamp": true,
+      "hasStatus": true,
+      "service": "planner-service",
+      "passed": true
+    },
+    {
+      "test": "ai-health JSON response",
+      "hasTimestamp": true,
+      "hasStatus": true,
+      "service": "ai-service",
+      "passed": true
+    },
+    {
+      "test": "monitoring-health JSON response",
+      "hasTimestamp": true,
+      "hasStatus": true,
+      "service": {
+        "auth": "healthy",
+        "planner": "healthy",
+        "ai": "healthy",
+        "monitoring": "healthy",
+        "redis": "healthy",
+        "postgres": "healthy"
+      },
+      "passed": true
+    },
+    {
+      "test": "Error context: missing auth header",
+      "hasErrorField": true,
+      "passed": true
+    },
+    {
+      "test": "Error context: invalid payload",
+      "hasErrorField": true,
+      "passed": true
+    },
+    {
+      "test": "Error context: not found",
+      "hasErrorField": false,
+      "passed": false
+    },
+    {
+      "test": "Audit log has entries with timestamps",
+      "entryCount": 0,
+      "allHaveTimestamps": false,
+      "passed": false
+    }
+  ],
+  "summary": {
+    "passed": 8,
+    "failed": 2
+  },
+  "correlationTrace": []
+}

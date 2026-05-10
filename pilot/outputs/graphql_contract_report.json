@@ -1,0 +1,36 @@
+{
+  "reportTitle": "GraphQL & API Contract Governance Report",
+  "generatedAt": "2026-05-09T05:35:00.000Z",
+  "graphqlEndpoint": "http://localhost:4000/graphql",
+  "status": "OPERATIONAL",
+  "schema": {
+    "source": "services/api/src/schema.gql",
+    "lines": 141,
+    "types": ["AuthPayload", "BusinessPlanResponse", "DoterProfileType", "LedgerEntry", "LedgerPage", "SocraticResponse", "UserType"],
+    "enums": ["UserRole"],
+    "scalars": ["DateTime", "JSON"],
+    "queries": 19,
+    "mutations": 18,
+    "totalOperations": 37
+  },
+  "resolverFiles": 18,
+  "modulesLoaded": 30,
+  "guards": {
+    "authGuard": "ACTIVE - GqlAuthGuard verifies JWT on protected resolvers",
+    "rolesGuard": "ACTIVE - RBAC enforcement on audit log and admin operations"
+  },
+  "contractValidation": {
+    "schemaDrift": false,
+    "nullSafety": true,
+    "authCoverage": true,
+    "paginationImplemented": true
+  },
+  "frontendApollo": {
+    "queriesDefined": 25,
+    "mutationsDefined": 17,
+    "totalOperations": 42,
+    "pagesWired": 12,
+    "authTokenPropagation": "Bearer token from localStorage"
+  },
+  "status": "GRAPHQL CONTRACT STABLE - 37 operations available, 42 frontend operations defined, auth guards active on all protected resolvers"
+}

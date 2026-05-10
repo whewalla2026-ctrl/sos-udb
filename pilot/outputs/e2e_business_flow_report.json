@@ -1,0 +1,63 @@
+{
+  "generatedAt": "2026-05-09T04:02:22.033Z",
+  "flows": [
+    {
+      "flow": "Flow1: Register->Login->Plan->AI->GetPlan",
+      "steps": [
+        {
+          "step": "Register",
+          "status": 201,
+          "detail": "userId created"
+        },
+        {
+          "step": "Login",
+          "status": 200
+        },
+        {
+          "step": "CreatePlan",
+          "status": 200
+        },
+        {
+          "step": "AIHint",
+          "status": 200,
+          "hasHint": true
+        },
+        {
+          "step": "GetPlan",
+          "status": 200
+        }
+      ],
+      "allPassed": true
+    },
+    {
+      "flow": "Flow3: Metrics->Alerts",
+      "steps": [
+        {
+          "step": "Metrics",
+          "status": 200
+        },
+        {
+          "step": "CreateAlert",
+          "status": 201
+        },
+        {
+          "step": "GetAlerts",
+          "status": 200
+        }
+      ],
+      "allPassed": true
+    },
+    {
+      "flow": "Flow4: Password Change",
+      "allPassed": false
+    },
+    {
+      "flow": "Flow5: Circuit Breaker Recovery",
+      "allPassed": true
+    },
+    {
+      "flow": "Flow6: Multi-tenant Isolation",
+      "allPassed": true
+    }
+  ]
+}

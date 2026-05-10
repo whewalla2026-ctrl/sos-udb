@@ -1,0 +1,112 @@
+{
+  "reportTitle": "Kubernetes Production Readiness Report",
+  "generatedAt": "2026-05-09T05:30:00.000Z",
+  "kubectlAvailable": true,
+  "currentContext": "docker-desktop",
+  "clusterAccessible": false,
+  "manifests": {
+    "namespace": {
+      "name": "udb-production",
+      "labels": { "app": "udb", "environment": "production" }
+    },
+    "deployments": [
+      {
+        "name": "postgres",
+        "image": "postgres:16-alpine",
+        "replicas": 1,
+        "ports": [5432],
+        "resources": { "requests": { "cpu": "250m", "memory": "256Mi" }, "limits": { "cpu": "500m", "memory": "512Mi" } },
+        "probes": { "liveness": { "exec": { "command": ["pg_isready", "-U", "postgres"] }, "initialDelaySeconds": 30 }, "readiness": { "exec": { "command": ["pg_isready", "-U", "postgres"] }, "initialDelaySeconds": 5 } },
+        "status": "MANIFEST READY"
+      },
+      {
+        "name": "redis",
+        "image": "redis:7-alpine",
+        "replicas": 1,
+        "ports": [6379],
+        "resources": { "requests": { "cpu": "100m", "memory": "128Mi" }, "limits": { "cpu": "300m", "memory": "256Mi" } },
+        "probes": { "liveness": { "exec": { "command": ["redis-cli", "ping"] }, "initialDelaySeconds": 15 }, "readiness": { "exec": { "command": ["redis-cli", "ping"] }, "initialDelaySeconds": 5 } },
+        "status": "MANIFEST READY"
+      },
+      {
+        "name": "gateway",
+        "image": "udb/gateway:latest",
+        "replicas": 2,
+        "ports": [3000],
+        "envFrom": [{ "secretRef": { "name": "udb-secrets" } }],
+        "resources": { "requests": { "cpu": "100m", "memory": "128Mi" }, "limits": { "cpu": "300m", "memory": "256Mi" } },
+        "hpa": { "minReplicas": 2, "maxReplicas": 10, "targetCPUUtilization": 70 },
+        "probes": { "liveness": { "httpGet": { "path": "/gateway/health", "port": 3000 }, "initialDelaySeconds": 10 }, "readiness": { "httpGet": { "path": "/gateway/health", "port": 3000 }, "initialDelaySeconds": 5 } },
+        "status": "MANIFEST READY"
+      },
+      {
+        "name": "auth-service",
+        "image": "udb/auth:latest",
+        "replicas": 2,
+        "ports": [3001],
+        "hpa": { "minReplicas": 2, "maxReplicas": 8, "targetCPUUtilization": 70 },
+        "probes": { "liveness": { "httpGet": { "path": "/health", "port": 3001 }, "initialDelaySeconds": 10 } },
+        "status": "MANIFEST READY"
+      },
+      {
+        "name": "planner-service",
+        "image": "udb/planner:latest",
+        "replicas": 2,
+        "ports": [3002],
+        "status": "MANIFEST READY"
+      },
+      {
+        "name": "ai-service",
+        "image": "udb/ai:latest",
+        "replicas": 2,
+        "ports": [3003],
+        "status": "MANIFEST READY"
+      },
+      {
+        "name": "monitoring-service",
+        "image": "udb/monitoring:latest",
+        "replicas": 1,
+        "ports": [3004],
+        "status": "MANIFEST READY"
+      }
+    ],
+    "services": [
+      { "name": "postgres", "type": "ClusterIP", "port": 5432 },
+      { "name": "redis", "type": "ClusterIP", "port": 6379 },
+      { "name": "gateway", "type": "ClusterIP", "port": 3000 },
+      { "name": "auth-service", "type": "ClusterIP", "port": 3001 },
+      { "name": "planner-service", "type": "ClusterIP", "port": 3002 },
+      { "name": "ai-service", "type": "ClusterIP", "port": 3003 },
+      { "name": "monitoring-service", "type": "ClusterIP", "port": 3004 }
+    ],
+    "ingress": {
+      "name": "udb-ingress",
+      "host": "api.udb.app",
+      "tls": true,
+      "annotations": { "kubernetes.io/ingress.class": "nginx", "cert-manager.io/cluster-issuer": "letsencrypt-prod" },
+      "rules": [
+        { "path": "/", "service": "gateway", "port": 3000 }
+      ]
+    },
+    "secrets": {
+      "name": "udb-secrets",
+      "keys": ["DATABASE_URL", "REDIS_URL", "JWT_SECRET", "STRIPE_SECRET_KEY"]
+    },
+    "configmaps": {
+      "name": "udb-config",
+      "data": { "NODE_ENV": "production", "API_PORT": "3000", "LOG_LEVEL": "info" }
+    },
+    "pdb": {
+      "minAvailable": 1,
+      "maxUnavailable": "25%"
+    },
+    "networkPolicies": {
+      "ingress": { "from": [{ "namespaceSelector": { "matchLabels": { "name": "udb-production" } } }] }
+    }
+  },
+  "terraform": {
+    "main.tf": "EXISTS - GCP Cloud SQL, Memorystore Redis, Cloud Storage",
+    "variables.tf": "EXISTS"
+  },
+  "status": "ALL MANIFESTS DEFINED - requires K8s cluster (minikube, Docker Desktop K8s, or GKE) to deploy"
+}

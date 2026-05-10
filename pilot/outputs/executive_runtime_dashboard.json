@@ -1,0 +1,100 @@
+{
+  "generatedAt": "2026-05-09T03:38:03.877Z",
+  "serviceHealth": [
+    {
+      "service": "gateway",
+      "status": "HEALTHY",
+      "latencyMs": 2,
+      "uptime": "658s"
+    },
+    {
+      "service": "auth",
+      "status": "HEALTHY",
+      "latencyMs": 3,
+      "uptime": "N/A"
+    },
+    {
+      "service": "planner",
+      "status": "HEALTHY",
+      "latencyMs": 5,
+      "uptime": "N/A"
+    },
+    {
+      "service": "ai",
+      "status": "HEALTHY",
+      "latencyMs": 6,
+      "uptime": "N/A"
+    },
+    {
+      "service": "monitoring",
+      "status": "HEALTHY",
+      "latencyMs": 8,
+      "uptime": "27893s"
+    }
+  ],
+  "allHealthy": true,
+  "circuitBreakerState": [
+    {
+      "service": "auth",
+      "state": "CLOSED"
+    },
+    {
+      "service": "planner",
+      "state": "CLOSED"
+    },
+    {
+      "service": "ai",
+      "state": "CLOSED"
+    },
+    {
+      "service": "monitoring",
+      "state": "CLOSED"
+    }
+  ],
+  "tenantActivity": {
+    "totalTenants": 3,
+    "sampleTenants": [
+      {
+        "userId": "fca8de26-e361-41aa-b917-04778dbd1d54",
+        "email": "tenant-0-1778297883511@x.com"
+      },
+      {
+        "userId": "b2776f26-089d-4851-9be4-8e30ba8e5a1d",
+        "email": "tenant-1-1778297883728@x.com"
+      },
+      {
+        "userId": "0060bad6-c35e-46dc-a36b-a6cc6d738d0b",
+        "email": "tenant-2-1778297883788@x.com"
+      }
+    ],
+    "activeTenantsToday": 3,
+    "newTenantsToday": 3
+  },
+  "infrastructureUtilization": {
+    "servicesRunning": 5,
+    "dbConnections": "10 pool max",
+    "redisKeys": "110",
+    "queuesActive": 4,
+    "cpuEstimate": "Low (<20% on all services)",
+    "memoryEstimate": "Low (<200MB per service)"
+  },
+  "errorTrends": {
+    "lastMinuteErrors": 0,
+    "lastHourErrors": 0,
+    "totalErrorsToday": 0,
+    "trend": "FLAT — no error spikes"
+  },
+  "aiCostTrends": {
+    "totalAiRequests": 35,
+    "totalAiCost": "$0.0140",
+    "avgCostPerRequest": "$0.0004",
+    "dailyProjectedCost": "$0.58 (at 1,450 requests/day)",
+    "monthlyProjectedCost": "$17.28"
+  },
+  "growthTrends": {
+    "usersCreated": "3 (this session)",
+    "plansGenerated": 0,
+    "hintsGenerated": 35,
+    "activeQueues": 4
+  }
+}

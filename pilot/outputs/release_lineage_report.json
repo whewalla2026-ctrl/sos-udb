@@ -1,0 +1,76 @@
+{
+  "generatedAt": "2026-05-09T02:51:47.635Z",
+  "lineage": {
+    "currentCommit": "03b0af105d573e1836308a038badc65f94228fb4",
+    "branch": "phase-3-platform",
+    "recentCommits": [
+      "03b0af1 feat: Phase 3 final hardening - CI/CD, security, Docker, backup, observability",
+      "07362d4 feat: Phase 3 platform hardening - microservices, event bus, queues, security, observability",
+      "9051fc7 chore: ignore local prisma prototypes",
+      "4b7e47e feat(api): add redacting logger and wire globally",
+      "d90fe72 chore: add eslint/prettier and enable lint in CI",
+      "a1474d6 ci: add pnpm-only workflow with typecheck",
+      "d09cf42 fix: restore workspace build after config cleanup",
+      "a99a74c chore: migrate turbo config for v2",
+      "754aa91 chore: add root start scripts for api and web",
+      "0b12753 chore: stop tracking env files and add templates"
+    ],
+    "services": [
+      {
+        "name": "gateway",
+        "version": "1.0.0",
+        "dockerfile": "Dockerfile.gateway",
+        "healthEndpoint": "/gateway/health"
+      },
+      {
+        "name": "auth",
+        "version": "1.0.0",
+        "dockerfile": "Dockerfile.auth",
+        "healthEndpoint": "/auth/health"
+      },
+      {
+        "name": "planner",
+        "version": "1.0.0",
+        "dockerfile": "Dockerfile.planner",
+        "healthEndpoint": "/planner/health"
+      },
+      {
+        "name": "ai",
+        "version": "1.0.0",
+        "dockerfile": "Dockerfile.ai",
+        "healthEndpoint": "/ai/health"
+      },
+      {
+        "name": "monitoring",
+        "version": "1.0.0",
+        "dockerfile": "Dockerfile.monitoring",
+        "healthEndpoint": "/monitoring/health"
+      }
+    ],
+    "dependencyLineage": {
+      "node": "v24.15.0",
+      "prisma": "5.x",
+      "redis": "3.0.504",
+      "postgresql": "16",
+      "npm_packages": [
+        "express",
+        "ioredis",
+        "helmet",
+        "cors",
+        "jsonwebtoken",
+        "scrypt-js"
+      ]
+    },
+    "schemaLineage": {
+      "tables": 25,
+      "migrations": "Prisma migration engine",
+      "lastMigration": "03b0af1 feat: Phase 3 final hardening - CI/CD, security, Docker, backup, observability"
+    },
+    "deploymentLineage": {
+      "environment": "local (Windows)",
+      "method": "manual node start",
+      "docker_ready": true,
+      "k8s_ready": true
+    }
+  }
+}

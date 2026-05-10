@@ -1,0 +1,66 @@
+{
+  "generatedAt": "2026-05-08T09:56:30.923Z",
+  "version": "1.0.0",
+  "releaseChannels": [
+    {
+      "name": "canary",
+      "frequency": "Continuous",
+      "stability": "experimental",
+      "audience": "internal",
+      "validation": "Unit + Integration"
+    },
+    {
+      "name": "stable",
+      "frequency": "Weekly",
+      "stability": "validated",
+      "audience": "production",
+      "validation": "Full certification suite"
+    },
+    {
+      "name": "hotfix",
+      "frequency": "As needed",
+      "stability": "critical",
+      "audience": "production",
+      "validation": "Minimal + security"
+    }
+  ],
+  "semanticVersioning": {
+    "current": "1.0.0",
+    "pattern": "MAJOR.MINOR.PATCH",
+    "major": "Breaking changes",
+    "minor": "New features (backward compatible)",
+    "patch": "Bug fixes, performance, security"
+  },
+  "automatedReleaseNotes": {
+    "source": "Git commit history (conventional commits)",
+    "format": "## {version} ({date})\n### Features\n### Fixes\n### Performance\n### Security",
+    "generator": "git log --format=\"%s\" --since={last_tag}"
+  },
+  "releaseGate": [
+    {
+      "name": "Load test",
+      "required": true,
+      "threshold": "p95 < 500ms at 1000 users"
+    },
+    {
+      "name": "Security scan",
+      "required": true,
+      "threshold": "No critical vulnerabilities"
+    },
+    {
+      "name": "Failure injection",
+      "required": true,
+      "threshold": "All scenarios PASS"
+    },
+    {
+      "name": "Backup validation",
+      "required": true,
+      "threshold": "Backup completed within 24h"
+    },
+    {
+      "name": "Cost check",
+      "required": "major.minor",
+      "threshold": "No regression > 10%"
+    }
+  ]
+}

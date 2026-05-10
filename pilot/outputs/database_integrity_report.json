@@ -1,0 +1,118 @@
+{
+  "generatedAt": "2026-05-09T03:56:55.206Z",
+  "tables": {
+    "count": 25,
+    "names": [
+      "achievements\r",
+      " activities\r",
+      " audit_logs\r",
+      " biometric_logs\r",
+      " doter_profiles\r",
+      " escrows\r",
+      " evidence_items\r",
+      " family_links\r",
+      " goals\r",
+      " lms_assignments\r",
+      " lms_connections\r",
+      " messages\r",
+      " notifications\r",
+      " points_ledger\r",
+      " quests\r",
+      " safety_scores\r",
+      " simulation_pathways\r",
+      " simulation_runs\r",
+      " skill_agents\r",
+      " skill_gaps\r",
+      " streaks\r",
+      " tutoring_sessions\r",
+      " users\r",
+      " ventures\r",
+      " weekly_plans"
+    ],
+    "rowCounts": {
+      "achievements": "0",
+      "activities": "0",
+      "audit_logs": "0",
+      "biometric_logs": "0",
+      "doter_profiles": "0",
+      "escrows": "0",
+      "evidence_items": "0",
+      "family_links": "0",
+      "goals": "0",
+      "lms_assignments": "0",
+      "lms_connections": "0",
+      "messages": "0",
+      "notifications": "0",
+      "points_ledger": "0",
+      "quests": "0",
+      "safety_scores": "0",
+      "simulation_pathways": "0",
+      "simulation_runs": "0",
+      "skill_agents": "0",
+      "skill_gaps": "0",
+      "streaks": "0",
+      "tutoring_sessions": "0",
+      "users": "93",
+      "ventures": "0",
+      "weekly_plans": "0"
+    }
+  },
+  "indexes": {
+    "count": 53,
+    "details": [
+      "achievements        | achievements_pkey\r",
+      " activities          | activities_pkey\r",
+      " activities          | activities_user_id_start_time_idx\r",
+      " audit_logs          | audit_logs_pkey\r",
+      " audit_logs          | audit_logs_actor_id_created_at_idx\r",
+      " audit_logs          | audit_logs_action_created_at_idx\r",
+      " biometric_logs      | biometric_logs_user_id_logged_at_idx\r",
+      " biometric_logs      | biometric_logs_pkey\r",
+      " doter_profiles      | doter_profiles_user_id_key\r",
+      " doter_profiles      | doter_profiles_pkey\r",
+      " escrows             | escrows_pkey\r",
+      " escrows             | escrows_seller_id_idx\r",
+      " evidence_items      | evidence_items_pkey\r",
+      " evidence_items      | evidence_items_user_id_idx\r",
+      " family_links        | family_links_parent_id_child_id_key\r",
+      " family_links        | family_links_pkey\r",
+      " goals               | goals_user_id_status_idx\r",
+      " goals               | goals_pkey\r",
+      " lms_assignments     | lms_assignments_connection_id_idx\r",
+      " lms_assignments     | lms_assignments_pkey\r",
+      " lms_connections     | lms_connections_user_id_idx\r",
+      " lms_connections     | lms_connections_pkey\r",
+      " messages            | messages_receiver_id_sender_id_idx\r",
+      " messages            | messages_sender_id_receiver_id_idx\r",
+      " messages            | messages_pkey\r",
+      " notifications       | notifications_pkey\r",
+      " notifications       | notifications_user_id_created_at_idx\r",
+      " points_ledger       | points_ledger_pkey\r",
+      " points_ledger       | points_ledger_user_id_created_at_idx\r",
+      " quests              | quests_user_id_status_idx\r"
+    ]
+  },
+  "foreignKeys": {
+    "count": 27
+  },
+  "dataIntegrity": [
+    {
+      "check": "system_catalog_accessible",
+      "result": "PASS"
+    }
+  ],
+  "migration": {
+    "status": "No Prisma migrations directory found — schema applied via db push"
+  },
+  "connectivity": {
+    "postgresql": "CONNECTED",
+    "connectionString": "postgresql://***@localhost:5432/udb"
+  },
+  "overallStatus": "DATABASE OPERATIONAL",
+  "recommendations": [
+    "Migrations in good shape",
+    "Set up automated nightly pg_dump backups",
+    "Configure pgBouncer for connection pooling at production scale",
+    "Add monitoring for long-running queries"
+  ]
+}

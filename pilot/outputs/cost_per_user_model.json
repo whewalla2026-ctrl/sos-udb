@@ -1,0 +1,314 @@
+{
+  "generatedAt": "2026-05-08T05:49:01.073Z",
+  "methodology": "Based on cloud provider pricing (AWS us-east-1) + real measured latencies from load test",
+  "infrastructure": {
+    "compute": {
+      "provider": "AWS/Azure",
+      "gateway": {
+        "instances": 2,
+        "costPerHr": 0.086,
+        "monthlyPerInstance": 43
+      },
+      "services": {
+        "instances": 2,
+        "costPerHr": 0.064,
+        "monthlyPerInstance": 32
+      },
+      "totalComputeMonthly": 342
+    },
+    "database": {
+      "type": "PostgreSQL 16 (RDS db.t3.medium)",
+      "costPerHr": 0.068,
+      "monthly": 50
+    },
+    "redis": {
+      "type": "Redis 7 (ElastiCache cache.t3.micro)",
+      "costPerHr": 0.034,
+      "monthly": 25
+    },
+    "loadBalancer": {
+      "costPerHr": 0.025,
+      "monthly": 18
+    }
+  },
+  "totalInfraMonthly": 435,
+  "costPerOperation": {
+    "authRegister": {
+      "dbQueries": 3,
+      "redisOps": 4,
+      "computeMs": 68,
+      "estimatedCostUSD": 0.000012
+    },
+    "authLogin": {
+      "dbQueries": 2,
+      "redisOps": 3,
+      "computeMs": 52,
+      "estimatedCostUSD": 0.000008
+    },
+    "planGenerate": {
+      "dbQueries": 0,
+      "redisOps": 0,
+      "computeMs": 3,
+      "estimatedCostUSD": 0.000001
+    },
+    "aiHint": {
+      "dbQueries": 0,
+      "redisOps": 2,
+      "computeMs": 2,
+      "estimatedCostUSD": 0.0004
+    },
+    "healthCheck": {
+      "dbQueries": 0,
+      "redisOps": 1,
+      "computeMs": 8,
+      "estimatedCostUSD": 0.000001
+    }
+  },
+  "projections": [
+    {
+      "activeUsers": 100,
+      "patterns": {
+        "light": {
+          "requestsPerDay": 2000,
+          "requestsPerMonth": 60000,
+          "aiHintsPerMonth": 1000,
+          "aiCost": 0.4,
+          "apiComputeCost": 0.06,
+          "dbCost": 0.037,
+          "redisCost": 0.006,
+          "totalOperational": 0.503,
+          "infraCost": 435,
+          "totalMonthly": 435.503,
+          "costPerUserMonthly": 4.355,
+          "costPerUserAnnual": 52.26
+        },
+        "medium": {
+          "requestsPerDay": 5000,
+          "requestsPerMonth": 150000,
+          "aiHintsPerMonth": 3000,
+          "aiCost": 1.2,
+          "apiComputeCost": 0.15,
+          "dbCost": 0.093,
+          "redisCost": 0.015,
+          "totalOperational": 1.4579999999999997,
+          "infraCost": 435,
+          "totalMonthly": 436.458,
+          "costPerUserMonthly": 4.365,
+          "costPerUserAnnual": 52.37
+        },
+        "heavy": {
+          "requestsPerDay": 10000,
+          "requestsPerMonth": 300000,
+          "aiHintsPerMonth": 8000,
+          "aiCost": 3.2,
+          "apiComputeCost": 0.3,
+          "dbCost": 0.188,
+          "redisCost": 0.03,
+          "totalOperational": 3.718,
+          "infraCost": 435,
+          "totalMonthly": 438.718,
+          "costPerUserMonthly": 4.387,
+          "costPerUserAnnual": 52.65
+        }
+      }
+    },
+    {
+      "activeUsers": 500,
+      "patterns": {
+        "light": {
+          "requestsPerDay": 10000,
+          "requestsPerMonth": 300000,
+          "aiHintsPerMonth": 5000,
+          "aiCost": 2,
+          "apiComputeCost": 0.3,
+          "dbCost": 0.185,
+          "redisCost": 0.03,
+          "totalOperational": 2.5149999999999997,
+          "infraCost": 435,
+          "totalMonthly": 437.515,
+          "costPerUserMonthly": 0.875,
+          "costPerUserAnnual": 10.5
+        },
+        "medium": {
+          "requestsPerDay": 25000,
+          "requestsPerMonth": 750000,
+          "aiHintsPerMonth": 15000,
+          "aiCost": 6,
+          "apiComputeCost": 0.75,
+          "dbCost": 0.46499999999999997,
+          "redisCost": 0.075,
+          "totalOperational": 7.29,
+          "infraCost": 435,
+          "totalMonthly": 442.29,
+          "costPerUserMonthly": 0.885,
+          "costPerUserAnnual": 10.61
+        },
+        "heavy": {
+          "requestsPerDay": 50000,
+          "requestsPerMonth": 1500000,
+          "aiHintsPerMonth": 40000,
+          "aiCost": 16,
+          "apiComputeCost": 1.5,
+          "dbCost": 0.94,
+          "redisCost": 0.15,
+          "totalOperational": 18.59,
+          "infraCost": 435,
+          "totalMonthly": 453.59,
+          "costPerUserMonthly": 0.907,
+          "costPerUserAnnual": 10.89
+        }
+      }
+    },
+    {
+      "activeUsers": 1000,
+      "patterns": {
+        "light": {
+          "requestsPerDay": 20000,
+          "requestsPerMonth": 600000,
+          "aiHintsPerMonth": 10000,
+          "aiCost": 4,
+          "apiComputeCost": 0.6,
+          "dbCost": 0.37,
+          "redisCost": 0.06,
+          "totalOperational": 5.029999999999999,
+          "infraCost": 435,
+          "totalMonthly": 440.03,
+          "costPerUserMonthly": 0.44,
+          "costPerUserAnnual": 5.28
+        },
+        "medium": {
+          "requestsPerDay": 50000,
+          "requestsPerMonth": 1500000,
+          "aiHintsPerMonth": 30000,
+          "aiCost": 12,
+          "apiComputeCost": 1.5,
+          "dbCost": 0.9299999999999999,
+          "redisCost": 0.15,
+          "totalOperational": 14.58,
+          "infraCost": 435,
+          "totalMonthly": 449.58,
+          "costPerUserMonthly": 0.45,
+          "costPerUserAnnual": 5.39
+        },
+        "heavy": {
+          "requestsPerDay": 100000,
+          "requestsPerMonth": 3000000,
+          "aiHintsPerMonth": 80000,
+          "aiCost": 32,
+          "apiComputeCost": 3,
+          "dbCost": 1.88,
+          "redisCost": 0.3,
+          "totalOperational": 37.18,
+          "infraCost": 435,
+          "totalMonthly": 472.18,
+          "costPerUserMonthly": 0.472,
+          "costPerUserAnnual": 5.67
+        }
+      }
+    },
+    {
+      "activeUsers": 5000,
+      "patterns": {
+        "light": {
+          "requestsPerDay": 100000,
+          "requestsPerMonth": 3000000,
+          "aiHintsPerMonth": 50000,
+          "aiCost": 20,
+          "apiComputeCost": 3,
+          "dbCost": 1.8499999999999999,
+          "redisCost": 0.3,
+          "totalOperational": 25.150000000000002,
+          "infraCost": 435,
+          "totalMonthly": 460.15,
+          "costPerUserMonthly": 0.092,
+          "costPerUserAnnual": 1.1
+        },
+        "medium": {
+          "requestsPerDay": 250000,
+          "requestsPerMonth": 7500000,
+          "aiHintsPerMonth": 150000,
+          "aiCost": 60,
+          "apiComputeCost": 7.5,
+          "dbCost": 4.65,
+          "redisCost": 0.75,
+          "totalOperational": 72.9,
+          "infraCost": 435,
+          "totalMonthly": 507.9,
+          "costPerUserMonthly": 0.102,
+          "costPerUserAnnual": 1.22
+        },
+        "heavy": {
+          "requestsPerDay": 500000,
+          "requestsPerMonth": 15000000,
+          "aiHintsPerMonth": 400000,
+          "aiCost": 160,
+          "apiComputeCost": 15,
+          "dbCost": 9.4,
+          "redisCost": 1.5,
+          "totalOperational": 185.9,
+          "infraCost": 435,
+          "totalMonthly": 620.9,
+          "costPerUserMonthly": 0.124,
+          "costPerUserAnnual": 1.49
+        }
+      }
+    },
+    {
+      "activeUsers": 10000,
+      "patterns": {
+        "light": {
+          "requestsPerDay": 200000,
+          "requestsPerMonth": 6000000,
+          "aiHintsPerMonth": 100000,
+          "aiCost": 40,
+          "apiComputeCost": 6,
+          "dbCost": 3.6999999999999997,
+          "redisCost": 0.6,
+          "totalOperational": 50.300000000000004,
+          "infraCost": 435,
+          "totalMonthly": 485.3,
+          "costPerUserMonthly": 0.049,
+          "costPerUserAnnual": 0.58
+        },
+        "medium": {
+          "requestsPerDay": 500000,
+          "requestsPerMonth": 15000000,
+          "aiHintsPerMonth": 300000,
+          "aiCost": 120,
+          "apiComputeCost": 15,
+          "dbCost": 9.3,
+          "redisCost": 1.5,
+          "totalOperational": 145.8,
+          "infraCost": 435,
+          "totalMonthly": 580.8,
+          "costPerUserMonthly": 0.058,
+          "costPerUserAnnual": 0.7
+        },
+        "heavy": {
+          "requestsPerDay": 1000000,
+          "requestsPerMonth": 30000000,
+          "aiHintsPerMonth": 800000,
+          "aiCost": 320,
+          "apiComputeCost": 30,
+          "dbCost": 18.8,
+          "redisCost": 3,
+          "totalOperational": 371.8,
+          "infraCost": 435,
+          "totalMonthly": 806.8,
+          "costPerUserMonthly": 0.081,
+          "costPerUserAnnual": 0.97
+        }
+      }
+    }
+  ],
+  "dominantCost": {
+    "item": "AI hints ($0.0004/hint)",
+    "note": "At 10,000 users with medium AI usage (30 hints/user/mo), AI costs reach $120/mo — 38% of total"
+  },
+  "recommendations": [
+    "Reduce AI hint cost by batching or caching common hints",
+    "Right-size compute instances during low-traffic periods",
+    "Consider reserved instances for 50%+ compute savings",
+    "Monitor cost-per-user KPIs in production billing dashboard"
+  ]
+}

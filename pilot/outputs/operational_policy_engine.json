@@ -1,0 +1,69 @@
+{
+  "generatedAt": "2026-05-09T02:51:47.638Z",
+  "engine": {
+    "deploymentPolicy": {
+      "validation": {
+        "preflight_checks": [
+          "health endpoints",
+          "DB connectivity",
+          "Redis connectivity",
+          "queue status"
+        ],
+        "manual_approval_required": true
+      },
+      "rules": [
+        "All services must pass health check before deployment",
+        "No deployment during freeze windows",
+        "Rollback if error rate > 5% after deployment"
+      ]
+    },
+    "rollbackPolicy": {
+      "trigger": "error rate > 5% OR p95 > 2s OR service unavailable",
+      "steps": [
+        "Revert docker tag to previous version",
+        "Restart all services in order",
+        "Verify health check",
+        "Monitor for 5min"
+      ],
+      "automated": false
+    },
+    "releaseApprovalScoring": {
+      "criteria": [
+        {
+          "name": "all_tests_pass",
+          "weight": 30,
+          "current": 30
+        },
+        {
+          "name": "load_test_pass",
+          "weight": 25,
+          "current": 25
+        },
+        {
+          "name": "security_scan_clear",
+          "weight": 20,
+          "current": 20
+        },
+        {
+          "name": "no_regression",
+          "weight": 15,
+          "current": 15
+        },
+        {
+          "name": "sre_signoff",
+          "weight": 10,
+          "current": 10
+        }
+      ],
+      "totalScore": 100,
+      "passingThreshold": 80
+    },
+    "operationalFreeze": {
+      "windows": [
+        "end-of-quarter deployment freeze",
+        "major holiday freeze"
+      ],
+      "policy": "During freeze: only P0/P1 hotfixes allowed"
+    }
+  }
+}

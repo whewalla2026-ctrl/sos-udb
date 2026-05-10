@@ -1,3 +1,6 @@
+const { initTracing, shutdownTracing } = require('../shared/tracing');
+initTracing('monitoring-service');
+
 const express = require('express');
 const helmet = require('helmet');
 const cors = require('cors');
@@ -109,6 +112,15 @@ app.post('/monitoring/signal', (req, res) => {
 async function start() {
   await eventBus.connect();
   log.info('Connected to Redis');
-  app.listen(PORT, () => log.info(`Monitoring service listening on :${PORT}`));
+  const server = app.listen(PORT, () => log.info(`Monitoring service listening on :${PORT}`));
+
+  process.on('SIGTERM', async () => {
+    log.info('SIGTERM received, shutting down gracefully');
+    server.close(() => log.info('HTTP server closed'));
+    if (eventBus.client) { await eventBus.client.quit(); }
+      if (eventBus.subscriber) { await eventBus.subscriber.quit(); }
+      await shutdownTracing();
+      setTimeout(() => { log.warn('Forced exit after timeout'); process.exit(0); }, 10000).unref();
+  });
 }
 start();

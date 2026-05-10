@@ -1,0 +1,111 @@
+{
+  "generatedAt": "2026-05-09T02:51:15.826Z",
+  "signals": [
+    {
+      "service": "gateway",
+      "latency": {
+        "p50": 1,
+        "p95": 5,
+        "p99": 67,
+        "avg": 3
+      },
+      "traffic": {
+        "requests_sampled": 40,
+        "throughput_estimate": "333 req/s"
+      },
+      "errors": {
+        "count": 0,
+        "rate": "0.00%"
+      },
+      "saturation": {
+        "estimated_capacity": ">2x",
+        "risk": "low"
+      }
+    },
+    {
+      "service": "auth",
+      "latency": {
+        "p50": 3,
+        "p95": 6,
+        "p99": 10,
+        "avg": 3
+      },
+      "traffic": {
+        "requests_sampled": 40,
+        "throughput_estimate": "333 req/s"
+      },
+      "errors": {
+        "count": 0,
+        "rate": "0.00%"
+      },
+      "saturation": {
+        "estimated_capacity": ">2x",
+        "risk": "low"
+      }
+    },
+    {
+      "service": "planner",
+      "latency": {
+        "p50": 3,
+        "p95": 6,
+        "p99": 7,
+        "avg": 3
+      },
+      "traffic": {
+        "requests_sampled": 40,
+        "throughput_estimate": "333 req/s"
+      },
+      "errors": {
+        "count": 0,
+        "rate": "0.00%"
+      },
+      "saturation": {
+        "estimated_capacity": ">2x",
+        "risk": "low"
+      }
+    },
+    {
+      "service": "ai",
+      "latency": {
+        "p50": 3,
+        "p95": 5,
+        "p99": 6,
+        "avg": 3
+      },
+      "traffic": {
+        "requests_sampled": 40,
+        "throughput_estimate": "333 req/s"
+      },
+      "errors": {
+        "count": 0,
+        "rate": "0.00%"
+      },
+      "saturation": {
+        "estimated_capacity": ">2x",
+        "risk": "low"
+      }
+    },
+    {
+      "service": "monitoring",
+      "latency": {
+        "p50": 2,
+        "p95": 6,
+        "p99": 6,
+        "avg": 3
+      },
+      "traffic": {
+        "requests_sampled": 40,
+        "throughput_estimate": "333 req/s"
+      },
+      "errors": {
+        "count": 0,
+        "rate": "0.00%"
+      },
+      "saturation": {
+        "estimated_capacity": ">5x",
+        "risk": "low"
+      }
+    }
+  ],
+  "method": "Real-time sampling against live services"
+}

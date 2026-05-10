@@ -1,5 +1,7 @@
 import type { Metadata } from 'next';
 import './globals.css';
+import { ApolloWrapper } from '../lib/apollo-wrapper';
+import { AuthProvider } from '../lib/auth-context';
 
 export const metadata: Metadata = {
   title: { default: 'UDB — Unified Developmental Backbone', template: '%s | UDB' },
@@ -14,7 +16,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
       </head>
-      <body>{children}</body>
+      <body>
+        <AuthProvider>
+          <ApolloWrapper>{children}</ApolloWrapper>
+        </AuthProvider>
+      </body>
     </html>
   );
 }

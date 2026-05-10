@@ -14,19 +14,26 @@ export class AuthService {
     private jwt: JwtService,
     private config: ConfigService,
   ) {
-    // Initialize Firebase Admin
+    // Initialize Firebase Admin (graceful if credentials not configured)
     if (!admin.apps.length) {
-      admin.initializeApp({
-        credential: admin.credential.cert({
-          projectId: config.get('FIREBASE_PROJECT_ID'),
-          privateKey: config.get('FIREBASE_PRIVATE_KEY')?.replace(/\\n/g, '\n'),
-          clientEmail: config.get('FIREBASE_CLIENT_EMAIL'),
-        }),
-      });
+      try {
+        admin.initializeApp({
+          credential: admin.credential.cert({
+            projectId: config.get('FIREBASE_PROJECT_ID'),
+            privateKey: config.get('FIREBASE_PRIVATE_KEY')?.replace(/\\n/g, '\n'),
+            clientEmail: config.get('FIREBASE_CLIENT_EMAIL'),
+          }),
+        });
+      } catch (e) {
+        this.logger.warn('Firebase Admin not initialized (credentials missing) — auth methods will be unavailable');
+      }
     }
   }
 
   async verifyFirebaseToken(idToken: string) {
+    if (!admin.apps.length) {
+      throw new UnauthorizedException('Firebase not configured');
+    }
     try {
       const decoded = await admin.auth().verifyIdToken(idToken);
       return decoded;

@@ -1,0 +1,16 @@
+{
+  "generatedAt": "2026-05-09T03:10:29.852Z",
+  "leakageTests": [
+    {
+      "test": "monitoring_signals_with_token",
+      "status": 200,
+      "passed": true
+    },
+    {
+      "test": "cache_collision",
+      "passed": true,
+      "note": "cache properly isolated by userId"
+    }
+  ],
+  "summary": "NO LEAKAGE DETECTED"
+}

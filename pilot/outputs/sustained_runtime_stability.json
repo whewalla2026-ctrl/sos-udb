@@ -1,0 +1,220 @@
+{
+  "test": "SECTION E1 – Sustained Runtime Stability",
+  "startTime": "2026-05-08T12:03:04.534Z",
+  "durationMs": 120082,
+  "concurrentUsers": 300,
+  "totalRequests": 318940,
+  "successfulRequests": 318940,
+  "failedRequests": 0,
+  "errorRate": 0,
+  "latencyPercentiles": {
+    "p50": 109,
+    "p95": 142,
+    "p99": 193
+  },
+  "snapshots": [
+    {
+      "elapsed": 30157,
+      "latency": {
+        "p50": 113,
+        "p95": 159,
+        "p99": 218,
+        "samples": 75795
+      },
+      "errorRate": 0,
+      "health": {
+        "planner": {
+          "status": 200,
+          "error": null
+        },
+        "ai": {
+          "status": 200,
+          "error": null
+        },
+        "auth": {
+          "status": 200,
+          "error": null
+        },
+        "monitoring": {
+          "status": 200,
+          "error": null
+        }
+      }
+    },
+    {
+      "elapsed": 60168,
+      "latency": {
+        "p50": 110,
+        "p95": 147,
+        "p99": 184,
+        "samples": 80029
+      },
+      "errorRate": 0,
+      "health": {
+        "planner": {
+          "status": 200,
+          "error": null
+        },
+        "ai": {
+          "status": 200,
+          "error": null
+        },
+        "auth": {
+          "status": 200,
+          "error": null
+        },
+        "monitoring": {
+          "status": 200,
+          "error": null
+        }
+      }
+    },
+    {
+      "elapsed": 90203,
+      "latency": {
+        "p50": 108,
+        "p95": 134,
+        "p99": 154,
+        "samples": 82967
+      },
+      "errorRate": 0,
+      "health": {
+        "planner": {
+          "status": 200,
+          "error": null
+        },
+        "ai": {
+          "status": 200,
+          "error": null
+        },
+        "auth": {
+          "status": 200,
+          "error": null
+        },
+        "monitoring": {
+          "status": 200,
+          "error": null
+        }
+      }
+    },
+    {
+      "elapsed": 120035,
+      "latency": {
+        "p50": 106,
+        "p95": 130,
+        "p99": 166,
+        "samples": 84067
+      },
+      "errorRate": 0,
+      "health": {
+        "planner": {
+          "status": 200,
+          "error": null
+        },
+        "ai": {
+          "status": 200,
+          "error": null
+        },
+        "auth": {
+          "status": 200,
+          "error": null
+        },
+        "monitoring": {
+          "status": 200,
+          "error": null
+        }
+      }
+    }
+  ],
+  "memoryReadings": [],
+  "analysis": {
+    "memoryTrend": "stable",
+    "latencyTrend": "stable",
+    "queueLag": [
+      {
+        "ts": 1778241814691,
+        "elapsed": 30157,
+        "health": {
+          "status": 200,
+          "body": {
+            "status": "healthy",
+            "timestamp": "2026-05-08T12:03:34.983Z",
+            "uptime": 1476.0789673,
+            "version": "1.0.0",
+            "services": {
+              "auth": "healthy",
+              "planner": "healthy",
+              "ai": "healthy",
+              "monitoring": "healthy",
+              "redis": "healthy",
+              "postgres": "healthy"
+            }
+          }
+        }
+      },
+      {
+        "ts": 1778241844702,
+        "elapsed": 60168,
+        "health": {
+          "status": 200,
+          "body": {
+            "status": "healthy",
+            "timestamp": "2026-05-08T12:04:04.993Z",
+            "uptime": 1506.0893345,
+            "version": "1.0.0",
+            "services": {
+              "auth": "healthy",
+              "planner": "healthy",
+              "ai": "healthy",
+              "monitoring": "healthy",
+              "redis": "healthy",
+              "postgres": "healthy"
+            }
+          }
+        }
+      },
+      {
+        "ts": 1778241874737,
+        "elapsed": 90203,
+        "health": {
+          "status": 200,
+          "body": {
+            "status": "healthy",
+            "timestamp": "2026-05-08T12:04:35.097Z",
+            "uptime": 1536.1934947,
+            "version": "1.0.0",
+            "services": {
+              "auth": "healthy",
+              "planner": "healthy",
+              "ai": "healthy",
+              "monitoring": "healthy",
+              "redis": "healthy",
+              "postgres": "healthy"
+            }
+          }
+        }
+      },
+      {
+        "ts": 1778241904569,
+        "elapsed": 120035,
+        "health": {
+          "status": 200,
+          "body": {
+            "status": "healthy",
+            "timestamp": "2026-05-08T12:05:04.572Z",
+            "uptime": 1565.6684162,
+            "version": "1.0.0",
+            "services": {
+              "auth": "healthy",
+              "planner": "healthy",
+              "ai": "healthy",
+              "monitoring": "healthy",
+              "redis": "healthy",
+              "postgres": "healthy"
+            }
+          }
+        }
+      }
+    ]
+  }
+}

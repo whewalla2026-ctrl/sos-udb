@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
-import request from 'supertest';
+import * as request from 'supertest';
 import { AppModule } from '../src/app.module';
 import { GqlAuthGuard } from '../src/auth/guards/gql-auth.guard';
 

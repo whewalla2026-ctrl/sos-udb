@@ -1,0 +1,37 @@
+{
+  "generatedAt": "2026-05-08T09:14:11.387Z",
+  "gatewayMetrics": "available",
+  "monitoringMetrics": "available",
+  "metricTypes": {
+    "counters": [
+      "http_requests_total",
+      "auth_failures_total",
+      "queue_failures_total",
+      "ai_hints_generated_total"
+    ],
+    "histograms": [
+      "request_duration_seconds"
+    ],
+    "gauges": [
+      "db_pool_usage",
+      "db_pool_max",
+      "redis_latency",
+      "queue_depth",
+      "ai_budget_usage"
+    ]
+  },
+  "perServiceMetrics": {
+    "gateway": {
+      "metricsEndpoint": "http://localhost:3000/metrics",
+      "status": "UP"
+    },
+    "monitoring": {
+      "metricsEndpoint": "http://localhost:3004/metrics",
+      "status": "UP"
+    }
+  },
+  "queueLag": "0 (all queues empty)",
+  "cacheHitRate": "80.4% (estimated)",
+  "aiCostTracking": "enabled via prometheus gauge",
+  "recommendation": "Deploy Prometheus server for metric retention. Current metrics are ephemeral."
+}

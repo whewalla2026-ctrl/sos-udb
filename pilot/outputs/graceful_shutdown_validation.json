@@ -1,0 +1,17 @@
+{
+  "generatedAt": "2026-05-08T09:06:16.618Z",
+  "currentState": "No graceful shutdown handlers implemented",
+  "testResult": {
+    "serviceKilled": "planner",
+    "gatewayResponseToDownstreamFailure": "PROPERLY ISOLATED (502)",
+    "gatewaySelfHealth": "STABLE",
+    "verdict": "Service failure properly isolated. Gateway continues serving."
+  },
+  "impact": "In-flight requests fail on restart. 30s MTTR for service recovery.",
+  "recommendations": [
+    "Add process.on(\"SIGTERM\", ...) handlers to all services for connection draining",
+    "Implement /health/ready (readiness) separate from /health/live (liveness)",
+    "Add Redis-backed shared cache to preserve state across restarts",
+    "For zero-downtime: add load balancer health check removal before stopping services"
+  ]
+}

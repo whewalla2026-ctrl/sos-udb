@@ -1,0 +1,20 @@
+{
+  "generatedAt": "2026-05-08T09:56:30.927Z",
+  "trains": [
+    {
+      "id": "RT-2026-05-08",
+      "type": "initial",
+      "version": "1.0.0",
+      "channels": [
+        "canary"
+      ],
+      "status": "active"
+    }
+  ],
+  "schedule": {
+    "canary": "Monday–Thursday, continuous integration",
+    "stable": "Friday 14:00 UTC weekly release",
+    "hotfix": "Within 2 hours of P1/P0 incident confirmation"
+  },
+  "rollbackPolicy": "Automated rollback if error rate > 1% within 15min of deployment"
+}

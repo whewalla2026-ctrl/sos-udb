@@ -1,0 +1,40 @@
+{
+  "generatedAt": "2026-05-09T03:34:25.312Z",
+  "deduplication": {
+    "strategy": "5min cooldown per service+error type",
+    "implementation": "Manual — circuit breaker acts as dedup",
+    "recommendation": "Deploy centralized alert manager (Alertmanager)",
+    "estimatedNoiseReduction": "60-70%"
+  },
+  "noiseSuppression": {
+    "knownIssues": [
+      "Redis 3.0 compatibility warnings (non-blocking)"
+    ],
+    "suppressionWindow": "Maintenance windows: scheduled",
+    "recommendation": "Implement maintenance mode toggle"
+  },
+  "severityEscalation": {
+    "p0": "<5min to on-call — auto-remediation via circuit breaker",
+    "p1": "<15min to team lead",
+    "p2": "<1hr to team",
+    "p3": "Next business day"
+  },
+  "incidentCorrelation": {
+    "currentCapability": "None — no centralized log aggregation",
+    "recommendation": "Deploy ELK or Loki + Grafana for correlation",
+    "correlationWindow": "5min sliding window"
+  },
+  "burnRateEscalation": {
+    "sloTarget": "99.5%",
+    "burnRateWindow": "1hr",
+    "alertAt": ">2% error rate",
+    "currentBurnRate": "0%",
+    "escalationTrigger": "Burn rate > 2% for 5min"
+  },
+  "recentLogSummary": {
+    "errorsInLogs": 0,
+    "warningsInLogs": 0,
+    "totalLogEntries": 0,
+    "dataSource": "starter-output.log | gateway logs"
+  }
+}

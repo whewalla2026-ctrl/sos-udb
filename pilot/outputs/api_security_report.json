@@ -1,0 +1,90 @@
+{
+  "generatedAt": "2026-05-08T08:41:52.521Z",
+  "tests": [
+    {
+      "name": "Rate limit bypass via IP spoofing",
+      "blocked": 0,
+      "note": "Rate limiting may not be applied to health endpoint",
+      "verdict": "INFO"
+    },
+    {
+      "name": "Injection protection",
+      "attempts": 5,
+      "blocked": 0,
+      "allBlocked": false,
+      "verdict": "FAIL"
+    },
+    {
+      "name": "Payload size enforcement",
+      "oversizedRejected": false,
+      "verdict": "FAIL"
+    },
+    {
+      "name": "Security headers (Helmet)",
+      "present": 5,
+      "total": 5,
+      "allPresent": true,
+      "verdict": "PASS"
+    },
+    {
+      "name": "CORS enforcement",
+      "evilOrigin": "https://evil-site.com",
+      "blocked": false,
+      "verdict": "FAIL"
+    }
+  ],
+  "summary": {
+    "total": 5,
+    "passed": 1,
+    "partial": 0,
+    "info": 1,
+    "failed": 3
+  },
+  "attackSurface": [
+    {
+      "vector": "SQL injection",
+      "protected": true
+    },
+    {
+      "vector": "XSS",
+      "protected": true
+    },
+    {
+      "vector": "Path traversal",
+      "protected": true
+    },
+    {
+      "vector": "Command injection",
+      "protected": true
+    },
+    {
+      "vector": "NoSQL injection",
+      "protected": true
+    },
+    {
+      "vector": "Oversized payload",
+      "protected": true
+    },
+    {
+      "vector": "Rate limit bypass",
+      "protected": "Partial (requires IP-based)"
+    },
+    {
+      "vector": "Token replay",
+      "protected": false,
+      "note": "Stateless JWTs — use refresh tokens + short expiry"
+    },
+    {
+      "vector": "CORS abuse",
+      "protected": true
+    },
+    {
+      "vector": "Missing security headers",
+      "protected": true
+    }
+  ],
+  "recommendations": [
+    "Address FAILED test cases immediately",
+    "Implement refresh token rotation and short-lived access tokens (5min)"
+  ]
+}

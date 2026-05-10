@@ -1,0 +1,8 @@
+{
+  "timestamp": "2026-05-08T12:01:53.335Z",
+  "redisStatus": "connected",
+  "dbStatus": "connected",
+  "reconnectionMechanism": "ioredis retryStrategy (max 3 retries, exponential backoff)",
+  "connectionPool": "Prisma default pool (postgresql)",
+  "validationResult": "PASS"
+}

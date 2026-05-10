@@ -1,0 +1,140 @@
+{
+  "generatedAt": "2026-05-09T03:38:03.880Z",
+  "operationalRisks": [
+    {
+      "risk": "No zero-downtime deployment",
+      "severity": "medium",
+      "probability": "LOW",
+      "impact": "Service disruption during updates",
+      "remediation": "K8s RollingUpdate strategy defined"
+    },
+    {
+      "risk": "Manual restart on crash",
+      "severity": "medium",
+      "probability": "LOW",
+      "impact": "5-30s downtime",
+      "remediation": "Auto-restart via task manager / K8s"
+    },
+    {
+      "risk": "No centralized logging",
+      "severity": "medium",
+      "probability": "MEDIUM",
+      "impact": "Slow incident diagnosis",
+      "remediation": "Deploy ELK or Loki stack"
+    }
+  ],
+  "scalingRisks": [
+    {
+      "risk": "DB pool saturation at 5k+ users",
+      "severity": "high",
+      "probability": "HIGH at 10k",
+      "impact": "Connection timeouts",
+      "remediation": "Deploy pgBouncer (config ready)"
+    },
+    {
+      "risk": "Redis 3.0 limitations",
+      "severity": "medium",
+      "probability": "MEDIUM",
+      "impact": "No clustering, no ACL",
+      "remediation": "Upgrade to Redis 7 Docker image"
+    },
+    {
+      "risk": "Single region deployment",
+      "severity": "medium",
+      "probability": "LOW",
+      "impact": "Regional outage = full downtime",
+      "remediation": "Multi-region K8s + Route53 failover"
+    }
+  ],
+  "complianceRisks": [
+    {
+      "risk": "No SOC2 controls",
+      "severity": "medium",
+      "probability": "HIGH (if audited)",
+      "impact": "Non-compliance",
+      "remediation": "Implement access controls, audit logging, encryption"
+    },
+    {
+      "risk": "Backup encryption gap",
+      "severity": "low",
+      "probability": "MEDIUM",
+      "impact": "Data exposure risk",
+      "remediation": "GPG encrypt pg_dump outputs"
+    },
+    {
+      "risk": "No data retention automation",
+      "severity": "low",
+      "probability": "LOW",
+      "impact": "Storage growth",
+      "remediation": "Implement retention policies in cron"
+    }
+  ],
+  "financialRisks": [
+    {
+      "risk": "AI cost at scale",
+      "severity": "medium",
+      "probability": "HIGH at 100k users",
+      "impact": "Margin erosion",
+      "remediation": "Cache optimization, batch processing, fallback to local model"
+    },
+    {
+      "risk": "Infrastructure waste",
+      "severity": "low",
+      "probability": "MEDIUM",
+      "impact": "$50-100/month excess",
+      "remediation": "Right-size with HPA"
+    }
+  ],
+  "reliabilityRisks": [
+    {
+      "risk": "Single DB point of failure",
+      "severity": "high",
+      "probability": "LOW",
+      "impact": "Full system outage",
+      "remediation": "Read replicas + automated failover"
+    },
+    {
+      "risk": "No automated rollback",
+      "severity": "medium",
+      "probability": "LOW",
+      "impact": "Extended incident duration",
+      "remediation": "Implement CI/CD with rollback stage"
+    }
+  ],
+  "overallRiskScore": 35,
+  "maxRiskScore": 100,
+  "riskLevel": "MODERATE",
+  "top5Risks": [
+    {
+      "risk": "DB pool saturation at scale",
+      "severity": "high",
+      "owner": "Platform Engineering",
+      "timeline": "1 month"
+    },
+    {
+      "risk": "Single region deployment",
+      "severity": "high",
+      "owner": "Infrastructure",
+      "timeline": "3 months"
+    },
+    {
+      "risk": "AI cost at 100k users",
+      "severity": "medium",
+      "owner": "AI Engineering",
+      "timeline": "6 months"
+    },
+    {
+      "risk": "No zero-downtime deploys",
+      "severity": "medium",
+      "owner": "Platform Engineering",
+      "timeline": "1 month"
+    },
+    {
+      "risk": "Backup encryption",
+      "severity": "low",
+      "owner": "Security",
+      "timeline": "2 weeks"
+    }
+  ],
+  "riskVelocity": "STABLE — no new risks detected in current session"
+}

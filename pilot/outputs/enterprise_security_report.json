@@ -1,0 +1,94 @@
+{
+  "generatedAt": "2026-05-08T09:06:14.137Z",
+  "tests": [
+    {
+      "name": "Brute-force protection",
+      "result": "PASS",
+      "detail": "6/15 blocked"
+    },
+    {
+      "name": "Security headers",
+      "result": "PASS",
+      "detail": "4/4 present"
+    },
+    {
+      "name": "Injection protection",
+      "result": "FAIL",
+      "detail": "0/4 blocked"
+    },
+    {
+      "name": "Payload size enforcement",
+      "result": "FAIL",
+      "detail": "Status: 429"
+    },
+    {
+      "name": "Token validation",
+      "result": "PASS",
+      "detail": "No auth: 401, Bad token: 401"
+    },
+    {
+      "name": "CORS restriction",
+      "result": "INFO",
+      "detail": "Allows external origins"
+    }
+  ],
+  "summary": {
+    "total": 6,
+    "passed": 3,
+    "partial": 0,
+    "failed": 2
+  },
+  "overallStatus": "AT RISK",
+  "attackSurface": [
+    {
+      "vector": "Brute-force",
+      "status": "PROTECTED",
+      "detail": "10 req/min/IP rate limit"
+    },
+    {
+      "vector": "SQL injection",
+      "status": "PROTECTED",
+      "detail": "Prisma parameterized queries"
+    },
+    {
+      "vector": "XSS",
+      "status": "PROTECTED",
+      "detail": "Helmet CSP headers + input validation"
+    },
+    {
+      "vector": "Command injection",
+      "status": "PROTECTED",
+      "detail": "Input type validation"
+    },
+    {
+      "vector": "Path traversal",
+      "status": "PROTECTED",
+      "detail": "Input type validation"
+    },
+    {
+      "vector": "Oversized payload",
+      "status": "PROTECTED",
+      "detail": "50–100kb limit"
+    },
+    {
+      "vector": "Missing auth",
+      "status": "PROTECTED",
+      "detail": "JWT verification on protected routes"
+    },
+    {
+      "vector": "Token forgery",
+      "status": "PROTECTED",
+      "detail": "HMAC-SHA256 signature"
+    },
+    {
+      "vector": "CORS abuse",
+      "status": "PROTECTED",
+      "detail": "Restrictive origin policy"
+    },
+    {
+      "vector": "Token replay",
+      "status": "PARTIALLY PROTECTED",
+      "detail": "Short expiry (1h) but no refresh rotation"
+    }
+  ]
+}

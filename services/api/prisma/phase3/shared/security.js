@@ -1,23 +1,22 @@
 const crypto = require('crypto');
+const redisState = require('./redis-state');
 
 const JWT_SECRET = process.env.JWT_SECRET || 'dev-secret-change-in-production-32chars';
-const JWT_EXPIRY = parseInt(process.env.JWT_EXPIRY_SECONDS || '3600');
+const JWT_EXPIRY = parseInt(process.env.JWT_EXPIRY_SECONDS || '300');
 const REFRESH_EXPIRY = parseInt(process.env.REFRESH_EXPIRY_SECONDS || '86400');
 const BCRYPT_COST = 10;
-
-const BLACKLISTED_TOKENS = new Set();
 
 // --- JWT-like token (HMAC-SHA256, no library needed) ---
 function createToken(payload, expiresIn = JWT_EXPIRY) {
   const header = Buffer.from(JSON.stringify({ alg: 'HS256', typ: 'JWT' })).toString('base64url');
-  const body = Buffer.from(JSON.stringify({ ...payload, iat: Math.floor(Date.now() / 1000), exp: Math.floor(Date.now() / 1000) + expiresIn })).toString('base64url');
+  const body = Buffer.from(JSON.stringify({ ...payload, sub: payload.userId, jti: crypto.randomUUID(), iat: Math.floor(Date.now() / 1000), exp: Math.floor(Date.now() / 1000) + expiresIn })).toString('base64url');
   const sig = crypto.createHmac('sha256', JWT_SECRET).update(`${header}.${body}`).digest('base64url');
   return `${header}.${body}.${sig}`;
 }
 
-function verifyToken(token) {
+async function verifyToken(token) {
   try {
-    if (BLACKLISTED_TOKENS.has(token)) return null;
+    if (await redisState.isTokenBlacklisted(token)) return null;
     const [header, body, sig] = token.split('.');
     const expected = crypto.createHmac('sha256', JWT_SECRET).update(`${header}.${body}`).digest('base64url');
     if (sig !== expected) return null;
@@ -27,8 +26,8 @@ function verifyToken(token) {
   } catch { return null; }
 }
 
-function blacklistToken(token) {
-  BLACKLISTED_TOKENS.add(token);
+async function blacklistToken(token) {
+  await redisState.blacklistToken(token);
 }
 
 function createRefreshToken(userId) {
@@ -54,24 +53,35 @@ function requireRole(...roles) {
   };
 }
 
-// --- Rate limiting (in-memory sliding window) ---
-const rateLimitBuckets = new Map();
+// --- Redis-backed distributed rate limiting ---
+const inMemoryFallback = new Map();
 
 function rateLimit({ windowMs = 60000, max = 100, keyFn = (req) => req.ip } = {}) {
-  return (req, res, next) => {
+  return async (req, res, next) => {
     const key = keyFn(req);
-    const now = Date.now();
-    if (!rateLimitBuckets.has(key)) rateLimitBuckets.set(key, []);
-    const timestamps = rateLimitBuckets.get(key).filter(t => now - t < windowMs);
-    timestamps.push(now);
-    rateLimitBuckets.set(key, timestamps);
-    if (timestamps.length > max) return res.status(429).json({ error: 'Too many requests', retryAfterMs: windowMs });
+    try {
+      // Try Redis-based rate limiting first
+      const result = await redisState.checkRateLimit(key, max, windowMs);
+      if (!result.allowed) {
+        return res.status(429).json({ error: 'Too many requests', retryAfterMs: result.retryAfter, distributed: true });
+      }
+    } catch (e) {
+      // Fallback to in-memory rate limiting if Redis is unavailable
+      const now = Date.now();
+      if (!inMemoryFallback.has(key)) inMemoryFallback.set(key, []);
+      const timestamps = inMemoryFallback.get(key).filter(t => now - t < windowMs);
+      timestamps.push(now);
+      inMemoryFallback.set(key, timestamps);
+      if (timestamps.length > max) {
+        return res.status(429).json({ error: 'Too many requests', retryAfterMs: windowMs, distributed: false });
+      }
+    }
     next();
   };
 }
 
 function clearRateLimitBuckets() {
-  rateLimitBuckets.clear();
+  inMemoryFallback.clear();
 }
 
 // --- Password hashing ---
@@ -86,11 +96,8 @@ function verifyPassword(password, stored) {
   return crypto.scryptSync(password, salt, 64).toString('hex') === hash;
 }
 
-// --- Audit logging ---
-const auditLog = [];
-const MAX_AUDIT_LOG = 10000;
-
-function logAudit(event, { userId, action, resource, details, ip }) {
+// --- Audit logging (Redis-backed) ---
+async function logAudit(event, { userId, action, resource, details, ip }) {
   const entry = {
     id: crypto.randomUUID(),
     timestamp: new Date().toISOString(),
@@ -101,16 +108,20 @@ function logAudit(event, { userId, action, resource, details, ip }) {
     details: details || {},
     ip: ip || '0.0.0.0',
   };
-  auditLog.push(entry);
-  if (auditLog.length > MAX_AUDIT_LOG) auditLog.splice(0, auditLog.length - MAX_AUDIT_LOG);
+  try {
+    await redisState.logAuditRedis(entry);
+  } catch (e) {
+    // silently fail audit — non-critical path
+  }
   return entry;
 }
 
-function getAuditLog({ limit = 100, event, userId } = {}) {
-  let entries = auditLog;
-  if (event) entries = entries.filter(e => e.event === event);
-  if (userId) entries = entries.filter(e => e.userId === userId);
-  return entries.slice(-limit);
+async function getAuditLog({ limit = 100, event, userId } = {}) {
+  try {
+    return await redisState.getAuditLogRedis({ limit, event, userId });
+  } catch {
+    return [];
+  }
 }
 
 module.exports = {

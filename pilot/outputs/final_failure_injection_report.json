@@ -1,16 +1,16 @@
 {
-  "validationDate": "2026-05-08T05:05:58.912Z",
+  "validationDate": "2026-05-09T15:02:52.860Z",
   "note": "Failure injection tests in failure-injection.js. Run with: node services/api/prisma/phase3/scripts/failure-injection.js",
   "servicesVerified": 5,
   "resilienceMatrix": {
-    "generatedAt": "2026-05-08T05:05:58.911Z",
+    "generatedAt": "2026-05-09T15:02:52.859Z",
     "serviceStatus": [
       {
         "name": "gateway",
         "port": 3000,
         "status": "reachable",
         "statusCode": 200,
-        "latencyMs": 50
+        "latencyMs": 39
       },
       {
         "name": "auth-service",
@@ -24,7 +24,7 @@
         "port": 3002,
         "status": "reachable",
         "statusCode": 200,
-        "latencyMs": 16
+        "latencyMs": 15
       },
       {
         "name": "ai-service",

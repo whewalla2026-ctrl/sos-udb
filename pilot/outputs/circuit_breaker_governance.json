@@ -1,0 +1,40 @@
+{
+  "generatedAt": "2026-05-09T03:11:06.961Z",
+  "circuitBreakers": {
+    "auth": {
+      "state": "CLOSED",
+      "totalCalls": 223,
+      "failures": 0,
+      "retryStormProtection": true,
+      "cascadingPrevention": true
+    },
+    "planner": {
+      "state": "CLOSED",
+      "totalCalls": 181,
+      "failures": 0,
+      "retryStormProtection": true,
+      "cascadingPrevention": true
+    },
+    "ai": {
+      "state": "CLOSED",
+      "totalCalls": 172,
+      "failures": 0,
+      "retryStormProtection": true,
+      "cascadingPrevention": true
+    },
+    "monitoring": {
+      "state": "CLOSED",
+      "totalCalls": 318,
+      "failures": 0,
+      "retryStormProtection": true,
+      "cascadingPrevention": true
+    }
+  },
+  "retryGovernance": {
+    "maxRetries": 3,
+    "backoff": "exponential 200-2000ms",
+    "dlqProtection": true,
+    "halfOpenMaxRequests": 1
+  },
+  "summary": "All circuit breakers CLOSED, 0 failures across all services. Retry storms prevented via max 3 retries + exponential backoff. Cascading failures prevented via per-service circuit isolation."
+}
