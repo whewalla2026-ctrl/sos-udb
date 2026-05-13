@@ -4,8 +4,8 @@ import { Trend, Rate, Counter } from 'k6/metrics';
 import crypto from 'k6/crypto';
 import encoding from 'k6/encoding';
 
-const GATEWAY = 'http://gateway:3000';
-const API = 'http://nestjs-graphql:4000';
+const GATEWAY = __ENV.GATEWAY_URL || 'http://gateway:3000';
+const API = __ENV.API_URL || 'http://nestjs-graphql:4000';
 const JWT_SECRET = __ENV.JWT_SECRET || 'change-me-to-a-strong-secret-at-least-256-bits-long!!';
 
 function makeNestJWT(sub, email, role) {

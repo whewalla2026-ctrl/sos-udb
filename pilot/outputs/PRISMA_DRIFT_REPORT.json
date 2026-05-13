@@ -1,0 +1,90 @@
+{
+  "meta": {
+    "report": "PRISMA_DRIFT_REPORT",
+    "date": "2026-05-10",
+    "phase": "Phase 1"
+  },
+  "drift_found_before": true,
+  "drift_found_after": false,
+  "issues_fixed": [
+    {
+      "id": "DRIFT-001",
+      "severity": "HIGH",
+      "description": "Achievement model lacks User relation",
+      "fix": "Added @relation to User with Cascade delete",
+      "status": "FIXED"
+    },
+    {
+      "id": "DRIFT-002",
+      "severity": "HIGH",
+      "description": "WeeklyPlan model lacks User relation",
+      "fix": "Added @relation to User with Cascade delete",
+      "status": "FIXED"
+    },
+    {
+      "id": "DRIFT-003",
+      "severity": "HIGH",
+      "description": "AnalyticsEvent model lacks User relation",
+      "fix": "Added @relation to User with Cascade delete",
+      "status": "FIXED"
+    },
+    {
+      "id": "DRIFT-004",
+      "severity": "MEDIUM",
+      "description": "QuestPillar enum missing SKILLS value in schema (present in DB)",
+      "fix": "Added SKILLS to QuestPillar enum definition",
+      "status": "FIXED"
+    },
+    {
+      "id": "DRIFT-005",
+      "severity": "MEDIUM",
+      "description": "18 indexes exist in DB but not in @@index declarations",
+      "fix": "Added @@index declarations to all affected models",
+      "status": "FIXED"
+    },
+    {
+      "id": "DRIFT-006",
+      "severity": "HIGH",
+      "description": "Achievement model missing `points` column (present in older DB)",
+      "fix": "Added `points Int @default(0)` field",
+      "status": "FIXED"
+    },
+    {
+      "id": "DRIFT-007",
+      "severity": "LOW",
+      "description": "Escrow venture FK had Restrict instead of Cascade",
+      "fix": "Changed to onDelete: Cascade",
+      "status": "FIXED"
+    },
+    {
+      "id": "DRIFT-008",
+      "severity": "MEDIUM",
+      "description": "No soft delete capability for GDPR compliance",
+      "fix": "Added deletedAt and isDeleted to User model",
+      "status": "FIXED"
+    },
+    {
+      "id": "DRIFT-009",
+      "severity": "MEDIUM",
+      "description": "prisma-enums.ts manual enum file missing SKILLS value",
+      "fix": "Added SKILLS = 'SKILLS' to QuestPillar enum",
+      "status": "FIXED"
+    }
+  ],
+  "remaining_issues": [],
+  "migration_history": {
+    "total_migrations": 2,
+    "applied": 2,
+    "pending": 0,
+    "rolled_back": 0,
+    "failed": 0
+  },
+  "schema_health": {
+    "total_models": 37,
+    "total_enums": 12,
+    "models_with_relations": 37,
+    "models_missing_relations": 0,
+    "indexes_in_schema": 37,
+    "production_safe": true
+  }
+}
