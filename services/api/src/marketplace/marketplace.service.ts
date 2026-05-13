@@ -85,7 +85,7 @@ export class MarketplaceService {
 
   async getMarketplaceItems(userId: string) {
     const user = await this.prisma.user.findUnique({ where: { id: userId }, include: { doterProfile: true } });
-    var items = [
+    const items = [
       { id: '1', name: 'Custom Avatar Skin', description: 'Unique look for your Doter', cost: 500, category: 'Cosmetic', icon: '🎨' },
       { id: '2', name: 'Premium Sound Pack', description: 'Exclusive sound effects', cost: 300, category: 'Audio', icon: '🎵' },
       { id: '3', name: 'Doter Habitat Theme', description: 'Custom environment for your Doter', cost: 800, category: 'Themes', icon: '🏠' },

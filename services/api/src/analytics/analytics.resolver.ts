@@ -134,8 +134,8 @@ export class AnalyticsResolver {
   @UseGuards(GqlAuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN)
   async analyticsSignupFunnel(@Args('days', { type: () => Int, defaultValue: 30 }) days: number) {
-    var endDate = new Date();
-    var startDate = new Date();
+    const endDate = new Date();
+    const startDate = new Date();
     startDate.setDate(startDate.getDate() - days);
     return this.analytics.getSignupConversion(startDate, endDate);
   }

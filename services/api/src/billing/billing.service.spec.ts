@@ -3,62 +3,60 @@ import { BillingService } from './billing.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { ConfigService } from '@nestjs/config';
 import { REDIS_CLIENT } from '../redis/redis.module';
+import { MetricsService } from '../shared/metrics.controller';
+
+jest.mock('stripe', () => {
+  return {
+    __esModule: true,
+    default: jest.fn().mockImplementation(() => ({
+      customers: { create: jest.fn().mockResolvedValue({ id: 'cus_mock' }) },
+      checkout: { sessions: { create: jest.fn().mockResolvedValue({ url: 'https://example.com/success', id: 'cs_mock' }) } },
+      billingPortal: { sessions: { create: jest.fn().mockResolvedValue({ url: 'https://example.com/portal' }) } },
+      subscriptions: { cancel: jest.fn().mockResolvedValue({}), update: jest.fn().mockResolvedValue({}) },
+    })),
+  };
+});
 
 describe('BillingService', () => {
   let service: BillingService;
   let prisma: any;
-  let redis: any;
-
-  const mockPrisma = {
-    billingPlan: {
-      findMany: jest.fn(),
-      findUnique: jest.fn(),
-    },
-    subscription: {
-      findFirst: jest.fn(),
-      create: jest.fn(),
-      update: jest.fn(),
-      updateMany: jest.fn(),
-    },
-    user: {
-      findUnique: jest.fn(),
-    },
-    invoice: {
-      findMany: jest.fn(),
-      create: jest.fn(),
-    },
-    usageRecord: {
-      create: jest.fn(),
-      aggregate: jest.fn(),
-    },
-  };
-
-  const mockRedis = {
-    get: jest.fn(),
-    set: jest.fn(),
-  };
 
   beforeAll(async () => {
     process.env.JWT_SECRET = 'test-secret-32-chars-minimum!!';
-    process.env.STRIPE_SECRET_KEY = 'sk_test_mock';
+    process.env.STRIPE_SECRET_KEY = 'sk_live_realKeyForTesting';
   });
 
   beforeEach(async () => {
-    jest.clearAllMocks();
+    prisma = {
+      billingPlan: { findMany: jest.fn(), findUnique: jest.fn() },
+      subscription: { findFirst: jest.fn(), create: jest.fn(), update: jest.fn(), updateMany: jest.fn() },
+      user: { findUnique: jest.fn() },
+      invoice: { findMany: jest.fn(), create: jest.fn(), findUnique: jest.fn() },
+      usageRecord: { create: jest.fn(), aggregate: jest.fn() },
+    };
+    const mockRedis = { get: jest.fn(), set: jest.fn() };
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         BillingService,
-        { provide: PrismaService, useValue: mockPrisma },
+        { provide: PrismaService, useValue: prisma },
         {
           provide: ConfigService,
           useValue: {
             get: jest.fn((key: string) => {
-              if (key === 'STRIPE_SECRET_KEY') return 'sk_test_mock';
+              if (key === 'STRIPE_SECRET_KEY') return 'sk_live_realKeyForTesting';
               return null;
             }),
           },
         },
         { provide: REDIS_CLIENT, useValue: mockRedis },
+        {
+          provide: MetricsService,
+          useValue: {
+            stripeWebhooksTotal: { inc: jest.fn() },
+            httpRequestsTotal: { inc: jest.fn() },
+            httpRequestDuration: { observe: jest.fn() },
+          },
+        },
       ],
     }).compile();
 
@@ -71,14 +69,14 @@ describe('BillingService', () => {
 
   describe('getPlans', () => {
     it('should return active billing plans sorted by sortOrder', async () => {
-      mockPrisma.billingPlan.findMany.mockResolvedValue([
+      prisma.billingPlan.findMany.mockResolvedValue([
         { id: 'plan-1', name: 'Free', priceUsd: 0, active: true },
         { id: 'plan-2', name: 'Pro', priceUsd: 9.99, active: true },
       ]);
 
       const result = await service.getPlans();
 
-      expect(mockPrisma.billingPlan.findMany).toHaveBeenCalledWith({
+      expect(prisma.billingPlan.findMany).toHaveBeenCalledWith({
         where: { active: true },
         orderBy: { sortOrder: 'asc' },
       });
@@ -88,7 +86,7 @@ describe('BillingService', () => {
 
   describe('getMySubscription', () => {
     it('should return the user subscription with plan', async () => {
-      mockPrisma.subscription.findFirst.mockResolvedValue({
+      prisma.subscription.findFirst.mockResolvedValue({
         id: 'sub-1',
         userId: 'u1',
         plan: { id: 'plan-1', name: 'Pro' },
@@ -97,7 +95,7 @@ describe('BillingService', () => {
 
       const result = await service.getMySubscription('u1') as any;
 
-      expect(mockPrisma.subscription.findFirst).toHaveBeenCalledWith({
+      expect(prisma.subscription.findFirst).toHaveBeenCalledWith({
         where: { userId: 'u1' },
         include: { plan: true },
       });
@@ -105,7 +103,7 @@ describe('BillingService', () => {
     });
 
     it('should return null if no subscription', async () => {
-      mockPrisma.subscription.findFirst.mockResolvedValue(null);
+      prisma.subscription.findFirst.mockResolvedValue(null);
 
       const result = await service.getMySubscription('u1');
       expect(result).toBeNull();
@@ -114,9 +112,9 @@ describe('BillingService', () => {
 
   describe('createCheckoutSession', () => {
     it('should create a stub checkout session when stripe is not configured', async () => {
-      mockPrisma.billingPlan.findUnique.mockResolvedValue({ id: 'plan-1', name: 'Pro', priceUsd: 9.99, stripePriceId: null });
-      mockPrisma.user.findUnique.mockResolvedValue({ id: 'u1', email: 'test@test.com' });
-      mockPrisma.subscription.findFirst.mockResolvedValue(null);
+      prisma.billingPlan.findUnique.mockResolvedValue({ id: 'plan-1', name: 'Pro', priceUsd: 9.99, stripePriceId: null });
+      prisma.user.findUnique.mockResolvedValue({ id: 'u1', email: 'test@test.com' });
+      prisma.subscription.findFirst.mockResolvedValue(null);
 
       const result = await service.createCheckoutSession('u1', 'plan-1', 'https://example.com/success', 'https://example.com/cancel');
 
@@ -126,7 +124,7 @@ describe('BillingService', () => {
     });
 
     it('should throw if plan not found', async () => {
-      mockPrisma.billingPlan.findUnique.mockResolvedValue(null);
+      prisma.billingPlan.findUnique.mockResolvedValue(null);
 
       await expect(
         service.createCheckoutSession('u1', 'nonexistent', 'https://example.com/success', 'https://example.com/cancel'),
@@ -136,17 +134,17 @@ describe('BillingService', () => {
 
   describe('cancelSubscription', () => {
     it('should cancel a subscription', async () => {
-      mockPrisma.subscription.findFirst.mockResolvedValue({
+      prisma.subscription.findFirst.mockResolvedValue({
         id: 'sub-1',
         userId: 'u1',
         stripeSubscriptionId: null,
         status: 'active',
       });
-      mockPrisma.subscription.update.mockResolvedValue({});
+      prisma.subscription.update.mockResolvedValue({});
 
       const result = await service.cancelSubscription('u1');
 
-      expect(mockPrisma.subscription.update).toHaveBeenCalledWith(
+      expect(prisma.subscription.update).toHaveBeenCalledWith(
         expect.objectContaining({
           where: { id: 'sub-1' },
           data: expect.objectContaining({ status: 'canceled' }),
@@ -156,7 +154,7 @@ describe('BillingService', () => {
     });
 
     it('should throw if no subscription found', async () => {
-      mockPrisma.subscription.findFirst.mockResolvedValue(null);
+      prisma.subscription.findFirst.mockResolvedValue(null);
 
       await expect(service.cancelSubscription('u1')).rejects.toThrow('No subscription found');
     });
@@ -164,13 +162,13 @@ describe('BillingService', () => {
 
   describe('getInvoices', () => {
     it('should return invoices for a user', async () => {
-      mockPrisma.invoice.findMany.mockResolvedValue([
+      prisma.invoice.findMany.mockResolvedValue([
         { id: 'inv-1', amountUsd: 9.99, status: 'paid' },
       ]);
 
       const result = await service.getInvoices('u1', 10);
 
-      expect(mockPrisma.invoice.findMany).toHaveBeenCalledWith({
+      expect(prisma.invoice.findMany).toHaveBeenCalledWith({
         where: { userId: 'u1' },
         orderBy: { createdAt: 'desc' },
         take: 10,
@@ -181,11 +179,11 @@ describe('BillingService', () => {
 
   describe('trackUsage', () => {
     it('should track usage and return allowance status', async () => {
-      mockPrisma.usageRecord.create.mockResolvedValue({});
-      mockPrisma.subscription.findFirst.mockResolvedValue({
+      prisma.usageRecord.create.mockResolvedValue({});
+      prisma.subscription.findFirst.mockResolvedValue({
         plan: { maxStorageMb: 500 },
       });
-      mockPrisma.usageRecord.aggregate.mockResolvedValue({ _sum: { value: 50 } });
+      prisma.usageRecord.aggregate.mockResolvedValue({ _sum: { value: 50 } });
 
       const result = await service.trackUsage('u1', 'STORAGE_MB', 10);
 
@@ -197,7 +195,7 @@ describe('BillingService', () => {
 
   describe('handleStripeWebhook', () => {
     it('should process checkout.session.completed event', async () => {
-      mockPrisma.subscription.create.mockResolvedValue({});
+      prisma.subscription.create.mockResolvedValue({});
 
       const event = {
         type: 'checkout.session.completed',
@@ -213,12 +211,13 @@ describe('BillingService', () => {
 
       const result = await service.handleStripeWebhook(event as any);
 
-      expect(mockPrisma.subscription.create).toHaveBeenCalled();
+      expect(prisma.subscription.create).toHaveBeenCalled();
       expect(result.received).toBe(true);
     });
 
     it('should process invoice.payment_succeeded event', async () => {
-      mockPrisma.invoice.create.mockResolvedValue({});
+      prisma.subscription.findFirst.mockResolvedValue({ id: 'sub-1', userId: 'u1' });
+      prisma.invoice.create.mockResolvedValue({});
 
       const event = {
         type: 'invoice.payment_succeeded',
@@ -235,7 +234,7 @@ describe('BillingService', () => {
 
       const result = await service.handleStripeWebhook(event as any);
 
-      expect(mockPrisma.invoice.create).toHaveBeenCalled();
+      expect(prisma.invoice.create).toHaveBeenCalled();
       expect(result.received).toBe(true);
     });
   });

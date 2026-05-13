@@ -16,8 +16,8 @@
     "db:studio": "pnpm --filter api prisma studio",
     "db:dev": "docker-compose -f docker-compose.dev.yml up -d",
     "db:dev-down": "docker-compose -f docker-compose.dev.yml down",
-    "test:e2e:phase2:db": "pnpm --filter @udb/api exec jest --config ./services/api/test/jest-e2e-phase2.json ./services/api/test/e2e-phase2-db.spec.ts",
-    "test:e2e:phase2:graphql": "pnpm --filter @udb/api exec jest --config ./services/api/test/jest-e2e-phase2.json ./services/api/test/e2e-phase2-graphql.spec.ts"
+    "test:e2e:phase2:db": "pnpm --filter @udb/api exec jest --config ./services/api/test/jest-e2e-phase2.json ./services/api/test/e2e-phase2-db.e2e-spec.ts",
+    "test:e2e:phase2:graphql": "pnpm --filter @udb/api exec jest --config ./services/api/test/jest-e2e-phase2.json ./services/api/test/e2e-phase2-graphql.e2e-spec.ts"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",

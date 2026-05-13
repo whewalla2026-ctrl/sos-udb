@@ -19,14 +19,14 @@ export class AnalyticsService {
   }
 
   async getDAU(days: number) {
-    var result: { date: string; count: number }[] = [];
-    for (var i = days - 1; i >= 0; i--) {
-      var date = new Date();
+    const result: { date: string; count: number }[] = [];
+    for (let i = days - 1; i >= 0; i--) {
+      const date = new Date();
       date.setDate(date.getDate() - i);
-      var start = new Date(date.getFullYear(), date.getMonth(), date.getDate());
-      var end = new Date(start);
+      const start = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+      const end = new Date(start);
       end.setDate(end.getDate() + 1);
-      var count = await this.prisma.user.count({
+      const count = await this.prisma.user.count({
         where: { lastSeenAt: { gte: start, lt: end } },
       });
       result.push({ date: start.toISOString().split('T')[0], count });
@@ -35,15 +35,15 @@ export class AnalyticsService {
   }
 
   async getWAU(weeks: number) {
-    var result: { week: string; count: number }[] = [];
-    for (var i = weeks - 1; i >= 0; i--) {
-      var end = new Date();
+    const result: { week: string; count: number }[] = [];
+    for (let i = weeks - 1; i >= 0; i--) {
+      const end = new Date();
       end.setDate(end.getDate() - i * 7);
-      var start = new Date(end);
+      const start = new Date(end);
       start.setDate(start.getDate() - 6);
       start.setHours(0, 0, 0, 0);
       end.setHours(23, 59, 59, 999);
-      var count = await this.prisma.user.count({
+      const count = await this.prisma.user.count({
         where: { lastSeenAt: { gte: start, lte: end } },
       });
       result.push({ week: start.toISOString().split('T')[0], count });
@@ -52,13 +52,13 @@ export class AnalyticsService {
   }
 
   async getMAU(months: number) {
-    var result: { month: string; count: number }[] = [];
-    for (var i = months - 1; i >= 0; i--) {
-      var date = new Date();
+    const result: { month: string; count: number }[] = [];
+    for (let i = months - 1; i >= 0; i--) {
+      const date = new Date();
       date.setMonth(date.getMonth() - i);
-      var start = new Date(date.getFullYear(), date.getMonth(), 1);
-      var end = new Date(date.getFullYear(), date.getMonth() + 1, 0, 23, 59, 59, 999);
-      var count = await this.prisma.user.count({
+      const start = new Date(date.getFullYear(), date.getMonth(), 1);
+      const end = new Date(date.getFullYear(), date.getMonth() + 1, 0, 23, 59, 59, 999);
+      const count = await this.prisma.user.count({
         where: { lastSeenAt: { gte: start, lte: end } },
       });
       result.push({ month: start.toISOString().split('T')[0], count });
@@ -76,16 +76,16 @@ export class AnalyticsService {
   }
 
   async getOverview() {
-    var now = new Date();
-    var todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-    var weekAgo = new Date(todayStart);
+    const now = new Date();
+    const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const weekAgo = new Date(todayStart);
     weekAgo.setDate(weekAgo.getDate() - 6);
-    var monthAgo = new Date(todayStart);
+    const monthAgo = new Date(todayStart);
     monthAgo.setMonth(monthAgo.getMonth() - 1);
-    var thirtyDaysAgo = new Date(now);
+    const thirtyDaysAgo = new Date(now);
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
-    var [dau, wau, mau, totalUsers, signupsToday, onboardingCompleted, totalOnboarding] = await Promise.all([
+    const [dau, wau, mau, totalUsers, signupsToday, onboardingCompleted, totalOnboarding] = await Promise.all([
       this.prisma.user.count({ where: { lastSeenAt: { gte: todayStart } } }),
       this.prisma.user.count({ where: { lastSeenAt: { gte: weekAgo } } }),
       this.prisma.user.count({ where: { lastSeenAt: { gte: monthAgo } } }),
@@ -95,27 +95,27 @@ export class AnalyticsService {
       this.prisma.onboardingStatus.count(),
     ]);
 
-    var onboardingCompletionRate = totalOnboarding > 0 ? onboardingCompleted / totalOnboarding : 0;
+    const onboardingCompletionRate = totalOnboarding > 0 ? onboardingCompleted / totalOnboarding : 0;
 
-    var churned = await this.prisma.user.count({
+    const churned = await this.prisma.user.count({
       where: { lastSeenAt: { lt: thirtyDaysAgo }, createdAt: { lt: thirtyDaysAgo } },
     });
-    var churnRate = totalUsers > 0 ? churned / totalUsers : 0;
+    const churnRate = totalUsers > 0 ? churned / totalUsers : 0;
 
     return { dau, wau, mau, totalUsers, signupsToday, onboardingCompletionRate, churnRate };
   }
 
   async getSignupConversion(startDate: Date, endDate: Date) {
-    var totalUsers = await this.prisma.user.count({
+    const totalUsers = await this.prisma.user.count({
       where: { createdAt: { gte: startDate, lte: endDate } },
     });
 
-    var onboardingRecords = await this.prisma.onboardingStatus.findMany({
+    const onboardingRecords = await this.prisma.onboardingStatus.findMany({
       where: { user: { createdAt: { gte: startDate, lte: endDate } } },
     });
 
-    var profileComplete = onboardingRecords.filter(o => o.profileComplete).length;
-    var firstQuestDone = onboardingRecords.filter(o => o.firstQuestDone).length;
+    const profileComplete = onboardingRecords.filter(o => o.profileComplete).length;
+    const firstQuestDone = onboardingRecords.filter(o => o.firstQuestDone).length;
 
     return [
       { label: 'Signed Up', count: totalUsers, conversionRate: 1 },
@@ -126,7 +126,7 @@ export class AnalyticsService {
   }
 
   async getOnboardingCompletion() {
-    var [total, completed] = await Promise.all([
+    const [total, completed] = await Promise.all([
       this.prisma.onboardingStatus.count(),
       this.prisma.onboardingStatus.count({ where: { completed: true } }),
     ]);
@@ -134,10 +134,10 @@ export class AnalyticsService {
   }
 
   async getFeatureUsage(feature: string, days: number) {
-    var cutoff = new Date();
+    const cutoff = new Date();
     cutoff.setDate(cutoff.getDate() - days);
 
-    var rows = await this.prisma.analyticsEvent.groupBy({
+    const rows = await this.prisma.analyticsEvent.groupBy({
       by: ['event'],
       where: {
         event: { contains: feature, mode: 'insensitive' },
@@ -150,18 +150,18 @@ export class AnalyticsService {
   }
 
   async getFeatureUsageDaily(feature: string, days: number) {
-    var result: { date: string; count: number }[] = [];
-    var cutoff = new Date();
+    const result: { date: string; count: number }[] = [];
+    const cutoff = new Date();
     cutoff.setDate(cutoff.getDate() - days);
 
-    for (var i = days - 1; i >= 0; i--) {
-      var date = new Date();
+    for (let i = days - 1; i >= 0; i--) {
+      const date = new Date();
       date.setDate(date.getDate() - i);
-      var start = new Date(date.getFullYear(), date.getMonth(), date.getDate());
-      var end = new Date(start);
+      const start = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+      const end = new Date(start);
       end.setDate(end.getDate() + 1);
 
-      var count = await this.prisma.analyticsEvent.count({
+      const count = await this.prisma.analyticsEvent.count({
         where: {
           event: { contains: feature, mode: 'insensitive' },
           createdAt: { gte: start, lt: end },
@@ -173,41 +173,41 @@ export class AnalyticsService {
   }
 
   async getRetention(days: number = 30) {
-    var retentionDays = [1, 3, 7, 14, 30];
-    var maxDay = Math.max(...retentionDays.filter(d => d <= days));
+    const retentionDays = [1, 3, 7, 14, 30];
+    const maxDay = Math.max(...retentionDays.filter(d => d <= days));
     if (maxDay <= 0) return { day1: 0, day3: 0, day7: 0, day14: 0, day30: 0 };
 
-    var cutoff = new Date();
+    const cutoff = new Date();
     cutoff.setDate(cutoff.getDate() - maxDay);
 
-    var users = await this.prisma.user.findMany({
+    const users = await this.prisma.user.findMany({
       where: { createdAt: { lte: cutoff } },
       select: { id: true, createdAt: true },
     });
 
-    var userIds = users.map(u => u.id);
+    const userIds = users.map(u => u.id);
 
-    var userActiveDates = new Map<string, Set<string>>();
+    const userActiveDates = new Map<string, Set<string>>();
 
-    var events = await this.prisma.analyticsEvent.findMany({
+    const events = await this.prisma.analyticsEvent.findMany({
       where: { userId: { in: userIds }, createdAt: { gte: cutoff } },
       select: { userId: true, createdAt: true },
     });
 
-    for (var evt of events) {
-      var key = evt.createdAt.toISOString().split('T')[0];
+    for (const evt of events) {
+      const key = evt.createdAt.toISOString().split('T')[0];
       if (!userActiveDates.has(evt.userId)) userActiveDates.set(evt.userId, new Set());
       userActiveDates.get(evt.userId)!.add(key);
     }
 
-    var result: Record<string, number> = {};
-    for (var day of retentionDays) {
+    const result: Record<string, number> = {};
+    for (const day of retentionDays) {
       if (day > days) { result['day' + day] = 0; continue; }
-      var retained = 0;
-      for (var user of users) {
-        var target = new Date(user.createdAt);
+      let retained = 0;
+      for (const user of users) {
+        const target = new Date(user.createdAt);
         target.setDate(target.getDate() + day);
-        var targetKey = target.toISOString().split('T')[0];
+        const targetKey = target.toISOString().split('T')[0];
         if (userActiveDates.get(user.id)?.has(targetKey)) retained++;
       }
       result['day' + day] = users.length > 0 ? retained / users.length : 0;
@@ -216,10 +216,10 @@ export class AnalyticsService {
   }
 
   async getChurnIndicators(days: number = 30) {
-    var cutoff = new Date();
+    const cutoff = new Date();
     cutoff.setDate(cutoff.getDate() - days);
 
-    var users = await this.prisma.user.findMany({
+    const users = await this.prisma.user.findMany({
       where: {
         lastSeenAt: { lt: cutoff },
         createdAt: { lt: cutoff },
@@ -232,10 +232,10 @@ export class AnalyticsService {
   }
 
   async getChurnRate() {
-    var thirtyDaysAgo = new Date();
+    const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
-    var [total, churned] = await Promise.all([
+    const [total, churned] = await Promise.all([
       this.prisma.user.count({ where: { createdAt: { lt: thirtyDaysAgo } } }),
       this.prisma.user.count({
         where: { createdAt: { lt: thirtyDaysAgo }, lastSeenAt: { lt: thirtyDaysAgo } },
@@ -246,8 +246,8 @@ export class AnalyticsService {
   }
 
   async getBillingConversion() {
-    var total = await this.prisma.user.count();
-    var paid = 0;
+    const total = await this.prisma.user.count();
+    let paid = 0;
     try {
       paid = await this.prisma.analyticsEvent.groupBy({
         by: ['userId'],
@@ -261,16 +261,16 @@ export class AnalyticsService {
   }
 
   async getActivationMetrics() {
-    var total = await this.prisma.user.count();
+    const total = await this.prisma.user.count();
 
-    var [onboardingCompleted, doterNamed, questCreatedGroups, questCompleted] = await Promise.all([
+    const [onboardingCompleted, doterNamed, questCreatedGroups, questCompleted] = await Promise.all([
       this.prisma.onboardingStatus.count({ where: { completed: true } }),
       this.prisma.doterProfile.count({ where: { NOT: { name: 'My Doter' } } }),
       this.prisma.quest.groupBy({ by: ['userId'] }),
       this.prisma.quest.count({ where: { status: 'APPROVED' } }),
     ]);
 
-    var questCreated = questCreatedGroups.length;
+    const questCreated = questCreatedGroups.length;
 
     return {
       totalUsers: total,

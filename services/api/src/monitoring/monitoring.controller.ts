@@ -16,11 +16,11 @@ export class MonitoringController {
   @Post('signal')
   @UseGuards(AuthGuard('jwt'))
   async signal(@Body() body: any, @Req() req: Request) {
-    var user = req.user as any;
+    const user = req.user as any;
     if (!user) return { ok: false, error: 'unauthorized' };
 
     if (body.signal === 'analytics_event' && body.payload) {
-      var payload = body.payload;
+      const payload = body.payload;
       await this.analytics.recordEvent(user.id, payload.event, payload.metadata || {});
       return { ok: true };
     }

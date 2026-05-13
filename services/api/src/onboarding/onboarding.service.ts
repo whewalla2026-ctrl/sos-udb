@@ -70,13 +70,13 @@ export class OnboardingService {
   }
 
   async getCompletionStats() {
-    var [total, completed] = await Promise.all([
+    const [total, completed] = await Promise.all([
       this.prisma.onboardingStatus.count(),
       this.prisma.onboardingStatus.count({ where: { completed: true } }),
     ]);
-    var completionRate = total > 0 ? completed / total : 0;
+    const completionRate = total > 0 ? completed / total : 0;
 
-    var avgResult = await this.prisma.onboardingStatus.aggregate({
+    const avgResult = await this.prisma.onboardingStatus.aggregate({
       _avg: { currentStep: true },
     });
 

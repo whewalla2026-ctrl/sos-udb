@@ -12,7 +12,7 @@ export class EscrowService {
     private prisma: PrismaService,
     private configService: ConfigService
   ) {
-    var stripeKey = this.configService.get<string>('STRIPE_SECRET_KEY');
+    const stripeKey = this.configService.get<string>('STRIPE_SECRET_KEY');
     if (!stripeKey || stripeKey === 'sk_test_mock') {
       this.logger.warn('STRIPE_SECRET_KEY not set. Escrow operations will fail.');
     }
@@ -28,7 +28,7 @@ export class EscrowService {
       throw new Error('Stripe not configured. Set STRIPE_SECRET_KEY environment variable.');
     }
 
-    var paymentIntent = await this.stripe.paymentIntents.create({
+    const paymentIntent = await this.stripe.paymentIntents.create({
       amount: Math.round(amountUsd * 100),
       currency: 'usd',
       payment_method_types: ['card'],
