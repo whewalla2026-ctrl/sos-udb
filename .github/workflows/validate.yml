@@ -17,34 +17,11 @@ jobs:
         with:
           version: 9
       - run: pnpm install --frozen-lockfile
-      - run: pnpm run typecheck || echo 'Typecheck warnings (non-blocking)'
-      - run: pnpm run lint || echo 'Lint warnings (non-blocking)'
+      - run: pnpm run typecheck
+      - run: pnpm run lint
 
-  unit-integration:
+  unit-tests:
     runs-on: ubuntu-latest
-    services:
-      postgres:
-        image: postgres:16-alpine
-        env:
-          POSTGRES_USER: udb
-          POSTGRES_PASSWORD: udb
-          POSTGRES_DB: udb
-        options: >-
-          --health-cmd pg_isready -U udb
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-        ports:
-          - 5432:5432
-      redis:
-        image: redis:7-alpine
-        options: >-
-          --health-cmd "redis-cli ping"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-        ports:
-          - 6379:6379
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -54,34 +31,10 @@ jobs:
         with:
           version: 9
       - run: pnpm install --frozen-lockfile
-      - run: pnpm run test || echo 'Test failures (non-blocking for phase3)'
-      - run: node services/api/prisma/phase3/shared/security.js --self-test 2>/dev/null || echo 'Security module loaded'
+      - run: pnpm run test
 
-  phase3-health:
+  build:
     runs-on: ubuntu-latest
-    services:
-      postgres:
-        image: postgres:16-alpine
-        env:
-          POSTGRES_USER: udb
-          POSTGRES_PASSWORD: udb
-          POSTGRES_DB: udb
-        ports:
-          - 5432:5432
-        options: >-
-          --health-cmd pg_isready -U udb
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-      redis:
-        image: redis:7-alpine
-        ports:
-          - 6379:6379
-        options: >-
-          --health-cmd "redis-cli ping"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -91,30 +44,4 @@ jobs:
         with:
           version: 9
       - run: pnpm install --frozen-lockfile
-      - name: Start phase3 services
-        run: |
-          export NODE_PATH=$(pnpm root)
-          node services/api/prisma/phase3/services/auth-service.js &
-          sleep 3
-          node services/api/prisma/phase3/services/planner-service.js &
-          sleep 2
-          node services/api/prisma/phase3/services/ai-service.js &
-          sleep 2
-          node services/api/prisma/phase3/services/monitoring-service.js &
-          sleep 2
-          node services/api/prisma/phase3/gateway.js &
-          sleep 5
-      - name: Health check
-        run: |
-          curl -f http://localhost:3000/gateway/health
-          curl -f http://localhost:3000/monitoring/health
-      - name: E2E smoke test
-        run: |
-          REG=$(curl -s -X POST http://localhost:3000/auth/register -H 'Content-Type: application/json' -d '{"email":"ci-test@test.com","password":"testpass123","role":"PARENT"}')
-          echo "Register: $(echo $REG | grep -o '"userId":"[^"]*"')"
-          TOKEN=$(echo $REG | grep -o '"token":"[^"]*"' | cut -d'"' -f4)
-          PLAN=$(curl -s -X POST http://localhost:3000/planning/generate -H "Authorization: Bearer $TOKEN" -H 'Content-Type: application/json' -d '{"userId":"ci-test"}')
-          echo "Plan: $(echo $PLAN | grep -o '"id":"[^"]*"')"
-          HINT=$(curl -s -X POST http://localhost:3000/ai-lite/hint -H "Authorization: Bearer $TOKEN" -H 'Content-Type: application/json' -d '{"userId":"ci-test","subject":"math"}')
-          echo "Hint: $(echo $HINT | grep -o '"confidence":[^,}]*')"
-          echo "ALL PHASE3 SMOKE TESTS PASSED"
+      - run: pnpm run build

@@ -8,46 +8,18 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
+  build-api:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
-      - name: Build gateway
+      - name: Build API
         uses: docker/build-push-action@v6
         with:
           context: .
-          file: services/api/prisma/phase3/Dockerfile.gateway
+          file: services/api/Dockerfile
           push: false
-          tags: udb/gateway:latest
-      - name: Build auth-service
-        uses: docker/build-push-action@v6
-        with:
-          context: .
-          file: services/api/prisma/phase3/Dockerfile.auth
-          push: false
-          tags: udb/auth-service:latest
-      - name: Build planner-service
-        uses: docker/build-push-action@v6
-        with:
-          context: .
-          file: services/api/prisma/phase3/Dockerfile.planner
-          push: false
-          tags: udb/planner-service:latest
-      - name: Build ai-service
-        uses: docker/build-push-action@v6
-        with:
-          context: .
-          file: services/api/prisma/phase3/Dockerfile.ai
-          push: false
-          tags: udb/ai-service:latest
-      - name: Build monitoring-service
-        uses: docker/build-push-action@v6
-        with:
-          context: .
-          file: services/api/prisma/phase3/Dockerfile.monitoring
-          push: false
-          tags: udb/monitoring-service:latest
+          tags: udb/api:latest
       - name: Compose validation
         run: docker compose -f docker-compose.prod.yml config 2>&1 || echo 'Compose config valid (may have warnings)'

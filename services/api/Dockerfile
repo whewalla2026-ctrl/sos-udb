@@ -1,12 +1,14 @@
 FROM node:20-slim AS builder
 WORKDIR /app
-RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
-COPY package*.json ./
-COPY prisma ./prisma
-RUN npm install
+RUN corepack enable && corepack prepare pnpm@9 --activate
+COPY pnpm-lock.yaml package.json pnpm-workspace.yaml ./
+COPY services/api/package.json services/api/
+RUN pnpm install --frozen-lockfile
+COPY services/api/prisma ./prisma
 RUN npx prisma generate
-COPY . .
-RUN npm run build
+COPY services/api/src ./src
+COPY services/api/tsconfig.json ./
+RUN pnpm --filter @udb/api build
 
 FROM node:20-slim AS runner
 WORKDIR /app
