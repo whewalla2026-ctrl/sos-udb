@@ -17,15 +17,15 @@ class LmsSyncWorker {
       console.log('[LMS Sync] Fetching assignments from connected LMS accounts...');
 
       try {
-        var response = await axios.get(API_BASE_URL + '/auth/users/with-lms', { timeout: 10000 });
-        var users = response.data?.users || [];
+        const response = await axios.get(API_BASE_URL + '/auth/users/with-lms', { timeout: 10000 });
+        const users = response.data?.users || [];
         console.log('[LMS Sync] Found ' + users.length + ' users with LMS connections');
 
-        for (var user of users) {
+        for (const user of users) {
           try {
-            var lmsRes = await axios.get(API_BASE_URL + '/lms/assignments/' + user.id, { timeout: 10000 });
-            var assignments = lmsRes.data?.assignments || [];
-            for (var assignment of assignments) {
+            const lmsRes = await axios.get(API_BASE_URL + '/lms/assignments/' + user.id, { timeout: 10000 });
+            const assignments = lmsRes.data?.assignments || [];
+            for (const assignment of assignments) {
               console.log('[LMS Sync] Synced assignment: ' + assignment.title + ' for user ' + user.id);
             }
           } catch (e: unknown) {
