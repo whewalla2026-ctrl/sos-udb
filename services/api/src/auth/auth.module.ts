@@ -4,10 +4,14 @@ import { PassportModule } from '@nestjs/passport';
 import { ConfigService } from '@nestjs/config';
 import { AuthService } from './auth.service';
 import { AuthResolver } from './auth.resolver';
+import { AdminAuthResolver } from './admin-auth.resolver';
+import { AuthController } from './auth.controller';
 import { FirebaseStrategy } from './strategies/firebase.strategy';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { GqlAuthGuard } from './guards/gql-auth.guard';
 import { RolesGuard } from './guards/roles.guard';
+import { PrismaModule } from '../prisma/prisma.module';
+import { MetricsModule } from '../shared/metrics.module';
 
 @Module({
   imports: [
@@ -16,11 +20,14 @@ import { RolesGuard } from './guards/roles.guard';
       inject: [ConfigService],
       useFactory: (config: ConfigService) => ({
         secret: config.get('JWT_SECRET'),
-        signOptions: { expiresIn: config.get('JWT_EXPIRY', '7d') },
+        signOptions: { expiresIn: config.get('JWT_EXPIRY', '15m') },
       }),
     }),
+    PrismaModule,
+    MetricsModule,
   ],
-  providers: [AuthService, AuthResolver, FirebaseStrategy, JwtStrategy, GqlAuthGuard, RolesGuard],
+  controllers: [AuthController],
+  providers: [AuthService, AuthResolver, AdminAuthResolver, FirebaseStrategy, JwtStrategy, GqlAuthGuard, RolesGuard],
   exports: [AuthService, GqlAuthGuard, RolesGuard, JwtModule],
 })
 export class AuthModule {}

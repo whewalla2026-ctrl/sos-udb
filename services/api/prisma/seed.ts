@@ -5,13 +5,32 @@ import { UserRole } from '../src/shared/user-role';
 const prisma = new PrismaClient();
 
 async function main() {
-  console.log('🌱 Seeding UDB database...');
+  console.log('Seeding UDB database...');
+
+  // Clean existing seed data first for idempotency
+  const existingChild = await prisma.user.findUnique({ where: { email: 'leo@udb.dev' } });
+  const existingParent = await prisma.user.findUnique({ where: { email: 'parent@udb.dev' } });
+  const existingIds = [existingChild?.id, existingParent?.id].filter(Boolean) as string[];
+
+  if (existingIds.length > 0) {
+    await prisma.activity.deleteMany({ where: { userId: { in: existingIds } } });
+    await prisma.notification.deleteMany({ where: { userId: { in: existingIds } } });
+    await prisma.skillGap.deleteMany({ where: { userId: { in: existingIds } } });
+    await prisma.biometricLog.deleteMany({ where: { userId: { in: existingIds } } });
+    await prisma.pointsLedger.deleteMany({ where: { userId: { in: existingIds } } });
+    await prisma.quest.deleteMany({ where: { userId: { in: existingIds } } });
+    await prisma.goal.deleteMany({ where: { userId: { in: existingIds } } });
+    await prisma.familyLink.deleteMany({
+      where: { OR: [{ parentId: { in: existingIds } }, { childId: { in: existingIds } }] },
+    });
+    await prisma.doterProfile.deleteMany({ where: { userId: { in: existingIds } } });
+    await prisma.user.deleteMany({ where: { id: { in: existingIds } } });
+    console.log('Cleaned existing seed data');
+  }
 
   // ── Create Parent User ──────────────────────────────────────────────────────
-  const parent = await prisma.user.upsert({
-    where: { email: 'parent@udb.dev' },
-    update: {},
-    create: {
+  const parent = await prisma.user.create({
+    data: {
       firebaseUid: 'seed-parent-uid-001',
       email: 'parent@udb.dev',
       displayName: 'Sarah Johnson',
@@ -32,10 +51,8 @@ async function main() {
   });
 
   // ── Create Child User ───────────────────────────────────────────────────────
-  const child = await prisma.user.upsert({
-    where: { email: 'leo@udb.dev' },
-    update: {},
-    create: {
+  const child = await prisma.user.create({
+    data: {
       firebaseUid: 'seed-child-uid-001',
       email: 'leo@udb.dev',
       displayName: 'Leo Johnson',
@@ -56,10 +73,8 @@ async function main() {
   });
 
   // ── Create Doter for Leo ────────────────────────────────────────────────────
-  await prisma.doterProfile.upsert({
-    where: { userId: child.id },
-    update: {},
-    create: {
+  await prisma.doterProfile.create({
+    data: {
       userId: child.id,
       name: 'Sparky',
       state: DoterState.JUVENILE,
@@ -73,10 +88,8 @@ async function main() {
   });
 
   // ── Family Link ─────────────────────────────────────────────────────────────
-  await prisma.familyLink.upsert({
-    where: { parentId_childId: { parentId: parent.id, childId: child.id } },
-    update: {},
-    create: { parentId: parent.id, childId: child.id, consentVerified: true, consentMethod: 'CREDIT_CARD' },
+  await prisma.familyLink.create({
+    data: { parentId: parent.id, childId: child.id, consentVerified: true, consentMethod: 'CREDIT_CARD' },
   });
 
   // ── Goals ───────────────────────────────────────────────────────────────────
@@ -158,10 +171,10 @@ async function main() {
     data: [
       { userId: child.id, transactionType: 'EARN', amount: 200, balanceAfter: 200, source: 'QUEST', description: 'Quest: Make Your Bed - Week 1' },
       { userId: child.id, transactionType: 'EARN', amount: 150, balanceAfter: 350, source: 'QUEST', description: 'Quest: Reading Challenge' },
-      { userId: child.id, transactionType: 'EARN', amount: 500, balanceAfter: 850, source: 'BONUS', description: '🎉 Streak Bonus: 10 Days!' },
-      { userId: child.id, transactionType: 'SPEND', amount: -100, balanceAfter: 750, source: 'PURCHASE', description: 'Doter Skin: "Cosmic Blue"' },
+      { userId: child.id, transactionType: 'EARN', amount: 500, balanceAfter: 850, source: 'BONUS', description: 'Streak Bonus: 10 Days!' },
+      { userId: child.id, transactionType: 'SPEND', amount: -100, balanceAfter: 750, source: 'PURCHASE', description: 'Doter Skin: Cosmic Blue' },
       { userId: child.id, transactionType: 'EARN', amount: 300, balanceAfter: 1050, source: 'QUEST', description: 'Quest: Science Project Completed' },
-      { userId: child.id, transactionType: 'EARN', amount: 200, balanceAfter: 1250, source: 'MANUAL_AWARD', description: 'Mom awarded: Helped with dishes all week ❤️' },
+      { userId: child.id, transactionType: 'EARN', amount: 200, balanceAfter: 1250, source: 'MANUAL_AWARD', description: 'Mom awarded: Helped with dishes all week' },
     ],
   });
 
@@ -198,9 +211,9 @@ async function main() {
   // ── Notifications ───────────────────────────────────────────────────────────
   await prisma.notification.createMany({
     data: [
-      { userId: child.id, type: 'QUEST_REMINDER', title: '📚 Quest Due Tomorrow!', body: 'You have "Complete 10 Fraction Worksheets" due tomorrow. Keep going!' },
-      { userId: parent.id, type: 'SKILL_GAP_ALERT', title: '📊 Skill Gap Detected', body: 'Leo hasn\'t practiced Social Skills in 10 days. We recommend a social quest!' },
-      { userId: child.id, type: 'LEVEL_UP', title: '🎉 You Reached Level 8!', body: 'Amazing! Your Doter Sparky is evolving!' },
+      { userId: child.id, type: 'QUEST_REMINDER', title: 'Quest Due Tomorrow!', body: 'You have "Complete 10 Fraction Worksheets" due tomorrow. Keep going!' },
+      { userId: parent.id, type: 'SKILL_GAP_ALERT', title: 'Skill Gap Detected', body: 'Leo hasn\'t practiced Social Skills in 10 days. We recommend a social quest!' },
+      { userId: child.id, type: 'LEVEL_UP', title: 'You Reached Level 8!', body: 'Amazing! Your Doter Sparky is evolving!' },
     ],
   });
 
@@ -232,11 +245,11 @@ async function main() {
     ],
   });
 
-  console.log('✅ Database seeded successfully!');
-  console.log(`👤 Parent: ${parent.email}`);
-  console.log(`👦 Child: ${child.email}`);
+  console.log('Database seeded successfully!');
+  console.log(`Parent: ${parent.email}`);
+  console.log(`Child: ${child.email}`);
 }
 
 main()
-  .catch(e => { console.error('❌ Seed failed:', e); process.exit(1); })
+  .catch(e => { console.error('Seed failed:', e); process.exit(1); })
   .finally(() => prisma.$disconnect());

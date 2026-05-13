@@ -1,9 +1,14 @@
-import { Module } from '@nestjs/common';
+import { Module, NestModule, MiddlewareConsumer } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { join } from 'path';
 import { ScheduleModule } from '@nestjs/schedule';
+import { ThrottlerModule } from '@nestjs/throttler';
+import { APP_GUARD } from '@nestjs/core';
+import { UdbThrottlerGuard } from './shared/throttler.guard';
+import { HttpMetricsMiddleware } from './shared/http-metrics.middleware';
+import { CookieMiddleware } from './shared/cookie.middleware';
 
 import { PrismaModule } from './prisma/prisma.module';
 import { RedisModule } from './redis/redis.module';
@@ -32,6 +37,11 @@ import { OnboardingModule } from './onboarding/onboarding.module';
 import { AnalyticsModule } from './analytics/analytics.module';
 import { MonitoringModule } from './monitoring/monitoring.module';
 import { MetricsModule } from './shared/metrics.module';
+import { MetricsService } from './shared/metrics.controller';
+import { HealthModule } from './health/health.module';
+import { TutorModule } from './tutor/tutor.module';
+import { BillingModule } from './billing/billing.module';
+import { createGraphQLMetricsPlugin } from './shared/graphql-metrics.plugin';
 
 @Module({
   imports: [
@@ -39,13 +49,25 @@ import { MetricsModule } from './shared/metrics.module';
     ConfigModule.forRoot({ isGlobal: true }),
     ScheduleModule.forRoot(),
 
+    // Rate limiting
+    ThrottlerModule.forRoot([{
+      ttl: 60000,
+      limit: 600,
+    }]),
+
     // GraphQL
-    GraphQLModule.forRoot<ApolloDriverConfig>({
+    GraphQLModule.forRootAsync<ApolloDriverConfig>({
       driver: ApolloDriver,
-      autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
-      sortSchema: true,
-      playground: true,
-      context: ({ req }) => ({ req }),
+      imports: [MetricsModule],
+      inject: [MetricsService],
+      useFactory: (metrics: MetricsService) => ({
+        autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
+        sortSchema: true,
+        playground: process.env.NODE_ENV !== 'production',
+        introspection: process.env.NODE_ENV !== 'production',
+        context: ({ req, res }) => ({ req, res }),
+        plugins: [createGraphQLMetricsPlugin(metrics)],
+      }),
     }),
 
     // Infrastructure
@@ -78,6 +100,19 @@ import { MetricsModule } from './shared/metrics.module';
     AnalyticsModule,
     MonitoringModule,
     MetricsModule,
+    HealthModule,
+    TutorModule,
+    BillingModule,
+  ],
+  providers: [
+    {
+      provide: APP_GUARD,
+      useClass: UdbThrottlerGuard,
+    },
   ],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(HttpMetricsMiddleware, CookieMiddleware).forRoutes('*');
+  }
+}

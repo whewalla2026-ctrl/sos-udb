@@ -19,6 +19,16 @@ export class AiService {
     this.initVertexAI();
   }
 
+  private sanitize(input: string): string {
+    return input
+      .replace(/\\/g, '\\\\')
+      .replace(/"/g, '\\"')
+      .replace(/\n/g, '\\n')
+      .replace(/\r/g, '\\r')
+      .replace(/\t/g, '\\t')
+      .replace(/\${/g, '\\${');
+  }
+
   private async initVertexAI() {
     try {
       // Dynamic import to allow graceful fallback
@@ -65,7 +75,7 @@ CRITICAL RULES:
 Conversation History:
 ${sessionHistory.map(h => `${h.role}: ${h.content}`).join('\n')}
 
-Student's current input: "${studentInput}"
+Student's current input: "<user_input>${this.sanitize(studentInput)}</user_input>"
 
 Respond as the Socratic mentor:`;
 
@@ -190,10 +200,10 @@ Be specific, warm, and actionable. Reference actual data. Don't be generic.`;
     const prompt = `You are an expert business plan advisor working with a ${data.founderAge}-year-old entrepreneur.
 
 Business Idea:
-- Problem: ${data.problem}
-- Solution: ${data.solution}
-- Target Market: ${data.targetMarket}
-- Pricing: ${data.pricingModel}
+- Problem: <problem>${this.sanitize(data.problem)}</problem>
+- Solution: <solution>${this.sanitize(data.solution)}</solution>
+- Target Market: <market>${this.sanitize(data.targetMarket)}</market>
+- Pricing: <pricing>${this.sanitize(data.pricingModel)}</pricing>
 
 Tasks:
 1. Write a concise executive summary (150 words)
@@ -233,9 +243,9 @@ Write in second person ("You wake up..."). Be specific and inspirational. Show t
     const prompt = `You are a supportive, educational AI coach for a student platform.
 A student has uploaded evidence of their activity.
 
-Activity Title: "${title}"
-Evidence Type: ${type}
-Evidence URL: ${url}
+Activity Title: "<evidence_title>${this.sanitize(title)}</evidence_title>"
+Evidence Type: <evidence_type>${this.sanitize(type)}</evidence_type>
+Evidence URL: <evidence_url>${this.sanitize(url)}</evidence_url>
 
 Provide a short, encouraging "Pro-Tip" (1-2 sentences) about this activity. Highlight what they did well and suggest one tiny area of improvement. Start with an emoji.`;
     return this.callLLM(prompt);
@@ -246,7 +256,7 @@ Provide a short, encouraging "Pro-Tip" (1-2 sentences) about this activity. High
     const prompt = `You are a COPPA-compliant safety moderator for a platform used by children (ages 6-18).
 Analyze the following message for grooming, bullying, self-harm, or inappropriate content.
 
-Message: "${content}"
+Message: "<message_content>${this.sanitize(content)}</message_content>"
 
 Return ONLY valid JSON in this format:
 { "isSafe": true/false, "safetyScore": 0-100, "flags": ["BULLYING", "GROOMING"] (empty if safe) }`;
@@ -261,7 +271,7 @@ Return ONLY valid JSON in this format:
 
   // ── Multimodal Emotional Intelligence (mEQ) (Phase 5) ────────────────────────
   async analyzeEmotionalState(userId: string, videoUrl: string, audioTranscript: string): Promise<{ emotion: string; focusScore: number; resilienceLevel: string }> {
-    const prompt = `Analyze the emotional state based on this transcript: "${audioTranscript}" and video reference: ${videoUrl}.
+    const prompt = `Analyze the emotional state based on this transcript: "<audio_transcript>${this.sanitize(audioTranscript)}</audio_transcript>" and video reference: <video_url>${this.sanitize(videoUrl)}</video_url>.
 Student ID: ${userId}
 Identify dominant emotion, focus score (0-100), and resilience level.
 Return JSON: { "emotion": "...", "focusScore": 0, "resilienceLevel": "..." }`;
@@ -276,7 +286,7 @@ Return JSON: { "emotion": "...", "focusScore": 0, "resilienceLevel": "..." }`;
 
   // ── Autonomous Skill Agents (Phase 5) ───────────────────────────────────────
   async triggerSkillAgent(userId: string, skill: string): Promise<string> {
-    const prompt = `You are an Autonomous Skill Agent for ${skill}.
+    const prompt = `You are an Autonomous Skill Agent for "${this.sanitize(skill)}".
 Student ${userId} wants to master this.
 Generate a pro-active learning path and the first step to take right now.`;
     return this.callLLM(prompt);

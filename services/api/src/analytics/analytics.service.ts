@@ -1,11 +1,16 @@
 import { Injectable, Logger } from '@nestjs/common';
+import { Cron } from '@nestjs/schedule';
 import { PrismaService } from '../prisma/prisma.service';
+import { MetricsService } from '../shared/metrics.controller';
 
 @Injectable()
 export class AnalyticsService {
   private readonly logger = new Logger(AnalyticsService.name);
 
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private metrics: MetricsService,
+  ) {}
 
   async recordEvent(userId: string, event: string, metadata: Record<string, any> = {}) {
     return this.prisma.analyticsEvent.create({
@@ -59,6 +64,15 @@ export class AnalyticsService {
       result.push({ month: start.toISOString().split('T')[0], count });
     }
     return result;
+  }
+
+  @Cron('*/5 * * * *')
+  async trackActiveUsers() {
+    const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
+    const count = await this.prisma.user.count({
+      where: { lastSeenAt: { gte: fiveMinutesAgo } },
+    });
+    this.metrics.activeUsers.set({ role: 'all' }, count);
   }
 
   async getOverview() {

@@ -1,6 +1,7 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { BlockchainService } from '../blockchain/blockchain.service';
+import { PointsService } from '../points/points.service';
 
 @Injectable()
 export class MarketplaceService {
@@ -8,7 +9,8 @@ export class MarketplaceService {
 
   constructor(
     private prisma: PrismaService,
-    private blockchain: BlockchainService
+    private blockchain: BlockchainService,
+    private points: PointsService,
   ) {}
 
   async getPublicProfile(userId: string) {
@@ -54,6 +56,31 @@ export class MarketplaceService {
         avatarUrl: true,
       },
     });
+  }
+
+  async purchaseItem(userId: string, itemId: string) {
+    const items = await this.getMarketplaceItems(userId);
+    const item = items.find(i => i.id === itemId);
+    if (!item) throw new NotFoundException(`Marketplace item ${itemId} not found`);
+
+    const entry = await this.points.spendPoints(userId, {
+      amount: item.cost,
+      source: 'PURCHASE' as any,
+      description: `Purchased: ${item.name}`,
+    });
+
+    await this.prisma.auditLog.create({
+      data: {
+        actorId: userId,
+        action: 'MARKETPLACE_PURCHASE',
+        targetType: 'MarketplaceItem',
+        targetId: itemId,
+        payload: { itemName: item.name, cost: item.cost },
+      },
+    });
+
+    this.logger.log(`🛒 User ${userId} purchased "${item.name}" for ${item.cost} coins`);
+    return { item, transaction: entry };
   }
 
   async getMarketplaceItems(userId: string) {

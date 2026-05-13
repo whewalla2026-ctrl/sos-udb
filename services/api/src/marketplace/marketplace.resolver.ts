@@ -1,8 +1,9 @@
-import { Resolver, Query, ObjectType, Field } from '@nestjs/graphql';
+import { Resolver, Query, Mutation, Args, ObjectType, Field } from '@nestjs/graphql';
 import { UseGuards } from '@nestjs/common';
 import { GqlAuthGuard } from '../auth/guards/gql-auth.guard';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { MarketplaceService } from './marketplace.service';
+import { GraphQLJSON } from 'graphql-type-json';
 
 @ObjectType()
 class MarketplaceItem {
@@ -14,6 +15,12 @@ class MarketplaceItem {
   @Field() icon: string;
 }
 
+@ObjectType()
+class PurchaseResult {
+  @Field(() => MarketplaceItem) item: any;
+  @Field(() => GraphQLJSON) transaction: any;
+}
+
 @Resolver()
 export class MarketplaceResolver {
   constructor(private marketplace: MarketplaceService) {}
@@ -22,5 +29,14 @@ export class MarketplaceResolver {
   @UseGuards(GqlAuthGuard)
   async marketplaceItems(@CurrentUser() user: any) {
     return this.marketplace.getMarketplaceItems(user.id);
+  }
+
+  @Mutation(() => PurchaseResult)
+  @UseGuards(GqlAuthGuard)
+  async purchaseItem(
+    @CurrentUser() user: any,
+    @Args('itemId') itemId: string,
+  ) {
+    return this.marketplace.purchaseItem(user.id, itemId);
   }
 }

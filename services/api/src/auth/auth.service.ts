@@ -1,9 +1,15 @@
-import { Injectable, UnauthorizedException, Logger } from '@nestjs/common';
+import { Injectable, UnauthorizedException, Logger, Inject } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from '../prisma/prisma.service';
 import { ConfigService } from '@nestjs/config';
 import * as admin from 'firebase-admin';
+import * as crypto from 'crypto';
+import * as path from 'path';
+import * as fs from 'fs';
+import { REDIS_CLIENT } from '../redis/redis.module';
+import Redis from 'ioredis';
 import { UserRole } from '../shared/user-role';
+import { MetricsService } from '../shared/metrics.controller';
 
 @Injectable()
 export class AuthService {
@@ -13,39 +19,83 @@ export class AuthService {
     private prisma: PrismaService,
     private jwt: JwtService,
     private config: ConfigService,
+    @Inject(REDIS_CLIENT) private redis: Redis,
+    private metrics: MetricsService,
   ) {
-    // Initialize Firebase Admin (graceful if credentials not configured)
-    if (!admin.apps.length) {
+    this.initializeFirebase();
+  }
+
+  private initializeFirebase() {
+    if (admin.apps.length) return;
+
+    const projectId = this.config.get<string>('FIREBASE_PROJECT_ID');
+    const privateKey = this.config.get<string>('FIREBASE_PRIVATE_KEY');
+    const clientEmail = this.config.get<string>('FIREBASE_CLIENT_EMAIL');
+    const gacPath = this.config.get<string>('GOOGLE_APPLICATION_CREDENTIALS');
+    const isProd = this.config.get<string>('NODE_ENV') === 'production';
+
+    // Try GOOGLE_APPLICATION_CREDENTIALS file first
+    if (gacPath && fs.existsSync(gacPath)) {
       try {
         admin.initializeApp({
-          credential: admin.credential.cert({
-            projectId: config.get('FIREBASE_PROJECT_ID'),
-            privateKey: config.get('FIREBASE_PRIVATE_KEY')?.replace(/\\n/g, '\n'),
-            clientEmail: config.get('FIREBASE_CLIENT_EMAIL'),
-          }),
+          credential: admin.credential.applicationDefault(),
         });
+        this.logger.log(`Firebase Admin initialized via GOOGLE_APPLICATION_CREDENTIALS: ${gacPath}`);
+        return;
       } catch (e) {
+        this.logger.warn(`GOOGLE_APPLICATION_CREDENTIALS file found but failed: ${e}`);
+      }
+    }
+
+    if (!projectId || !privateKey || !clientEmail) {
+      if (isProd) {
+        this.logger.error(
+          'FIREBASE_PROJECT_ID, FIREBASE_PRIVATE_KEY, and FIREBASE_CLIENT_EMAIL must be set in production. ' +
+          'Alternatively, set GOOGLE_APPLICATION_CREDENTIALS to a valid service account JSON file.',
+        );
+      } else {
         this.logger.warn('Firebase Admin not initialized (credentials missing) — auth methods will be unavailable');
+      }
+      return;
+    }
+
+    try {
+      admin.initializeApp({
+        credential: admin.credential.cert({
+          projectId,
+          privateKey: privateKey.replace(/\\n/g, '\n'),
+          clientEmail,
+        }),
+      });
+      this.logger.log('Firebase Admin initialized via env vars');
+    } catch (e) {
+      if (isProd) {
+        this.logger.error(`Firebase Admin failed to initialize: ${e}`);
+      } else {
+        this.logger.warn('Firebase Admin not initialized (invalid credentials) — auth methods will be unavailable');
       }
     }
   }
 
   async verifyFirebaseToken(idToken: string) {
     if (!admin.apps.length) {
+      this.metrics.authFailures.inc({ reason: 'firebase_not_configured' });
       throw new UnauthorizedException('Firebase not configured');
     }
     try {
       const decoded = await admin.auth().verifyIdToken(idToken);
       return decoded;
     } catch (error) {
+      this.metrics.authFailures.inc({ reason: 'invalid_firebase_token' });
       throw new UnauthorizedException('Invalid Firebase token');
     }
   }
 
-  async loginWithFirebase(idToken: string, role: UserRole = UserRole.PARENT) {
+  async loginWithFirebase(idToken: string) {
     const decoded = await this.verifyFirebaseToken(idToken);
 
-    // Upsert user
+    const role: UserRole = (decoded.role as UserRole) || UserRole.CHILD;
+
     let user = await this.prisma.user.findUnique({
       where: { firebaseUid: decoded.uid },
     });
@@ -74,31 +124,102 @@ export class AuthService {
         },
       });
 
-      // Create Doter for child accounts
       if (role === UserRole.CHILD) {
         await this.prisma.doterProfile.create({
           data: { userId: user.id },
         });
-        this.logger.log(`🥚 Doter created for new child user: ${user.id}`);
+        this.logger.log(`Doter created for new child user: ${user.id}`);
       }
 
-      this.logger.log(`✨ New user registered: ${user.email} (${role})`);
+      this.metrics.signupsTotal.inc({ role });
+      this.logger.log(`New user registered: ${user.email} (${role})`);
     }
 
-    // Mint JWT
-    const payload = { sub: user.id, email: user.email, role: user.role };
+    const jti = crypto.randomUUID();
+    const payload = { sub: user.id, email: user.email, role: user.role, jti };
     const accessToken = this.jwt.sign(payload);
+    const refreshToken = await this.generateRefreshToken(user.id);
 
-    // Audit
+    await this.prisma.user.update({
+      where: { id: user.id },
+      data: { lastSeenAt: new Date() },
+    });
+
     await this.prisma.auditLog.create({
       data: {
         actorId: user.id,
         action: 'USER_LOGIN',
-        payload: { provider: 'firebase', role },
+        payload: { provider: 'firebase', role, jti },
       },
     });
 
-    return { accessToken, user };
+    return { accessToken, refreshToken, user };
+  }
+
+  async refreshAccessToken(refreshToken: string) {
+    const hashedToken = crypto.createHash('sha256').update(refreshToken).digest('hex');
+    const stored = await this.redis.get(`refresh:${hashedToken}`);
+    if (!stored) {
+      this.metrics.authFailures.inc({ reason: 'invalid_refresh_token' });
+      throw new UnauthorizedException('Invalid or expired refresh token');
+    }
+
+    const { userId } = JSON.parse(stored);
+
+    await this.redis.del(`refresh:${hashedToken}`);
+
+    const user = await this.prisma.user.findUnique({ where: { id: userId } });
+    if (!user || user.isDeleted) {
+      this.metrics.authFailures.inc({ reason: 'user_deactivated' });
+      throw new UnauthorizedException('User not found or deactivated');
+    }
+
+    const jti = crypto.randomUUID();
+    const payload = { sub: user.id, email: user.email, role: user.role, jti };
+    const newAccessToken = this.jwt.sign(payload);
+    const newRefreshToken = await this.generateRefreshToken(user.id);
+
+    return { accessToken: newAccessToken, refreshToken: newRefreshToken, user };
+  }
+
+  async logout(accessToken: string, refreshToken: string) {
+    try {
+      const decoded = this.jwt.verify(accessToken) as any;
+      if (decoded?.jti) {
+        const ttl = decoded.exp - Math.floor(Date.now() / 1000);
+        if (ttl > 0) {
+          await this.redis.set(`blacklist:${decoded.jti}`, 'true', 'EX', ttl);
+        }
+      }
+    } catch {
+      this.logger.warn('Logout with invalid access token');
+    }
+
+    if (refreshToken) {
+      const hashedToken = crypto.createHash('sha256').update(refreshToken).digest('hex');
+      await this.redis.del(`refresh:${hashedToken}`);
+    }
+
+    this.logger.log('User logged out');
+  }
+
+  async isTokenBlacklisted(jti: string): Promise<boolean> {
+    const result = await this.redis.get(`blacklist:${jti}`);
+    return result === 'true';
+  }
+
+  private async generateRefreshToken(userId: string): Promise<string> {
+    const refreshToken = crypto.randomUUID() + '-' + crypto.randomUUID();
+    const hashedToken = crypto.createHash('sha256').update(refreshToken).digest('hex');
+
+    await this.redis.set(
+      `refresh:${hashedToken}`,
+      JSON.stringify({ userId }),
+      'EX',
+      7 * 24 * 60 * 60,
+    );
+
+    return refreshToken;
   }
 
   async validateUser(userId: string) {

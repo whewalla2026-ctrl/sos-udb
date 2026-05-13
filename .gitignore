@@ -18,3 +18,11 @@ coverage/
 prisma/
 services/api/prisma/phase3/
 services/api/prisma/generate-sql.js
+
+# PostgreSQL data directory — binary, runtime-only
+pgsql/
+tmp/
+src/schema.gql
+pilot/schema.json
+*_stderr.log
+*_stdout.log

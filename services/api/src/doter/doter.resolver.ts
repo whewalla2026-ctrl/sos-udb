@@ -26,4 +26,21 @@ export class DoterResolver {
   async addDoterXP(@CurrentUser() user: any, @Args('xp', { type: () => Int }) xp: number) {
     return this.doter.addXP(user.id, xp);
   }
+
+  @Query(() => [GraphQLJSON])
+  @UseGuards(GqlAuthGuard)
+  async myDoterRewards(@CurrentUser() user: any) {
+    return this.doter.getRewards(user.id);
+  }
+
+  @Query(() => [GraphQLJSON])
+  async evolutionTriggers() {
+    return this.doter.getEvolutionTriggers();
+  }
+
+  @Query(() => GraphQLJSON, { nullable: true })
+  @UseGuards(GqlAuthGuard)
+  async gamificationAnalytics(@CurrentUser() user: any) {
+    return this.doter.getGamificationAnalytics(user.id);
+  }
 }

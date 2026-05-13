@@ -1,3 +1,0 @@
-DROP TABLE IF EXISTS public."User" CASCADE;
-DROP TABLE IF EXISTS public."AcademicRecord" CASCADE;
-DROP TABLE IF EXISTS public."BehaviorLog" CASCADE;

@@ -45,6 +45,7 @@ enum QuestPillar {
   ENTREPRENEURSHIP
   SOCIAL
   LIFE_SKILLS
+  SKILLS
 }
 
 enum TransactionType {
@@ -133,6 +134,10 @@ model User {
   coppaConsentDate     DateTime? @map("coppa_consent_date")
   gdprDeleteRequested  Boolean   @default(false) @map("gdpr_delete_requested")
 
+  // Soft delete for GDPR compliance
+  deletedAt   DateTime? @map("deleted_at")
+  isDeleted   Boolean   @default(false) @map("is_deleted")
+
   // Accessibility
   accessibilitySettings Json @default("{}") @map("accessibility_settings")
 
@@ -173,6 +178,9 @@ model User {
   ventures       Venture[]
   escrows        Escrow[]
 
+  // Achievements
+  achievements   Achievement[]
+
   // Safety
   safetyScores   SafetyScore[]
 
@@ -180,6 +188,25 @@ model User {
   auditLogs AuditLog[]
   notifications Notification[]
   onboarding    OnboardingStatus?
+
+  // Planning
+  weeklyPlans       WeeklyPlan[]
+
+  // Analytics
+  analyticsEvents   AnalyticsEvent[]
+
+  // Phase 4
+  tutorInteractions TutorInteraction[]
+  tutorMemories     TutorMemory[]
+  topicMastery      TopicMastery[]
+  tutorAnalytics    TutorAnalytics[]
+  tutorEvaluations  TutorEvaluation[]
+  doterRewards      DoterReward[]
+  subscriptions     Subscription[]
+  invoices          Invoice[]
+  usageRecords      UsageRecord[]
+  syncSessions      SyncSession[]
+  syncConflicts     SyncConflict[]
 
   @@map("users")
 }
@@ -273,6 +300,8 @@ model Quest {
   chunks       Quest[]       @relation("QuestChunks")
   evidenceItems EvidenceItem[]
 
+  @@index([userId, status])
+  @@index([userId, createdAt])
   @@map("quests")
 }
 
@@ -294,6 +323,7 @@ model PointsLedger {
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+  @@index([userId, createdAt])
   @@map("points_ledger")
 }
 
@@ -318,6 +348,7 @@ model Goal {
   user   User    @relation(fields: [userId], references: [id], onDelete: Cascade)
   quests Quest[]
 
+  @@index([userId, status])
   @@map("goals")
 }
 
@@ -354,6 +385,7 @@ model Activity {
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+  @@index([userId, startTime])
   @@map("activities")
 }
 
@@ -396,6 +428,7 @@ model LmsConnection {
   user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
   lmsAssignments LmsAssignment[]
 
+  @@index([userId])
   @@map("lms_connections")
 }
 
@@ -417,6 +450,7 @@ model LmsAssignment {
 
   connection LmsConnection @relation(fields: [connectionId], references: [id], onDelete: Cascade)
 
+  @@index([connectionId])
   @@map("lms_assignments")
 }
 
@@ -455,6 +489,7 @@ model TutoringSession {
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+  @@index([userId])
   @@map("tutoring_sessions")
 }
 
@@ -494,9 +529,11 @@ model Message {
   createdAt   DateTime      @default(now()) @map("created_at")
   readAt      DateTime?     @map("read_at")
 
-  sender   User @relation("SentMessages", fields: [senderId], references: [id])
-  receiver User @relation("ReceivedMessages", fields: [receiverId], references: [id])
+  sender   User @relation("SentMessages", fields: [senderId], references: [id], onDelete: Restrict)
+  receiver User @relation("ReceivedMessages", fields: [receiverId], references: [id], onDelete: Restrict)
 
+  @@index([senderId, receiverId, createdAt])
+  @@index([receiverId, senderId, createdAt])
   @@map("messages")
 }
 
@@ -519,6 +556,7 @@ model EvidenceItem {
   user  User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   quest Quest? @relation(fields: [questId], references: [id])
 
+  @@index([userId])
   @@map("evidence_items")
 }
 
@@ -551,6 +589,7 @@ model Venture {
   user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   escrows Escrow[]
 
+  @@index([userId])
   @@map("ventures")
 }
 
@@ -572,9 +611,10 @@ model Escrow {
   createdAt    DateTime     @default(now()) @map("created_at")
   updatedAt    DateTime     @updatedAt @map("updated_at")
 
-  venture Venture @relation(fields: [ventureId], references: [id])
-  seller  User    @relation(fields: [sellerId], references: [id])
+  venture Venture @relation(fields: [ventureId], references: [id], onDelete: Cascade)
+  seller  User    @relation(fields: [sellerId], references: [id], onDelete: Restrict)
 
+  @@index([sellerId])
   @@map("escrows")
 }
 
@@ -587,12 +627,16 @@ model Achievement {
   description   String
   pillar        QuestPillar
   badgeUrl      String   @map("badge_url")
+  points        Int      @default(0)
   sbtTokenId    String?  @map("sbt_token_id") // Blockchain token ID
   sbtContract   String?  @map("sbt_contract") // Polygon contract address
   isMinted      Boolean  @default(false) @map("is_minted")
   metadata      Json     @default("{}")
   earnedAt      DateTime @default(now()) @map("earned_at")
 
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
   @@map("achievements")
 }
 
@@ -626,6 +670,9 @@ model WeeklyPlan {
   createdAt   DateTime @default(now()) @map("created_at")
   updatedAt   DateTime @updatedAt @map("updated_at")
 
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
   @@map("weekly_plans")
 }
 
@@ -644,6 +691,7 @@ model Notification {
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+  @@index([userId, createdAt])
   @@map("notifications")
 }
 
@@ -661,7 +709,7 @@ model AuditLog {
   createdAt  DateTime @default(now()) @map("created_at")
   // NO relations with onDelete — audit must be permanent
 
-  actor User @relation(fields: [actorId], references: [id])
+  actor User @relation(fields: [actorId], references: [id], onDelete: Restrict)
 
   @@index([actorId, createdAt])
   @@index([action, createdAt])
@@ -674,6 +722,8 @@ model AnalyticsEvent {
   event     String
   metadata  Json     @default("{}")
   createdAt DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([event, createdAt])
   @@index([userId, createdAt])
@@ -699,4 +749,273 @@ model OnboardingStatus {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("onboarding_status")
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// PHASE 4 — Socratic Tutor Engine
+// ═══════════════════════════════════════════════════════════════════════════════
+
+/// Tutor session response / interaction log (enhances existing TutoringSession)
+model TutorInteraction {
+  id           String   @id @default(uuid())
+  sessionId    String   @map("session_id")
+  userId       String   @map("user_id")
+  role         String   // 'user' | 'tutor'
+  content      String
+  intent       String?  // WANTS_ANSWER | CONFUSED | HINT_REQUEST | EXPLORING
+  confidence   Float?   // AI confidence 0-1
+  comprehension Float?  // Estimated comprehension 0-1
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([sessionId])
+  @@index([userId, createdAt])
+  @@map("tutor_interactions")
+}
+
+/// Tutor memory (short-term per session, long-term across sessions)
+model TutorMemory {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  type      String   // SHORT_TERM | LONG_TERM | TOPIC_GRAPH
+  key       String   // memory key / topic identifier
+  value     Json     // memory value
+  weight    Float    @default(1.0) // relevance weight
+  expiresAt DateTime? @map("expires_at")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, type])
+  @@index([userId, key])
+  @@map("tutor_memories")
+}
+
+/// Topic mastery tracking per student
+model TopicMastery {
+  id          String   @id @default(uuid())
+  userId      String   @map("user_id")
+  subject     String
+  topic       String
+  masteryLevel Float   @default(0) @map("mastery_level") // 0.0 - 1.0
+  confidence  Float    @default(0) @map("confidence")
+  attempts    Int      @default(0)
+  correctPct  Float    @default(0) @map("correct_pct")
+  lastPracticed DateTime? @map("last_practiced")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, subject, topic])
+  @@map("topic_mastery")
+}
+
+/// Tutor analytics snapshot
+model TutorAnalytics {
+  id             String   @id @default(uuid())
+  userId         String   @map("user_id")
+  totalSessions  Int      @default(0) @map("total_sessions")
+  totalInteractions Int  @default(0) @map("total_interactions")
+  avgConfidence  Float    @default(0) @map("avg_confidence")
+  avgComprehension Float @default(0) @map("avg_comprehension")
+  struggleCount  Int      @default(0) @map("struggle_count")
+  hintRequests   Int      @default(0) @map("hint_requests")
+  learningVelocity Float  @default(0) @map("learning_velocity") // topics mastered per week
+  retentionScore  Float   @default(0) @map("retention_score") // 0-100
+  totalTimeSpent  Int     @default(0) @map("total_time_spent") // seconds
+  completedSessions Int  @default(0) @map("completed_sessions")
+  lastActiveAt   DateTime? @map("last_active_at")
+  snapshotDate   DateTime @default(now()) @map("snapshot_date")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([userId, snapshotDate])
+  @@map("tutor_analytics")
+}
+
+/// Tutor evaluation scores for quality monitoring
+model TutorEvaluation {
+  id                String   @id @default(uuid())
+  sessionId         String   @map("session_id")
+  userId            String   @map("user_id")
+  interactionId     String?  @map("interaction_id")
+  qualityScore      Float    @default(0) @map("quality_score")       // 0-1 how good was the tutor response
+  hallucinationRisk Float    @default(0) @map("hallucination_risk")   // 0-1 risk of hallucination
+  safetyCheck       Boolean  @default(true) @map("safety_check")
+  responseRelevance Float    @default(0) @map("response_relevance")   // 0-1
+  studentFeedback   Float?   @map("student_feedback")                // student rating 0-5
+  evaluatedAt       DateTime @default(now()) @map("evaluated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([sessionId])
+  @@index([userId])
+  @@map("tutor_evaluations")
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// PHASE 4 — Doter Evolution Engine
+// ═══════════════════════════════════════════════════════════════════════════════
+
+/// Doter reward / badge system
+model DoterReward {
+  id          String   @id @default(uuid())
+  userId      String   @map("user_id")
+  type        String   // BADGE | UNLOCKABLE | VISUAL_EVOLUTION | MILESTONE
+  name        String
+  description String?
+  iconUrl     String?  @map("icon_url")
+  tier        String   // BRONZE | SILVER | GOLD | PLATINUM | DIAMOND
+  triggerType String?  @map("trigger_type") // STREAK | MASTERY | QUEST | ACHIEVEMENT
+  triggerValue Float?  @map("trigger_value")
+  earnedAt    DateTime @default(now()) @map("earned_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("doter_rewards")
+}
+
+/// Evolution trigger definitions
+model EvolutionTrigger {
+  id          String   @id @default(uuid())
+  name        String
+  description String?
+  condition   Json     // { type: 'STREAK', threshold: 7 } or { type: 'XP', threshold: 5000 }
+  effect      Json     // { state: 'HATCHLING', xpBonus: 100 }
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  @@map("evolution_triggers")
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// PHASE 4 — Stripe Escrow + Billing
+// ═══════════════════════════════════════════════════════════════════════════════
+
+/// Subscription plan definitions
+model BillingPlan {
+  id          String   @id @default(uuid())
+  stripePriceId String? @unique @map("stripe_price_id")
+  name        String   // FREE | PRO | ENTERPRISE
+  description String?
+  priceUsd    Float    @map("price_usd")
+  interval    String   @default("month") // month | year
+  features    Json     @default("[]")    // ["tutor", "ventures", "escrow", "analytics"]
+  maxUsers    Int      @default(1)       @map("max_users")
+  maxVentures Int      @default(0)       @map("max_ventures")
+  maxStorageMb Int     @default(100)     @map("max_storage_mb")
+  active      Boolean  @default(true)
+  sortOrder   Int      @default(0)       @map("sort_order")
+  createdAt   DateTime @default(now())   @map("created_at")
+  updatedAt   DateTime @updatedAt        @map("updated_at")
+
+  subscriptions Subscription[]
+
+  @@map("billing_plans")
+}
+
+/// Customer subscriptions
+model Subscription {
+  id              String    @id @default(uuid())
+  userId          String    @map("user_id")
+  planId          String    @map("plan_id")
+  stripeSubscriptionId String? @unique @map("stripe_subscription_id")
+  stripeCustomerId String?  @map("stripe_customer_id")
+  status          String    @default("active") // active | past_due | canceled | trialing
+  currentPeriodStart DateTime? @map("current_period_start")
+  currentPeriodEnd   DateTime? @map("current_period_end")
+  canceledAt      DateTime? @map("canceled_at")
+  trialEnd        DateTime? @map("trial_end")
+  metadata        Json      @default("{}")
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  plan BillingPlan @relation(fields: [planId], references: [id])
+
+  @@index([userId])
+  @@index([stripeCustomerId])
+  @@map("subscriptions")
+}
+
+/// Payment invoices
+model Invoice {
+  id              String    @id @default(uuid())
+  subscriptionId  String    @map("subscription_id")
+  userId          String    @map("user_id")
+  stripeInvoiceId String?   @unique @map("stripe_invoice_id")
+  amountUsd       Float     @map("amount_usd")
+  currency        String    @default("usd")
+  status          String    @default("pending") // pending | paid | past_due | failed | void
+  paidAt          DateTime? @map("paid_at")
+  invoiceUrl      String?   @map("invoice_url")
+  metadata        Json      @default("{}")
+  createdAt       DateTime  @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([subscriptionId])
+  @@map("invoices")
+}
+
+/// Usage metering for tenant billing
+model UsageRecord {
+  id          String   @id @default(uuid())
+  userId      String   @map("user_id")
+  metric      String   // API_CALLS | STORAGE_MB | TUTOR_SESSIONS | AI_TOKENS
+  value       Float
+  recordedAt  DateTime @default(now()) @map("recorded_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, metric, recordedAt])
+  @@map("usage_records")
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// PHASE 4 — UUP Sync Engine
+// ═══════════════════════════════════════════════════════════════════════════════
+
+/// Multi-device sync sessions
+model SyncSession {
+  id          String   @id @default(uuid())
+  userId      String   @map("user_id")
+  deviceId    String   @map("device_id")
+  deviceName  String?  @map("device_name")
+  deviceType  String   @default("web") @map("device_type") // web | mobile | tablet
+  lastSyncAt  DateTime? @map("last_sync_at")
+  stateHash   String?  @map("state_hash") // hash of synced state for conflict detection
+  metadata    Json     @default("{}")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, deviceId])
+  @@map("sync_sessions")
+}
+
+/// Conflict resolution log
+model SyncConflict {
+  id          String   @id @default(uuid())
+  userId      String   @map("user_id")
+  deviceId    String   @map("device_id")
+  resourceType String  @map("resource_type") // UUP | PROFILE | SETTINGS
+  resourceId  String   @map("resource_id")
+  localValue  Json     @map("local_value")
+  remoteValue Json     @map("remote_value")
+  resolution  String   @default("pending") // pending | local_wins | remote_wins | merged
+  resolvedAt  DateTime? @map("resolved_at")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("sync_conflicts")
 }

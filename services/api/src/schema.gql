@@ -25,9 +25,15 @@ type AnalyticsOverviewType {
   wau: Int!
 }
 
+input ApproveQuestInput {
+  aiConfidence: Int
+  questId: String!
+}
+
 type AuthPayload {
   accessToken: String!
   email: String!
+  refreshToken: String!
   role: UserRole!
   userId: String!
 }
@@ -36,6 +42,13 @@ type BillingConversionType {
   paid: Int!
   rate: Float!
   total: Int!
+}
+
+input BiometricInput {
+  focusScore: Int
+  notes: String
+  sleepHours: Int
+  stressLevel: Int
 }
 
 input BusinessPlanInput {
@@ -60,6 +73,32 @@ type ChurnIndicatorType {
   lastSeenAt: DateTime
 }
 
+enum ConflictResolution {
+  local_wins
+  merged
+  pending
+  remote_wins
+}
+
+input CreateMicroQuestsInput {
+  chunkDurationMinutes: Int
+  pillar: QuestPillar!
+  title: String!
+  totalDurationMinutes: Int!
+}
+
+input CreateQuestInput {
+  coinReward: Int
+  description: String
+  dueDate: DateTime
+  goalId: String
+  masteryWeight: Int
+  metadata: JSON
+  pillar: QuestPillar!
+  title: String!
+  xpReward: Int
+}
+
 type DAUType {
   count: Int!
   date: String!
@@ -82,6 +121,10 @@ type DoterProfileType {
   xp: Float!
 }
 
+type EnqueueResult {
+  queued: Boolean!
+}
+
 type FeatureUsageDailyType {
   count: Int!
   date: String!
@@ -90,6 +133,13 @@ type FeatureUsageDailyType {
 type FeatureUsageType {
   event: String!
   usageCount: Int!
+}
+
+type FirebaseUserInfo {
+  displayName: String
+  email: String!
+  role: String
+  uid: String!
 }
 
 type FunnelStepType {
@@ -135,26 +185,53 @@ type MarketplaceItem {
   name: String!
 }
 
+type MicroQuestResult {
+  chunks: [QuestType!]!
+  parentQuest: QuestType!
+}
+
 type Mutation {
   addDoterXP(xp: Int!): JSON!
   addEvidence(questId: String, title: String!, type: String!, url: String!): JSON!
+  approveQuest(data: ApproveQuestInput!): QuestType!
+  askSocraticTutor(input: String!, sessionId: String!): JSON!
   askTutor(input: String!, sessionId: String!, subject: String!): SocraticResponse!
+  cancelSubscription: JSON!
   completeOnboarding: OnboardingStatusType!
   createActivity(endTime: String!, pillar: String, startTime: String!, title: String!): JSON!
+  createCheckoutSession(cancelUrl: String!, planId: String!, successUrl: String!): JSON!
   createGoal(pillar: String!, title: String!): JSON!
+  createMicroQuests(data: CreateMicroQuestsInput!): MicroQuestResult!
+  createPortalSession(returnUrl: String!): JSON!
+  createQuest(data: CreateQuestInput!): QuestType!
   createVenture(name: String!, pricingModel: String!, problem: String!, solution: String!, targetMarket: String!): JSON!
+  deleteUser(userId: String!): Boolean!
+  endTutoringSession(id: String!): JSON!
+  enqueueOfflineChange(input: OfflineChangeInput!): EnqueueResult!
   generateBusinessPlan(data: BusinessPlanInput!): BusinessPlanResponse!
   generateWeeklyPlan: JSON!
   linkChild(childId: String!, consentMethod: String!): JSON!
-  logBiometric(data: String!): JSON!
-  loginWithFirebase(idToken: String!, role: UserRole! = PARENT): AuthPayload!
+  logBiometric(data: BiometricInput!): JSON!
+  loginWithFirebase(idToken: String!): AuthPayload!
+  logout(refreshToken: String!): Boolean!
   markAllRead: JSON!
   markNotificationRead(id: String!): JSON!
   nameMyDoter(name: String!): JSON!
+  processRetryQueue: RetryQueueResult!
+  purchaseItem(itemId: String!): PurchaseResult!
+  refreshToken(refreshToken: String!): RefreshPayload!
+  registerDevice(input: RegisterDeviceInput!): RegisterDeviceResult!
   releaseFunds(escrowId: String!): JSON!
+  resolveConflict(input: ResolveConflictInput!): ResolveConflictResult!
   sendMessage(content: String!, receiverId: String!): JSON!
+  setFirebaseCustomClaim(role: UserRole!, uid: String!): SetCustomClaimResult!
   skipOnboarding: OnboardingStatusType!
-  startTutoringSession(subject: String!): JSON!
+  startTutoringSession(assignmentId: String, subject: String!): JSON!
+  submitQuest(data: SubmitQuestInput!): QuestType!
+  syncState(input: SyncStateInput!): SyncStateResult!
+  trackTopicMastery(correct: Boolean!, subject: String!, topic: String!): JSON!
+  trackUsage(metric: String!, value: Int!): JSON!
+  unlinkChild(childId: String!): JSON!
   updateOnboardingDoterNamed: OnboardingStatusType!
   updateOnboardingFirstQuestDone: OnboardingStatusType!
   updateOnboardingProfile: OnboardingStatusType!
@@ -162,6 +239,12 @@ type Mutation {
   updateOnboardingTourCompleted: OnboardingStatusType!
   updateProfile(data: UpdateProfileInput!): UserType!
   updateSkillGap(gapScore: Float!, subject: String!): JSON!
+  updateUserRole(role: UserRole!, userId: String!): SetCustomClaimResult!
+}
+
+input OfflineChangeInput {
+  deviceId: String!
+  payload: JSON!
 }
 
 type OnboardingCompletionType {
@@ -193,6 +276,11 @@ type OnboardingStatusType {
   userId: String!
 }
 
+type PurchaseResult {
+  item: MarketplaceItem!
+  transaction: JSON!
+}
+
 type Query {
   analyticsActivationMetrics: ActivationMetricsType!
   analyticsBillingConversion: BillingConversionType!
@@ -207,31 +295,126 @@ type Query {
   analyticsSignupFunnel(days: Int! = 30): [FunnelStepType!]!
   analyticsWAU(weeks: Int! = 8): [WAUType!]!
   auditLog(limit: Int! = 50): JSON!
+  billingPlans: [JSON!]!
   biometricHistory(days: Float! = 30): JSON!
+  childQuests(childId: String!, filters: QuestFiltersInput): [QuestType!]!
   coachingInsight: String!
+  conflict(conflictId: String!): SyncConflictType
   conversation(withUserId: String!): JSON!
   dashboardData: JSON!
   evidenceGallery: JSON!
+  evolutionTriggers: [JSON!]!
   focusPeak: JSON!
   futureSelfNarrative: String!
+  gamificationAnalytics: JSON
   goalProgress(goalId: String!): JSON!
   inbox: JSON!
+  listFirebaseUsers(maxResults: Float = 100): [FirebaseUserInfo!]!
   marketplaceItems: [MarketplaceItem!]!
   me: UserType!
   myBalance: Int!
   myCalendar(from: String!, to: String!): JSON!
   myChildren: [UserType!]!
+  myConflicts(status: String): [SyncConflictType!]!
+  myDevices: [SyncDeviceType!]!
   myDoter: JSON
+  myDoterRewards: [JSON!]!
   myFamily: JSON!
   myGoals: JSON!
+  myInvoices(limit: Int): [JSON!]!
   myLedger(page: Int! = 1, pageSize: Int! = 20): LedgerPage!
+  myQuests(filters: QuestFiltersInput): [QuestType!]!
   mySafetyScore: JSON
   mySkillGaps: JSON!
+  mySubscription: JSON!
+  myTopics(subject: String): [JSON!]!
+  myTutorAnalytics: JSON!
+  myTutoringSessions(limit: Int): [JSON!]!
+  myUUP: JSON!
   myVentures: JSON!
   myWeeklyPlan: JSON
   onboardingStats: OnboardingStatsType!
   onboardingStatus: OnboardingStatusType!
+  questById(id: String!): QuestType!
+  retryQueueSize: Int!
+  tutorRecommendations: [JSON!]!
+  tutoringSession(id: String!): JSON!
   unreadNotifications: JSON!
+}
+
+input QuestFiltersInput {
+  pillar: QuestPillar
+  status: QuestStatus
+}
+
+enum QuestPillar {
+  ACADEMIC
+  BIOMETRIC
+  ENTREPRENEURSHIP
+  GAMIFICATION
+  LIFE_SKILLS
+  SKILLS
+  SOCIAL
+}
+
+enum QuestStatus {
+  APPROVED
+  EXPIRED
+  IN_PROGRESS
+  PENDING
+  REJECTED
+  SUBMITTED
+}
+
+type QuestType {
+  aiConfidence: Float
+  aiVerified: Boolean
+  chunkIndex: Int
+  coinReward: Int!
+  createdAt: DateTime!
+  description: String
+  dueDate: DateTime
+  goalId: String
+  id: String!
+  isChunk: Boolean!
+  metadata: JSON
+  parentQuestId: String
+  pillar: QuestPillar!
+  proofType: String
+  proofUrl: String
+  status: QuestStatus!
+  title: String!
+  updatedAt: DateTime!
+  userId: String!
+  xpReward: Int!
+}
+
+type RefreshPayload {
+  accessToken: String!
+  email: String!
+  refreshToken: String!
+  role: UserRole!
+  userId: String!
+}
+
+input RegisterDeviceInput {
+  deviceId: String!
+  deviceName: String
+  deviceType: String
+}
+
+type RegisterDeviceResult {
+  registered: Boolean!
+}
+
+input ResolveConflictInput {
+  conflictId: String!
+  resolution: ConflictResolution!
+}
+
+type ResolveConflictResult {
+  resolution: String!
+  resolved: Boolean!
 }
 
 type RetentionType {
@@ -242,9 +425,65 @@ type RetentionType {
   day30: Float!
 }
 
+type RetryQueueResult {
+  failed: Float!
+  processed: Float!
+}
+
+type SetCustomClaimResult {
+  role: UserRole!
+  success: Boolean!
+  uid: String!
+}
+
 type SocraticResponse {
   intent: String!
   response: String!
+}
+
+input SubmitQuestInput {
+  proofType: String!
+  proofUrl: String!
+  questId: String!
+}
+
+type SyncConflictType {
+  createdAt: DateTime!
+  deviceId: String!
+  id: String!
+  localValue: JSON!
+  remoteValue: JSON!
+  resolution: String!
+  resolvedAt: DateTime
+  resourceId: String!
+  resourceType: String!
+  userId: String!
+}
+
+type SyncDeviceType {
+  createdAt: DateTime!
+  deviceId: String!
+  deviceName: String
+  deviceType: String!
+  id: String!
+  lastSyncAt: DateTime
+  metadata: JSON!
+  stateHash: String
+  updatedAt: DateTime!
+  userId: String!
+}
+
+input SyncStateInput {
+  deviceId: String!
+  localState: JSON!
+}
+
+type SyncStateResult {
+  conflict: Boolean
+  conflictId: String
+  message: String
+  state: JSON
+  synced: Boolean
 }
 
 input UpdateProfileInput {

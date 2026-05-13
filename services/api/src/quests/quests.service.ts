@@ -2,7 +2,9 @@ import { Injectable, Logger, NotFoundException, ForbiddenException } from '@nest
 import { PrismaService } from '../prisma/prisma.service';
 import { UupSyncService } from '../uup-sync/uup-sync.service';
 import { PointsService } from '../points/points.service';
+import { MetricsService } from '../shared/metrics.controller';
 import { QuestStatus, QuestPillar } from '../shared/prisma-enums';
+import { UserRole } from '../shared/user-role';
 
 @Injectable()
 export class QuestsService {
@@ -12,6 +14,7 @@ export class QuestsService {
     private prisma: PrismaService,
     private uupSync: UupSyncService,
     private points: PointsService,
+    private metrics: MetricsService,
   ) {}
 
   async createQuest(userId: string, data: {
@@ -103,6 +106,14 @@ export class QuestsService {
   async approveQuest(questId: string, approverId: string, aiConfidence?: number) {
     const quest = await this.prisma.quest.findUnique({ where: { id: questId } });
     if (!quest) throw new NotFoundException();
+    const approver = await this.prisma.user.findUnique({ where: { id: approverId }, select: { id: true, role: true } });
+    if (!approver) throw new ForbiddenException();
+    const isOwner = approver.id === quest.userId;
+    const isAdmin = approver.role === UserRole.ADMIN;
+    const isParent = approver.role === UserRole.PARENT && await this.prisma.familyLink.findFirst({
+      where: { parentId: approver.id, childId: quest.userId },
+    }).then(Boolean);
+    if (!isOwner && !isAdmin && !isParent) throw new ForbiddenException();
 
     // Approve quest
     const updated = await this.prisma.quest.update({
@@ -147,6 +158,7 @@ export class QuestsService {
       },
     });
 
+    this.metrics.questsCompleted.inc({ pillar: quest.pillar });
     this.logger.log(`✅ Quest approved: ${quest.title} (+${quest.xpReward}XP, +${quest.coinReward} coins)`);
     return updated;
   }
@@ -168,6 +180,7 @@ export class QuestsService {
     });
 
     if (isComplete) {
+      this.metrics.goalCompletions.inc({ pillar: goal.pillar });
       this.logger.log(`🏆 Goal COMPLETED: ${goalId}`);
       // Trigger celebration protocol
       await this.prisma.notification.create({
@@ -190,10 +203,13 @@ export class QuestsService {
     });
   }
 
-  async getQuestById(questId: string) {
-    return this.prisma.quest.findUnique({
+  async getQuestById(questId: string, userId?: string) {
+    const quest = await this.prisma.quest.findUnique({
       where: { id: questId },
       include: { chunks: true, evidenceItems: true, goal: true },
     });
+    if (!quest) throw new NotFoundException();
+    if (userId && quest.userId !== userId) throw new ForbiddenException();
+    return quest;
   }
 }

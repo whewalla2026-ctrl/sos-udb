@@ -1,6 +1,9 @@
 import { Resolver, Query, Mutation, Args } from '@nestjs/graphql';
 import { UseGuards } from '@nestjs/common';
 import { GqlAuthGuard } from '../auth/guards/gql-auth.guard';
+import { RolesGuard } from '../auth/guards/roles.guard';
+import { Roles } from '../auth/decorators/roles.decorator';
+import { UserRole } from '../shared/user-role';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { UsersService } from './users.service';
 import { ObjectType, Field, InputType } from '@nestjs/graphql';
@@ -53,7 +56,8 @@ export class UsersResolver {
   }
 
   @Query(() => [UserType])
-  @UseGuards(GqlAuthGuard)
+  @UseGuards(GqlAuthGuard, RolesGuard)
+  @Roles(UserRole.PARENT)
   async myChildren(@CurrentUser() user: any) {
     return this.users.getChildren(user.id);
   }
