@@ -19,6 +19,9 @@ prisma/
 services/api/prisma/phase3/
 services/api/prisma/generate-sql.js
 
+# Playwright test artifacts
+test-results/
+
 # PostgreSQL data directory — binary, runtime-only
 pgsql/
 tmp/

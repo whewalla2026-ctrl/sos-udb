@@ -14,7 +14,7 @@ module.exports = {
   ],
   rules: {
     // Keep CI green while surfacing existing issues for follow-up cleanup.
-    '@typescript-eslint/no-unused-vars': 'warn',
+    '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }],
     '@typescript-eslint/no-explicit-any': 'warn',
   },
   env: {

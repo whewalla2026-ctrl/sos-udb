@@ -18,7 +18,7 @@ export class BlockchainService {
     }
   }
 
-  async mintSBT(userId: string, achievementId: string, metadataUri: string) {
+  async mintSBT(userId: string, achievementId: string, _metadataUri: string) {
     this.logger.log('Minting Soulbound Token for user ' + userId + ', achievement ' + achievementId);
 
     if (!this.wallet) {

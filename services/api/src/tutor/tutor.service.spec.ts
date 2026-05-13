@@ -8,9 +8,6 @@ import { MetricsService } from '../shared/metrics.controller';
 
 describe('TutorService', () => {
   let service: TutorService;
-  let prisma: any;
-  let ai: any;
-  let redis: any;
 
   const mockPrisma = {
     tutoringSession: {

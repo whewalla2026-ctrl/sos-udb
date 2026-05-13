@@ -1,7 +1,7 @@
-var gatewayUrl = process.env.NEXT_PUBLIC_GATEWAY_URL || 'http://localhost:3000';
+const apiUrl = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/graphql').replace(/\/graphql$/, '');
 
-export function trackEvent(event: string, metadata?: Record<string, any>) {
-  fetch(gatewayUrl + '/monitoring/signal', {
+export function trackEvent(event: string, metadata?: Record<string, unknown>) {
+  fetch(apiUrl + '/monitoring/signal', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     credentials: 'include',

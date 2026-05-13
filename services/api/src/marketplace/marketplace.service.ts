@@ -1,4 +1,4 @@
-import { Injectable, Logger, NotFoundException, BadRequestException } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { BlockchainService } from '../blockchain/blockchain.service';
 import { PointsService } from '../points/points.service';
@@ -42,7 +42,7 @@ export class MarketplaceService {
     };
   }
 
-  async listTalents(pillar?: string) {
+  async listTalents(_pillar?: string) {
     // Basic marketplace listing of top students
     return this.prisma.user.findMany({
       where: {
@@ -84,7 +84,7 @@ export class MarketplaceService {
   }
 
   async getMarketplaceItems(userId: string) {
-    const user = await this.prisma.user.findUnique({ where: { id: userId }, include: { doterProfile: true } });
+    const _user = await this.prisma.user.findUnique({ where: { id: userId }, include: { doterProfile: true } });
     const items = [
       { id: '1', name: 'Custom Avatar Skin', description: 'Unique look for your Doter', cost: 500, category: 'Cosmetic', icon: '🎨' },
       { id: '2', name: 'Premium Sound Pack', description: 'Exclusive sound effects', cost: 300, category: 'Audio', icon: '🎵' },

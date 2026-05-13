@@ -4,7 +4,6 @@ import { PrismaService } from '../prisma/prisma.service';
 import { ConfigService } from '@nestjs/config';
 import * as admin from 'firebase-admin';
 import * as crypto from 'crypto';
-import * as path from 'path';
 import * as fs from 'fs';
 import { REDIS_CLIENT } from '../redis/redis.module';
 import Redis from 'ioredis';

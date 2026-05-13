@@ -128,7 +128,7 @@ export class UupSyncService {
     // ── Academic Triggers ─────────────────────────────────────────────────────
     if (source === 'academic') {
       const skillGaps = payload.skill_gaps || {};
-      const criticalGaps = Object.entries(skillGaps).filter(([_, v]) => (v as number) < 0.2);
+      const criticalGaps = Object.entries(skillGaps).filter(([_key, v]) => (v as number) < 0.2);
 
       if (criticalGaps.length > 0) {
         await this.createNotification(userId, 'SKILL_GAP_ALERT', {

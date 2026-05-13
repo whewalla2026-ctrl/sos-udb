@@ -13,6 +13,12 @@ export default defineConfig({
       args: ['--no-sandbox', '--disable-setuid-sandbox'],
     },
   },
+  webServer: {
+    command: 'pnpm --filter @udb/web dev',
+    url: 'http://localhost:3030',
+    reuseExistingServer: true,
+    timeout: 30000,
+  },
   projects: [
     { name: 'chrome', use: { browserName: 'chromium', channel: 'chrome' } },
   ],

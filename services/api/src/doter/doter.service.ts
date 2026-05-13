@@ -69,7 +69,7 @@ export class DoterService {
     return { doter: updated, evolved, newState: evolved ? newState : undefined, rewards: rewards.length > 0 ? rewards : undefined };
   }
 
-  async checkRewards(userId: string, xp: number, state: DoterState): Promise<any[]> {
+  async checkRewards(userId: string, xp: number, _state: DoterState): Promise<any[]> {
     const earned: any[] = [];
     const triggers = await this.prisma.evolutionTrigger.findMany({ where: { active: true } });
 

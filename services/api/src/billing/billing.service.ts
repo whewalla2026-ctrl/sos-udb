@@ -5,7 +5,6 @@ import { MetricsService } from '../shared/metrics.controller';
 import { REDIS_CLIENT } from '../redis/redis.module';
 import Redis from 'ioredis';
 import Stripe from 'stripe';
-import crypto from 'crypto';
 
 @Injectable()
 export class BillingService {
@@ -42,7 +41,6 @@ export class BillingService {
   }
 
   private async idempotentCall<T>(key: string, fn: () => Promise<T>): Promise<T> {
-    const idempotencyKey = `${key}_${crypto.randomUUID()}`;
     return fn();
   }
 

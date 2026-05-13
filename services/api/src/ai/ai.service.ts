@@ -108,7 +108,7 @@ Respond as the Socratic mentor:`;
 
   // ── Weekly Planning Assistant (UC-044) ───────────────────────────────────────
   async generateWeeklyPlan(userId: string, weekStart: Date): Promise<any> {
-    const [user, skillGaps, biometricData] = await Promise.all([
+    const [_user, skillGaps, biometricData] = await Promise.all([
       this.prisma.user.findUnique({ where: { id: userId }, include: { doterProfile: true } }),
       this.prisma.skillGap.findMany({ where: { userId }, orderBy: { gapScore: 'asc' }, take: 5 }),
       this.prisma.biometricLog.findMany({

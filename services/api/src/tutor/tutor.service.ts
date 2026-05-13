@@ -61,7 +61,7 @@ export class TutorService {
     return { ...result, evaluation: evalResult };
   }
 
-  async evaluateTutorResponse(response: string, input: string, subject: string): Promise<{ qualityScore: number; hallucinationRisk: number; safetyCheck: boolean; relevance: number }> {
+  async evaluateTutorResponse(response: string, input: string, _subject: string): Promise<{ qualityScore: number; hallucinationRisk: number; safetyCheck: boolean; relevance: number }> {
     const lower = response.toLowerCase();
     const inputWords = input.toLowerCase().split(' ').filter(w => w.length > 3);
     const responseWords = response.toLowerCase().split(' ');
