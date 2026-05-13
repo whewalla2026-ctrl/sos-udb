@@ -1,0 +1,8 @@
+FROM certbot/certbot:latest
+
+# Post-renewal hook to reload nginx
+RUN mkdir -p /etc/letsencrypt/renewal-hooks/post
+COPY renewal-hook.sh /etc/letsencrypt/renewal-hooks/post/reload-nginx.sh
+RUN chmod +x /etc/letsencrypt/renewal-hooks/post/reload-nginx.sh
+
+ENTRYPOINT ["certbot"]

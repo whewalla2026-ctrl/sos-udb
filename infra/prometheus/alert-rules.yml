@@ -1,0 +1,75 @@
+groups:
+  - name: udb_service_alerts
+    interval: 30s
+    rules:
+      - alert: ServiceDown
+        expr: up == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: 'Service {{ $labels.service }} is down'
+          description: '{{ $labels.job }} has been unreachable for more than 1 minute.'
+
+      - alert: HighErrorRate
+        expr: rate(udb_http_requests_total{status=~"5.."}[5m]) / rate(udb_http_requests_total[5m]) > 0.05
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: 'High error rate on {{ $labels.service }}'
+          description: 'Error rate > 5% on {{ $labels.service }} for 2 minutes ({{ $value | humanizePercentage }}).'
+
+      - alert: HighMemoryUsage
+        expr: udb_process_resident_memory_bytes > 500 * 1024 * 1024
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: 'High memory on {{ $labels.service }}'
+          description: '{{ $labels.service }} is using > 500MB memory ({{ $value | humanize }}).'
+
+      - alert: EventLoopLag
+        expr: udb_nodejs_eventloop_lag_seconds > 1
+        for: 1m
+        labels:
+          severity: warning
+        annotations:
+          summary: 'High event loop lag on {{ $labels.service }}'
+          description: 'Event loop lag > 1s on {{ $labels.service }} ({{ $value | humanizeDuration }}).'
+
+      - alert: HighAuthFailureRate
+        expr: rate(udb_auth_failures_total[5m]) > 10
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: 'High auth failure rate'
+          description: '> 10 auth failures/minute for 2 minutes.'
+
+      - alert: SignupDrop
+        expr: rate(udb_signups_total[1h]) < rate(udb_signups_total[24h] offset 24h) * 0.5
+        for: 1h
+        labels:
+          severity: info
+        annotations:
+          summary: 'Signup rate dropped by 50%'
+          description: 'Hourly signup rate is 50% below the 24h average.'
+
+      - alert: QuestCompletionDrop
+        expr: rate(udb_quests_completed_total[1h]) < 1
+        for: 6h
+        labels:
+          severity: info
+        annotations:
+          summary: 'Low quest completion rate'
+          description: 'Less than 1 quest completed per hour for 6 hours.'
+
+      - alert: HighStripeWebhookFailure
+        expr: rate(udb_stripe_webhooks_total{status="failed"}[5m]) > 2
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: 'Stripe webhook failures'
+          description: '> 2 Stripe webhook failures per minute.'

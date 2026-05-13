@@ -28,11 +28,11 @@ class LmsSyncWorker {
             for (var assignment of assignments) {
               console.log('[LMS Sync] Synced assignment: ' + assignment.title + ' for user ' + user.id);
             }
-          } catch (e) {
-            console.warn('[LMS Sync] Error fetching assignments for user ' + user.id + ': ' + e.message);
+          } catch (e: unknown) {
+            console.warn('[LMS Sync] Error fetching assignments for user ' + user.id + ': ' + (e as Error).message);
           }
         }
-      } catch (e) {
+      } catch (e: unknown) {
         console.warn('[LMS Sync] Could not fetch LMS users from API. Will retry on next cycle.');
       }
       

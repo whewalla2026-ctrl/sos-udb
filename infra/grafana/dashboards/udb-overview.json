@@ -1,34 +1,74 @@
 {
   "title": "UDB Runtime Overview",
+  "uid": "udb-overview",
+  "tags": ["udb", "production"],
+  "timezone": "browser",
+  "editable": true,
   "panels": [
     {
       "title": "HTTP Request Rate",
-      "type": "graph",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 0 },
       "targets": [
         { "expr": "rate(udb_http_requests_total[1m])", "legendFormat": "{{service}} {{method}}" }
       ]
     },
     {
       "title": "Request Duration (p95)",
-      "type": "graph",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 0 },
       "targets": [
         { "expr": "histogram_quantile(0.95, sum(rate(udb_http_request_duration_seconds_bucket[1m])) by (le, service))", "legendFormat": "{{service}}" }
       ]
     },
     {
-      "title": "Active Memory",
-      "type": "graph",
+      "title": "Memory Usage",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 8, "x": 0, "y": 8 },
       "targets": [
         { "expr": "udb_process_resident_memory_bytes / 1024 / 1024", "legendFormat": "{{service}}" }
       ]
     },
     {
       "title": "Auth Failures",
-      "type": "graph",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 8, "x": 8, "y": 8 },
       "targets": [
-        { "expr": "rate(udb_auth_failures_total[1m])", "legendFormat": "failures" }
+        { "expr": "rate(udb_auth_failures_total[1m])", "legendFormat": "{{reason}}" }
+      ]
+    },
+    {
+      "title": "Signups",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 8, "x": 16, "y": 8 },
+      "targets": [
+        { "expr": "rate(udb_signups_total[1h])", "legendFormat": "{{role}}" }
+      ]
+    },
+    {
+      "title": "Quests Completed",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 8, "x": 0, "y": 16 },
+      "targets": [
+        { "expr": "rate(udb_quests_completed_total[1h])", "legendFormat": "{{pillar}}" }
+      ]
+    },
+    {
+      "title": "Active Users",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 8, "x": 8, "y": 16 },
+      "targets": [
+        { "expr": "udb_active_users", "legendFormat": "{{role}}" }
+      ]
+    },
+    {
+      "title": "Stripe Webhooks",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 8, "x": 16, "y": 16 },
+      "targets": [
+        { "expr": "rate(udb_stripe_webhooks_total[5m])", "legendFormat": "{{event}} ({{status}})" }
       ]
     }
   ],
-  "schemaVersion": 27
+  "schemaVersion": 39
 }

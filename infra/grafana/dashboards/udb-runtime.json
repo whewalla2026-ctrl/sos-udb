@@ -1,34 +1,70 @@
 {
   "title": "UDB Runtime Details",
+  "uid": "udb-runtime",
+  "tags": ["udb", "production"],
+  "timezone": "browser",
+  "editable": true,
   "panels": [
     {
       "title": "Event Loop Lag",
-      "type": "graph",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 8, "x": 0, "y": 0 },
       "targets": [
         { "expr": "udb_nodejs_eventloop_lag_seconds", "legendFormat": "{{service}}" }
       ]
     },
     {
-      "title": "Redis Latency",
-      "type": "graph",
-      "targets": [
-        { "expr": "rate(udb_redis_latency_seconds_sum[1m]) / rate(udb_redis_latency_seconds_count[1m])", "legendFormat": "avg latency" }
-      ]
-    },
-    {
       "title": "DB Pool Usage",
-      "type": "graph",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 8, "x": 8, "y": 0 },
       "targets": [
         { "expr": "udb_db_pool_usage", "legendFormat": "pool" }
       ]
     },
     {
-      "title": "Queue Depth",
-      "type": "graph",
+      "title": "Tutoring Sessions",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 8, "x": 16, "y": 0 },
       "targets": [
-        { "expr": "udb_queue_depth", "legendFormat": "{{queue}}" }
+        { "expr": "rate(udb_tutoring_sessions_total[1h])", "legendFormat": "{{subject}}" }
+      ]
+    },
+    {
+      "title": "Goal Completions",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 8, "x": 0, "y": 8 },
+      "targets": [
+        { "expr": "rate(udb_goal_completions_total[1h])", "legendFormat": "{{pillar}}" }
+      ]
+    },
+    {
+      "title": "UUP Syncs",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 8, "x": 8, "y": 8 },
+      "targets": [
+        { "expr": "rate(udb_uup_syncs_total[1h])", "legendFormat": "{{source}} ({{result}})" }
+      ]
+    },
+    {
+      "title": "Doter Level Ups",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 8, "x": 16, "y": 8 },
+      "targets": [
+        { "expr": "rate(udb_doter_level_ups_total[1h])", "legendFormat": "level {{level}}" }
+      ]
+    },
+    {
+      "title": "Logs (errors)",
+      "type": "logs",
+      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 16 },
+      "targets": [
+        {
+          "expr": "{service=\"nestjs-graphql\"} |= \"error\"",
+          "legendFormat": "",
+          "datasource": "Loki"
+        }
       ]
     }
   ],
-  "schemaVersion": 27
+  "schemaVersion": 39
 }
