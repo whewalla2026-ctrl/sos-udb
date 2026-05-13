@@ -3,7 +3,7 @@ import { useQuery, useMutation } from '@apollo/client';
 import { GET_UNREAD_NOTIFICATIONS, MARK_ALL_READ } from '../../../lib/queries';
 
 export default function NotificationsPage() {
-  var { data: notifData, loading } = useQuery(GET_UNREAD_NOTIFICATIONS);
+  var { data: notifData, loading, error } = useQuery(GET_UNREAD_NOTIFICATIONS);
   var [markAllRead] = useMutation(MARK_ALL_READ);
 
   var notifications = notifData?.unreadNotifications || [];
@@ -22,6 +22,8 @@ export default function NotificationsPage() {
 
       {loading ? (
         <div className="glass-card" style={{ padding: 40, textAlign: 'center', color: 'var(--text-muted)' }}>Loading notifications...</div>
+      ) : error ? (
+        <div className="glass-card" style={{ padding: 40, textAlign: 'center', color: 'var(--color-danger)' }}>Failed to load notifications.</div>
       ) : notifications.length === 0 ? (
         <div className="glass-card" style={{ padding: 40, textAlign: 'center' }}>
           <div style={{ fontSize: '3rem', marginBottom: 16 }}>🔔</div>

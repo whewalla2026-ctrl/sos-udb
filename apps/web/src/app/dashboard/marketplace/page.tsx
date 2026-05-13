@@ -4,7 +4,7 @@ import { useQuery } from '@apollo/client';
 import { MARKETPLACE_ITEMS } from '../../../lib/queries';
 
 export default function MarketplacePage() {
-  var { data: itemsData, loading } = useQuery(MARKETPLACE_ITEMS);
+  var { data: itemsData, loading, error } = useQuery(MARKETPLACE_ITEMS);
   var [search, setSearch] = useState('');
   var [category, setCategory] = useState('All Categories');
 
@@ -33,6 +33,8 @@ export default function MarketplacePage() {
       </div>
       {loading ? (
         <div style={{ textAlign: 'center', padding: 40, color: 'var(--text-muted)' }}>Loading marketplace...</div>
+      ) : error ? (
+        <div className="glass-card" style={{ padding: 40, textAlign: 'center', color: 'var(--color-danger)' }}>Failed to load marketplace items.</div>
       ) : (
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: 16 }}>
           {filtered.map(function(item: any) {

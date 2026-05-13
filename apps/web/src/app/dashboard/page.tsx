@@ -22,27 +22,41 @@ function LoadingSkeleton() {
   );
 }
 
+function ErrorDisplay({ message }: { message: string }) {
+  return (
+    <div className="glass-card" style={{ padding: 32, textAlign: 'center', marginTop: 24 }}>
+      <div style={{ fontSize: '2rem', marginBottom: 12 }}>⚠️</div>
+      <h3 style={{ fontWeight: 600, marginBottom: 8 }}>Failed to load dashboard</h3>
+      <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem' }}>{message}</p>
+    </div>
+  );
+}
+
 export default function DashboardPage() {
   var { data: meData, loading: meLoading, error: meError } = useQuery(GET_ME);
-  var { data: dashData, loading: dashLoading } = useQuery(GET_DASHBOARD_DATA);
+  var { data: dashData, loading: dashLoading, error: dashError } = useQuery(GET_DASHBOARD_DATA);
 
   if (meLoading || dashLoading) return <LoadingSkeleton />;
+  if (meError) return <ErrorDisplay message={meError.message} />;
+  if (dashError) return <ErrorDisplay message={dashError.message} />;
 
   var user = meData?.me;
-  var role = user?.role || 'CHILD';
+  if (!user) return <ErrorDisplay message="User not found. Please log in again." />;
+
+  var role = user.role;
 
   var childData = {
-    user: user || { displayName: 'User', role: 'CHILD', avatarUrl: '' },
+    user: user,
     doter: dashData?.myDoter || { name: 'Doter', state: 'EGG', level: 1, xp: 0, xpNext: 1000, coinBalance: 0, streakDays: 0, isEnergetic: false, isSluggy: false },
-    quests: [],
+    quests: dashData?.myGoals || [],
     goals: dashData?.myGoals || [],
-    biometric: { sleepHours: 8, focusScore: 80, stressLevel: 20, steps: 5000 },
+    biometric: dashData?.biometricHistory || {},
     notifications: dashData?.unreadNotifications || [],
   };
 
   var parentData = {
-    user: user || { displayName: 'Parent', role: 'PARENT', avatarUrl: '' },
-    children: dashData?.myChildren || [],
+    user: user,
+    children: [],
     pendingApprovals: [],
   };
 

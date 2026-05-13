@@ -6,7 +6,7 @@ import { GET_ME } from '../lib/queries';
 import {
   LayoutDashboard, Gamepad2, Bell, Crosshair, Target, Calendar, CalendarRange,
   GraduationCap, Brain, Image, Heart, Landmark, Briefcase, Users, MessageSquare,
-  Shield, Sparkles, Award, Globe, Store, Settings, LogOut, BarChart3,
+  Shield, Sparkles, Award, Globe, Store, Settings, LogOut, BarChart3, Smartphone,
 } from 'lucide-react';
 
 var ICON_MAP: Record<string, any> = {
@@ -31,6 +31,7 @@ var ICON_MAP: Record<string, any> = {
   Achievements: Award,
   'Joon World': Globe,
   Marketplace: Store,
+  Sync: Smartphone,
   Settings: Settings,
   'Sign Out': LogOut,
 };
@@ -72,6 +73,9 @@ var NAV_ITEMS = [
     { href: '/dashboard/joon-world', icon: 'Joon World', label: 'Joon World' },
     { href: '/dashboard/marketplace', icon: 'Marketplace', label: 'Marketplace' },
   ]},
+  { section: 'SYSTEM', items: [
+    { href: '/dashboard/sync', icon: 'Sync', label: 'Sync & Devices' },
+  ]},
 ];
 
 var ADMIN_ITEMS = [
@@ -89,11 +93,30 @@ function NavIcon({ name, size = 18 }: { name: string; size?: number }) {
   return Icon ? <Icon size={size} /> : <span style={{ fontSize: '1rem', width: 18, textAlign: 'center', flexShrink: 0 }}>{name}</span>;
 }
 
-export default function Sidebar({ unreadCount = 0 }: { unreadCount?: number }) {
+export default function Sidebar() {
   var pathname = usePathname();
-  var { data } = useQuery(GET_ME);
+  var { data, loading, error } = useQuery(GET_ME);
   var user = data?.me;
   var doter = user?.doterProfile;
+  var unreadCount = 0;
+
+  if (loading) {
+    return (
+      <nav className="sidebar" id="sidebar-nav">
+        <div className="sidebar-logo">🌟 UDB</div>
+        <div style={{ padding: 24, textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.8125rem' }}>Loading...</div>
+      </nav>
+    );
+  }
+
+  if (error) {
+    return (
+      <nav className="sidebar" id="sidebar-nav">
+        <div className="sidebar-logo">🌟 UDB</div>
+        <div style={{ padding: 24, textAlign: 'center', color: 'var(--color-danger)', fontSize: '0.8125rem' }}>Failed to load</div>
+      </nav>
+    );
+  }
 
   return (
     <nav className="sidebar" id="sidebar-nav">

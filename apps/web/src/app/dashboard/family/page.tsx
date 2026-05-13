@@ -3,7 +3,7 @@ import { useQuery } from '@apollo/client';
 import { GET_MY_CHILDREN } from '../../../lib/queries';
 
 export default function FamilyPage() {
-  var { data: childrenData, loading } = useQuery(GET_MY_CHILDREN);
+  var { data: childrenData, loading, error } = useQuery(GET_MY_CHILDREN);
 
   var children = childrenData?.myChildren || [];
 
@@ -18,6 +18,8 @@ export default function FamilyPage() {
         <h2 style={{ fontSize: '1.25rem', fontWeight: 700, marginBottom: 20 }}>Linked Accounts</h2>
         {loading ? (
           <div style={{ color: 'var(--text-muted)', textAlign: 'center', padding: 20 }}>Loading family data...</div>
+        ) : error ? (
+          <div style={{ padding: 20, textAlign: 'center', color: 'var(--color-danger)' }}>Failed to load family data.</div>
         ) : children.length === 0 ? (
           <div style={{ padding: 20, textAlign: 'center', color: 'var(--text-muted)' }}>
             No children linked yet. Use the button below to link a child account.

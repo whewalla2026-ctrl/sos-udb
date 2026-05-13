@@ -3,7 +3,7 @@ import { useQuery } from '@apollo/client';
 import { GET_MY_SAFETY_SCORE } from '../../../lib/queries';
 
 export default function SafetyPage() {
-  var { data: safetyData, loading } = useQuery(GET_MY_SAFETY_SCORE);
+  var { data: safetyData, loading, error } = useQuery(GET_MY_SAFETY_SCORE);
 
   var safety = safetyData?.mySafetyScore;
   var score = safety?.score ?? 100;
@@ -18,6 +18,8 @@ export default function SafetyPage() {
 
       {loading ? (
         <div className="glass-card" style={{ padding: 24, textAlign: 'center', color: 'var(--text-muted)' }}>Loading safety data...</div>
+      ) : error ? (
+        <div className="glass-card" style={{ padding: 24, textAlign: 'center', color: 'var(--color-danger)' }}>Failed to load safety data.</div>
       ) : (
         <>
           <div className="glass-card" style={{ padding: 24, borderTop: `4px solid ${score >= 70 ? 'var(--color-success)' : 'var(--color-danger)'}` }}>

@@ -3,7 +3,7 @@ import { useLazyQuery } from '@apollo/client';
 import { FUTURE_SELF_NARRATIVE } from '../../../lib/queries';
 
 export default function FutureSelfPage() {
-  var [getNarrative, { data, loading }] = useLazyQuery(FUTURE_SELF_NARRATIVE, { fetchPolicy: 'network-only' });
+  var [getNarrative, { data, loading, error }] = useLazyQuery(FUTURE_SELF_NARRATIVE, { fetchPolicy: 'network-only' });
   var narrative = data?.futureSelfNarrative || '';
 
   return (
@@ -14,8 +14,14 @@ export default function FutureSelfPage() {
           Future Self Simulator
         </h1>
         <p style={{ color: 'var(--text-secondary)', fontSize: '1.125rem', lineHeight: 1.6, marginBottom: 32 }}>
-          Our AI analyzes your current habits, skill gaps, and venture progress to generate a highly realistic "Day in the Life" story of you at age 30.
+          Our AI analyzes your current habits, skill gaps, and venture progress to generate a highly realistic &quot;Day in the Life&quot; story of you at age 30.
         </p>
+
+        {error && (
+          <div style={{ padding: '10px 14px', background: 'rgba(220,38,38,0.1)', border: '1px solid rgba(220,38,38,0.3)', borderRadius: 'var(--radius-md)', color: 'var(--color-danger)', fontSize: '0.875rem', marginBottom: 16 }}>
+            Failed to generate narrative. Please try again.
+          </div>
+        )}
 
         {!narrative ? (
           <button id="simulate-future-btn" className="btn btn-primary btn-lg" onClick={() => getNarrative()} disabled={loading}>

@@ -331,6 +331,100 @@ export var MARKETPLACE_ITEMS = gql`
   }
 `;
 
+// ── UUP Sync ──────────────────────────────────────────────────────────────
+
+export var GET_MY_UUP = gql`
+  query GetMyUUP {
+    myUUP
+  }
+`;
+
+export var GET_MY_DEVICES = gql`
+  query GetMyDevices {
+    myDevices {
+      id
+      deviceId
+      deviceName
+      deviceType
+      lastSyncAt
+      stateHash
+      createdAt
+      updatedAt
+    }
+  }
+`;
+
+export var GET_MY_CONFLICTS = gql`
+  query GetMyConflicts($status: String) {
+    myConflicts(status: $status) {
+      id
+      userId
+      deviceId
+      resourceType
+      resourceId
+      localValue
+      remoteValue
+      resolution
+      resolvedAt
+      createdAt
+    }
+  }
+`;
+
+export var GET_CONFLICT = gql`
+  query GetConflict($conflictId: String!) {
+    conflict(conflictId: $conflictId) {
+      id
+      userId
+      deviceId
+      resourceType
+      resourceId
+      localValue
+      remoteValue
+      resolution
+      resolvedAt
+      createdAt
+    }
+  }
+`;
+
+export var REGISTER_DEVICE = gql`
+  mutation RegisterDevice($input: RegisterDeviceInput!) {
+    registerDevice(input: $input) {
+      registered
+    }
+  }
+`;
+
+export var SYNC_STATE = gql`
+  mutation SyncState($input: SyncStateInput!) {
+    syncState(input: $input) {
+      synced
+      conflict
+      conflictId
+      message
+      state
+    }
+  }
+`;
+
+export var RESOLVE_CONFLICT = gql`
+  mutation ResolveConflict($input: ResolveConflictInput!) {
+    resolveConflict(input: $input) {
+      resolved
+      resolution
+    }
+  }
+`;
+
+export var ENQUEUE_OFFLINE_CHANGE = gql`
+  mutation EnqueueOfflineChange($input: OfflineChangeInput!) {
+    enqueueOfflineChange(input: $input) {
+      queued
+    }
+  }
+`;
+
 export var GET_ANALYTICS_OVERVIEW = gql`
   query GetAnalyticsOverview {
     analyticsOverview {

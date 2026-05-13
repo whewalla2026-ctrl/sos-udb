@@ -1,4 +1,4 @@
-var GATEWAY_URL = process.env.NEXT_PUBLIC_GATEWAY_URL || 'http://localhost:3000';
+var NESTJS_URL = process.env.NEXT_PUBLIC_API_URL ? process.env.NEXT_PUBLIC_API_URL.replace('/graphql', '') : 'http://localhost:4000';
 
 var FRIENDLY_ERRORS: Record<number, string> = {
   400: 'Invalid request. Please check your input.',
@@ -19,14 +19,15 @@ function getUserFriendlyMessage(status: number, serverMessage?: string): string 
   return FRIENDLY_ERRORS[status] || 'Something went wrong. Please try again.';
 }
 
-async function request(method: string, path: string, body?: any, auth?: boolean) {
+async function request(method: string, path: string, body?: any) {
   var headers: Record<string, string> = { 'Content-Type': 'application/json' };
-  if (auth) {
-    var token = localStorage.getItem('accessToken');
-    if (token) headers['Authorization'] = 'Bearer ' + token;
-  }
   try {
-    var res = await fetch(GATEWAY_URL + path, { method, headers, body: body ? JSON.stringify(body) : undefined });
+    var res = await fetch(NESTJS_URL + path, {
+      method,
+      headers,
+      credentials: 'include',
+      body: body ? JSON.stringify(body) : undefined,
+    });
     if (!res.ok) {
       var data;
       try { data = await res.json(); } catch (_) { data = {}; }
@@ -36,7 +37,7 @@ async function request(method: string, path: string, body?: any, auth?: boolean)
     return data;
   } catch (err: any) {
     if (err instanceof ApiError) throw err;
-    if (err.message === 'Failed to fetch' || err.name === 'TypeError' && err.message.indexOf('fetch') !== -1) {
+    if (err.message === 'Failed to fetch' || (err.name === 'TypeError' && err.message.indexOf('fetch') !== -1)) {
       throw new ApiError('Unable to connect. Please check your internet connection.', 0);
     }
     throw new ApiError(getUserFriendlyMessage(500), 500);
@@ -61,13 +62,12 @@ export var api = {
   login: (email: string, password: string) =>
     request('POST', '/auth/login', { email, password }),
 
-  refresh: () => {
-    var refreshToken = localStorage.getItem('refreshToken');
-    if (!refreshToken) throw new ApiError('Session expired. Please log in again.', 401);
-    return request('POST', '/auth/refresh', { refreshToken });
-  },
+  refresh: () =>
+    request('POST', '/auth/refresh'),
 
-  validate: () => request('GET', '/auth/me', undefined, true),
+  validate: () => request('GET', '/auth/me'),
+
+  logout: () => request('POST', '/auth/logout'),
 
   forgotPassword: (email: string) =>
     request('POST', '/auth/forgot-password', { email }),
@@ -76,5 +76,5 @@ export var api = {
     request('POST', '/auth/reset-password', { token, newPassword }),
 
   changePassword: (email: string, currentPassword: string, newPassword: string) =>
-    request('POST', '/auth/change-password', { email, currentPassword, newPassword }, true),
+    request('POST', '/auth/change-password', { email, currentPassword, newPassword }),
 };

@@ -3,7 +3,7 @@ import { useQuery, useMutation } from '@apollo/client';
 import { INBOX } from '../../../lib/queries';
 
 export default function MessagesPage() {
-  var { data: inboxData, loading } = useQuery(INBOX);
+  var { data: inboxData, loading, error } = useQuery(INBOX);
 
   var messages = inboxData?.inbox || [];
 
@@ -16,6 +16,8 @@ export default function MessagesPage() {
 
       {loading ? (
         <div className="glass-card" style={{ padding: 40, textAlign: 'center', color: 'var(--text-muted)' }}>Loading messages...</div>
+      ) : error ? (
+        <div className="glass-card" style={{ padding: 40, textAlign: 'center', color: 'var(--color-danger)' }}>Failed to load messages.</div>
       ) : messages.length === 0 ? (
         <div className="glass-card" style={{ padding: 40, textAlign: 'center' }}>
           <div style={{ fontSize: '3rem', marginBottom: 16 }}>🔒</div>

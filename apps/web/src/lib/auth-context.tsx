@@ -16,7 +16,7 @@ interface AuthContextType {
   error: string | null;
   login: (email: string, password: string) => Promise<void>;
   register: (email: string, password: string, displayName: string) => Promise<void>;
-  logout: () => void;
+  logout: () => Promise<void>;
   clearError: () => void;
 }
 
@@ -30,28 +30,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   var clearError = useCallback(() => setError(null), []);
 
   useEffect(() => {
-    var token = localStorage.getItem('accessToken');
-    if (!token) { setLoading(false); return; }
     api.validate()
       .then(function(data) {
         setUser({ userId: data.userId, email: data.email, displayName: data.displayName, role: data.role });
       })
       .catch(function() {
-        var rt = localStorage.getItem('refreshToken');
-        if (rt) {
-          api.refresh().then(function(data) {
-            localStorage.setItem('accessToken', data.token);
-            localStorage.setItem('refreshToken', data.refreshToken);
-            setUser({ userId: data.userId, email: data.email, displayName: data.displayName, role: data.role });
-          }).catch(function() {
-            localStorage.removeItem('accessToken');
-            localStorage.removeItem('refreshToken');
-            setUser(null);
-          });
-        } else {
-          localStorage.removeItem('accessToken');
-          setUser(null);
-        }
+        setUser(null);
       })
       .finally(function() { setLoading(false); });
   }, []);
@@ -61,8 +45,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setLoading(true);
     try {
       var data = await api.login(email, password);
-      localStorage.setItem('accessToken', data.token);
-      localStorage.setItem('refreshToken', data.refreshToken);
       setUser({ userId: data.userId, email: data.email, displayName: data.displayName, role: data.role });
     } catch (err: any) {
       setError(err.message || 'Login failed');
@@ -77,8 +59,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setLoading(true);
     try {
       var data = await api.register(email, password, displayName);
-      localStorage.setItem('accessToken', data.token);
-      localStorage.setItem('refreshToken', data.refreshToken);
       setUser({ userId: data.userId, email: data.email, displayName: data.displayName, role: data.role });
     } catch (err: any) {
       setError(err.message || 'Registration failed');
@@ -88,9 +68,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
-  var logout = useCallback(function() {
-    localStorage.removeItem('accessToken');
-    localStorage.removeItem('refreshToken');
+  var logout = useCallback(async function() {
+    try {
+      await api.logout();
+    } catch {
+      // Swallow — cookies cleared server-side regardless
+    }
     setUser(null);
   }, []);
 
