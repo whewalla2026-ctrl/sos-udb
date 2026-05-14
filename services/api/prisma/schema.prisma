@@ -4,7 +4,8 @@
 // ─────────────────────────────────────────────────────────────────────────────
 
 generator client {
-  provider = "prisma-client-js"
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "debian-openssl-3.0.x"]
 }
 
 datasource db {
@@ -117,14 +118,14 @@ enum BiometricSource {
 // ─── Core Models ─────────────────────────────────────────────────────────────
 
 model User {
-  id          String   @id @default(uuid())
-  firebaseUid String   @unique @map("firebase_uid")
-  email       String   @unique
-  displayName String?  @map("display_name")
-  avatarUrl   String?  @map("avatar_url")
+  id          String    @id @default(uuid())
+  firebaseUid String    @unique @map("firebase_uid")
+  email       String    @unique
+  displayName String?   @map("display_name")
+  avatarUrl   String?   @map("avatar_url")
   role        UserRole
   dateOfBirth DateTime? @map("date_of_birth")
-  timezone    String   @default("UTC")
+  timezone    String    @default("UTC")
 
   // The Unified User Profile (UUP) — JSONB
   uupData Json @default("{}") @map("uup_data")
@@ -135,21 +136,21 @@ model User {
   gdprDeleteRequested  Boolean   @default(false) @map("gdpr_delete_requested")
 
   // Soft delete for GDPR compliance
-  deletedAt   DateTime? @map("deleted_at")
-  isDeleted   Boolean   @default(false) @map("is_deleted")
+  deletedAt DateTime? @map("deleted_at")
+  isDeleted Boolean   @default(false) @map("is_deleted")
 
   // Accessibility
   accessibilitySettings Json @default("{}") @map("accessibility_settings")
 
   // Timestamps
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
+  createdAt  DateTime  @default(now()) @map("created_at")
+  updatedAt  DateTime  @updatedAt @map("updated_at")
   lastSeenAt DateTime? @map("last_seen_at")
 
   // ── Relations ──────────────────────────────────────────────────────────────
   // Family
-  parentLinks  FamilyLink[] @relation("ParentLinks")
-  childLinks   FamilyLink[] @relation("ChildLinks")
+  parentLinks FamilyLink[] @relation("ParentLinks")
+  childLinks  FamilyLink[] @relation("ChildLinks")
 
   // Gamification
   doterProfile DoterProfile?
@@ -159,41 +160,41 @@ model User {
   streaks      Streak[]
 
   // Calendar
-  activities   Activity[]
+  activities Activity[]
 
   // Academic
-  lmsConnections LmsConnection[]
-  skillGaps      SkillGap[]
+  lmsConnections   LmsConnection[]
+  skillGaps        SkillGap[]
   tutoringSessions TutoringSession[]
 
   // Biometric
   biometricLogs BiometricLog[]
 
   // Social
-  sentMessages     Message[] @relation("SentMessages")
-  receivedMessages Message[] @relation("ReceivedMessages")
+  sentMessages     Message[]      @relation("SentMessages")
+  receivedMessages Message[]      @relation("ReceivedMessages")
   evidenceItems    EvidenceItem[]
 
   // Entrepreneurship
-  ventures       Venture[]
-  escrows        Escrow[]
+  ventures Venture[]
+  escrows  Escrow[]
 
   // Achievements
-  achievements   Achievement[]
+  achievements Achievement[]
 
   // Safety
-  safetyScores   SafetyScore[]
+  safetyScores SafetyScore[]
 
   // System
-  auditLogs AuditLog[]
+  auditLogs     AuditLog[]
   notifications Notification[]
   onboarding    OnboardingStatus?
 
   // Planning
-  weeklyPlans       WeeklyPlan[]
+  weeklyPlans WeeklyPlan[]
 
   // Analytics
-  analyticsEvents   AnalyticsEvent[]
+  analyticsEvents AnalyticsEvent[]
 
   // Phase 4
   tutorInteractions TutorInteraction[]
@@ -214,12 +215,12 @@ model User {
 // ─── Family ──────────────────────────────────────────────────────────────────
 
 model FamilyLink {
-  id               String   @id @default(uuid())
-  parentId         String   @map("parent_id")
-  childId          String   @map("child_id")
-  consentVerified  Boolean  @default(false) @map("consent_verified")
-  consentMethod    String?  @map("consent_method") // CREDIT_CARD | ID_CHECK
-  createdAt        DateTime @default(now()) @map("created_at")
+  id              String   @id @default(uuid())
+  parentId        String   @map("parent_id")
+  childId         String   @map("child_id")
+  consentVerified Boolean  @default(false) @map("consent_verified")
+  consentMethod   String?  @map("consent_method") // CREDIT_CARD | ID_CHECK
+  createdAt       DateTime @default(now()) @map("created_at")
 
   parent User @relation("ParentLinks", fields: [parentId], references: [id], onDelete: Cascade)
   child  User @relation("ChildLinks", fields: [childId], references: [id], onDelete: Cascade)
@@ -241,15 +242,15 @@ model DoterProfile {
   streakDays  Int        @default(0) @map("streak_days")
 
   // Current status flags
-  isSluggy    Boolean @default(false) @map("is_sluggy")     // sleep < 6h
-  isEnergetic Boolean @default(false) @map("is_energetic")  // activity complete
+  isSluggy    Boolean @default(false) @map("is_sluggy") // sleep < 6h
+  isEnergetic Boolean @default(false) @map("is_energetic") // activity complete
   debuffs     Json    @default("[]")
   buffs       Json    @default("[]")
 
   // Visual
-  skinId      String  @default("default") @map("skin_id")
-  accessories Json    @default("[]")
-  evolutionHistory Json @default("[]") @map("evolution_history")
+  skinId           String @default("default") @map("skin_id")
+  accessories      Json   @default("[]")
+  evolutionHistory Json   @default("[]") @map("evolution_history")
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
@@ -270,14 +271,14 @@ model Quest {
   status      QuestStatus @default(PENDING)
 
   // Rewards
-  xpReward    Int @default(100) @map("xp_reward")
-  coinReward  Int @default(50)  @map("coin_reward")
+  xpReward   Int @default(100) @map("xp_reward")
+  coinReward Int @default(50) @map("coin_reward")
 
   // Proof of Work
-  proofUrl      String? @map("proof_url")
-  proofType     String? @map("proof_type") // IMAGE | VIDEO | TEXT | URL
-  aiConfidence  Float?  @map("ai_confidence")
-  aiVerified    Boolean @default(false) @map("ai_verified")
+  proofUrl     String? @map("proof_url")
+  proofType    String? @map("proof_type") // IMAGE | VIDEO | TEXT | URL
+  aiConfidence Float?  @map("ai_confidence")
+  aiVerified   Boolean @default(false) @map("ai_verified")
 
   // Goal mapping
   goalId        String? @map("goal_id")
@@ -289,15 +290,15 @@ model Quest {
   chunkIndex    Int?    @map("chunk_index")
 
   // Metadata
-  metadata  Json     @default("{}")
+  metadata  Json      @default("{}")
   dueDate   DateTime? @map("due_date")
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime  @updatedAt @map("updated_at")
 
-  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
-  goal         Goal?         @relation(fields: [goalId], references: [id])
-  parentQuest  Quest?        @relation("QuestChunks", fields: [parentQuestId], references: [id])
-  chunks       Quest[]       @relation("QuestChunks")
+  user          User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  goal          Goal?          @relation(fields: [goalId], references: [id])
+  parentQuest   Quest?         @relation("QuestChunks", fields: [parentQuestId], references: [id])
+  chunks        Quest[]        @relation("QuestChunks")
   evidenceItems EvidenceItem[]
 
   @@index([userId, status])
@@ -330,20 +331,20 @@ model PointsLedger {
 // ─── Goals ───────────────────────────────────────────────────────────────────
 
 model Goal {
-  id            String     @id @default(uuid())
-  userId        String     @map("user_id")
-  title         String
-  description   String?
-  pillar        QuestPillar
-  status        GoalStatus @default(ACTIVE)
-  targetWeight  Float      @default(100) @map("target_weight")
-  currentWeight Float      @default(0)   @map("current_weight")
-  certificateUrl String?   @map("certificate_url")
-  metadata      Json       @default("{}")
-  dueDate       DateTime?  @map("due_date")
-  completedAt   DateTime?  @map("completed_at")
-  createdAt     DateTime   @default(now()) @map("created_at")
-  updatedAt     DateTime   @updatedAt @map("updated_at")
+  id             String      @id @default(uuid())
+  userId         String      @map("user_id")
+  title          String
+  description    String?
+  pillar         QuestPillar
+  status         GoalStatus  @default(ACTIVE)
+  targetWeight   Float       @default(100) @map("target_weight")
+  currentWeight  Float       @default(0) @map("current_weight")
+  certificateUrl String?     @map("certificate_url")
+  metadata       Json        @default("{}")
+  dueDate        DateTime?   @map("due_date")
+  completedAt    DateTime?   @map("completed_at")
+  createdAt      DateTime    @default(now()) @map("created_at")
+  updatedAt      DateTime    @updatedAt @map("updated_at")
 
   user   User    @relation(fields: [userId], references: [id], onDelete: Cascade)
   quests Quest[]
@@ -365,23 +366,23 @@ model Activity {
   // Scheduling
   startTime   DateTime @map("start_time")
   endTime     DateTime @map("end_time")
-  rrule       String?          // rrule string for recurring events (FR-22.1)
+  rrule       String? // rrule string for recurring events (FR-22.1)
   isRecurring Boolean  @default(false) @map("is_recurring")
 
   // Linking
-  questId     String?  @map("quest_id")
-  goalId      String?  @map("goal_id")
+  questId String? @map("quest_id")
+  goalId  String? @map("goal_id")
 
   // Version history (UC-014)
-  version     Int      @default(1)
-  versionHistory Json  @default("[]") @map("version_history")
+  version        Int  @default(1)
+  versionHistory Json @default("[]") @map("version_history")
 
   // Deep work flag
-  isDeepWork  Boolean @default(false) @map("is_deep_work")
-  metadata    Json    @default("{}")
+  isDeepWork Boolean @default(false) @map("is_deep_work")
+  metadata   Json    @default("{}")
 
-  createdAt   DateTime @default(now()) @map("created_at")
-  updatedAt   DateTime @updatedAt @map("updated_at")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -392,16 +393,16 @@ model Activity {
 // ─── Streaks ─────────────────────────────────────────────────────────────────
 
 model Streak {
-  id           String   @id @default(uuid())
-  userId       String   @map("user_id")
+  id           String      @id @default(uuid())
+  userId       String      @map("user_id")
   pillar       QuestPillar
-  currentDays  Int      @default(0) @map("current_days")
-  longestDays  Int      @default(0) @map("longest_days")
-  lastActivity DateTime? @map("last_activity")
-  freezeCount  Int      @default(0) @map("freeze_count") // UC-051: Streak Freeze
+  currentDays  Int         @default(0) @map("current_days")
+  longestDays  Int         @default(0) @map("longest_days")
+  lastActivity DateTime?   @map("last_activity")
+  freezeCount  Int         @default(0) @map("freeze_count") // UC-051: Streak Freeze
 
-  createdAt    DateTime @default(now()) @map("created_at")
-  updatedAt    DateTime @updatedAt @map("updated_at")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -412,20 +413,20 @@ model Streak {
 // ─── LMS Integration ─────────────────────────────────────────────────────────
 
 model LmsConnection {
-  id           String   @id @default(uuid())
-  userId       String   @map("user_id")
-  provider     String   // GOOGLE_CLASSROOM | CANVAS | MOODLE
-  accessToken  String   @map("access_token")
-  refreshToken String?  @map("refresh_token")
+  id           String    @id @default(uuid())
+  userId       String    @map("user_id")
+  provider     String // GOOGLE_CLASSROOM | CANVAS | MOODLE
+  accessToken  String    @map("access_token")
+  refreshToken String?   @map("refresh_token")
   tokenExpiry  DateTime? @map("token_expiry")
-  externalId   String   @map("external_id") // Course/user ID in LMS
-  syncStatus   String   @default("PENDING") @map("sync_status")
+  externalId   String    @map("external_id") // Course/user ID in LMS
+  syncStatus   String    @default("PENDING") @map("sync_status")
   lastSyncAt   DateTime? @map("last_sync_at")
-  metadata     Json     @default("{}")
-  createdAt    DateTime @default(now()) @map("created_at")
-  updatedAt    DateTime @updatedAt @map("updated_at")
+  metadata     Json      @default("{}")
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
 
-  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user           User            @relation(fields: [userId], references: [id], onDelete: Cascade)
   lmsAssignments LmsAssignment[]
 
   @@index([userId])
@@ -433,20 +434,20 @@ model LmsConnection {
 }
 
 model LmsAssignment {
-  id            String   @id @default(uuid())
-  connectionId  String   @map("connection_id")
-  externalId    String   @map("external_id")
-  title         String
-  description   String?
-  dueDate       DateTime? @map("due_date")
-  courseId      String   @map("course_id")
-  courseName    String   @map("course_name")
-  points        Float?
-  grade         Float?
-  status        String   @default("PENDING")
-  difficulty    Float?   // AI-predicted workload score 0-1
-  metadata      Json     @default("{}")
-  syncedAt      DateTime @default(now()) @map("synced_at")
+  id           String    @id @default(uuid())
+  connectionId String    @map("connection_id")
+  externalId   String    @map("external_id")
+  title        String
+  description  String?
+  dueDate      DateTime? @map("due_date")
+  courseId     String    @map("course_id")
+  courseName   String    @map("course_name")
+  points       Float?
+  grade        Float?
+  status       String    @default("PENDING")
+  difficulty   Float? // AI-predicted workload score 0-1
+  metadata     Json      @default("{}")
+  syncedAt     DateTime  @default(now()) @map("synced_at")
 
   connection LmsConnection @relation(fields: [connectionId], references: [id], onDelete: Cascade)
 
@@ -457,15 +458,15 @@ model LmsAssignment {
 // ─── Skill Gaps ───────────────────────────────────────────────────────────────
 
 model SkillGap {
-  id           String   @id @default(uuid())
-  userId       String   @map("user_id")
-  subject      String
-  pillar       QuestPillar
-  gapScore     Float    @map("gap_score")  // 0.0 (critical) - 1.0 (mastered)
-  lastPracticed DateTime? @map("last_practiced")
-  ritScore     Float?   @map("rit_score")  // NWEA RIT score if available
-  metadata     Json     @default("{}")
-  updatedAt    DateTime @updatedAt @map("updated_at")
+  id            String      @id @default(uuid())
+  userId        String      @map("user_id")
+  subject       String
+  pillar        QuestPillar
+  gapScore      Float       @map("gap_score") // 0.0 (critical) - 1.0 (mastered)
+  lastPracticed DateTime?   @map("last_practiced")
+  ritScore      Float?      @map("rit_score") // NWEA RIT score if available
+  metadata      Json        @default("{}")
+  updatedAt     DateTime    @updatedAt @map("updated_at")
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -476,16 +477,16 @@ model SkillGap {
 // ─── AI Tutoring ─────────────────────────────────────────────────────────────
 
 model TutoringSession {
-  id            String   @id @default(uuid())
-  userId        String   @map("user_id")
-  assignmentId  String?  @map("assignment_id")
-  subject       String
-  sessionLog    Json     @default("[]") @map("session_log") // [{role, content, timestamp}]
-  pathToSolution Json    @default("[]") @map("path_to_solution") // FR-65.2
-  masteryGained Float    @default(0) @map("mastery_gained")
-  duration      Int      @default(0) // seconds
-  createdAt     DateTime @default(now()) @map("created_at")
-  endedAt       DateTime? @map("ended_at")
+  id             String    @id @default(uuid())
+  userId         String    @map("user_id")
+  assignmentId   String?   @map("assignment_id")
+  subject        String
+  sessionLog     Json      @default("[]") @map("session_log") // [{role, content, timestamp}]
+  pathToSolution Json      @default("[]") @map("path_to_solution") // FR-65.2
+  masteryGained  Float     @default(0) @map("mastery_gained")
+  duration       Int       @default(0) // seconds
+  createdAt      DateTime  @default(now()) @map("created_at")
+  endedAt        DateTime? @map("ended_at")
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -496,17 +497,17 @@ model TutoringSession {
 // ─── Biometric Logs ──────────────────────────────────────────────────────────
 
 model BiometricLog {
-  id          String         @id @default(uuid())
-  userId      String         @map("user_id")
-  loggedAt    DateTime       @default(now()) @map("logged_at")
-  sleepHours  Float?         @map("sleep_hours")
+  id          String          @id @default(uuid())
+  userId      String          @map("user_id")
+  loggedAt    DateTime        @default(now()) @map("logged_at")
+  sleepHours  Float?          @map("sleep_hours")
   hrv         Float?
-  stressLevel Float?         @map("stress_level")
-  focusScore  Float?         @map("focus_score")
-  heartRate   Float?         @map("heart_rate")
+  stressLevel Float?          @map("stress_level")
+  focusScore  Float?          @map("focus_score")
+  heartRate   Float?          @map("heart_rate")
   steps       Int?
   source      BiometricSource
-  metadata    Json           @default("{}")
+  metadata    Json            @default("{}")
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -540,17 +541,17 @@ model Message {
 // ─── Evidence Gallery (UC-019/059) ───────────────────────────────────────────
 
 model EvidenceItem {
-  id           String  @id @default(uuid())
-  userId       String  @map("user_id")
-  questId      String? @map("quest_id")
+  id           String   @id @default(uuid())
+  userId       String   @map("user_id")
+  questId      String?  @map("quest_id")
   title        String
-  type         String  // IMAGE | VIDEO | TEXT | DOCUMENT
+  type         String // IMAGE | VIDEO | TEXT | DOCUMENT
   url          String
-  thumbnailUrl String? @map("thumbnail_url")
-  aiProTip     String? @map("ai_pro_tip") // AI feedback
-  comments     Json    @default("[]")
-  isPublic     Boolean @default(false) @map("is_public")
-  metadata     Json    @default("{}")
+  thumbnailUrl String?  @map("thumbnail_url")
+  aiProTip     String?  @map("ai_pro_tip") // AI feedback
+  comments     Json     @default("[]")
+  isPublic     Boolean  @default(false) @map("is_public")
+  metadata     Json     @default("{}")
   createdAt    DateTime @default(now()) @map("created_at")
 
   user  User   @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -571,20 +572,20 @@ model Venture {
   businessPlanUrl String?       @map("business_plan_url")
 
   // AI-generated plan fields
-  problem         String?
-  solution        String?
-  targetMarket    String?
-  pricingModel    String?
-  revenueModel    String?
-  totalRevenue    Float    @default(0) @map("total_revenue")
+  problem      String?
+  solution     String?
+  targetMarket String?
+  pricingModel String?
+  revenueModel String?
+  totalRevenue Float   @default(0) @map("total_revenue")
 
   // Parent approval
-  parentApproved  Boolean  @default(false) @map("parent_approved")
+  parentApproved   Boolean   @default(false) @map("parent_approved")
   parentApprovedAt DateTime? @map("parent_approved_at")
 
-  metadata        Json     @default("{}")
-  createdAt       DateTime @default(now()) @map("created_at")
-  updatedAt       DateTime @updatedAt @map("updated_at")
+  metadata  Json     @default("{}")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
 
   user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   escrows Escrow[]
@@ -596,20 +597,20 @@ model Venture {
 // ─── Financial Escrow (UC-095) ────────────────────────────────────────────────
 
 model Escrow {
-  id           String       @id @default(uuid())
-  ventureId    String       @map("venture_id")
-  sellerId     String       @map("seller_id")
-  buyerEmail   String       @map("buyer_email")
-  amountUsd    Float        @map("amount_usd")
-  status       EscrowStatus @default(HELD)
-  stripePaymentIntentId String? @map("stripe_payment_intent_id")
-  proofUrl     String?      @map("proof_url")
-  proofNotes   String?      @map("proof_notes")
-  rejectionReason String?   @map("rejection_reason")
-  releasedAt   DateTime?    @map("released_at")
-  metadata     Json         @default("{}")
-  createdAt    DateTime     @default(now()) @map("created_at")
-  updatedAt    DateTime     @updatedAt @map("updated_at")
+  id                    String       @id @default(uuid())
+  ventureId             String       @map("venture_id")
+  sellerId              String       @map("seller_id")
+  buyerEmail            String       @map("buyer_email")
+  amountUsd             Float        @map("amount_usd")
+  status                EscrowStatus @default(HELD)
+  stripePaymentIntentId String?      @map("stripe_payment_intent_id")
+  proofUrl              String?      @map("proof_url")
+  proofNotes            String?      @map("proof_notes")
+  rejectionReason       String?      @map("rejection_reason")
+  releasedAt            DateTime?    @map("released_at")
+  metadata              Json         @default("{}")
+  createdAt             DateTime     @default(now()) @map("created_at")
+  updatedAt             DateTime     @updatedAt @map("updated_at")
 
   venture Venture @relation(fields: [ventureId], references: [id], onDelete: Cascade)
   seller  User    @relation(fields: [sellerId], references: [id], onDelete: Restrict)
@@ -621,18 +622,18 @@ model Escrow {
 // ─── Achievement NFTs / SBTs ──────────────────────────────────────────────────
 
 model Achievement {
-  id            String   @id @default(uuid())
-  userId        String   @map("user_id")
-  title         String
-  description   String
-  pillar        QuestPillar
-  badgeUrl      String   @map("badge_url")
-  points        Int      @default(0)
-  sbtTokenId    String?  @map("sbt_token_id") // Blockchain token ID
-  sbtContract   String?  @map("sbt_contract") // Polygon contract address
-  isMinted      Boolean  @default(false) @map("is_minted")
-  metadata      Json     @default("{}")
-  earnedAt      DateTime @default(now()) @map("earned_at")
+  id          String      @id @default(uuid())
+  userId      String      @map("user_id")
+  title       String
+  description String
+  pillar      QuestPillar
+  badgeUrl    String      @map("badge_url")
+  points      Int         @default(0)
+  sbtTokenId  String?     @map("sbt_token_id") // Blockchain token ID
+  sbtContract String?     @map("sbt_contract") // Polygon contract address
+  isMinted    Boolean     @default(false) @map("is_minted")
+  metadata    Json        @default("{}")
+  earnedAt    DateTime    @default(now()) @map("earned_at")
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -643,12 +644,12 @@ model Achievement {
 // ─── Safety Monitoring ────────────────────────────────────────────────────────
 
 model SafetyScore {
-  id          String   @id @default(uuid())
-  userId      String   @map("user_id")
-  score       Float    // 0-100
-  components  Json     @default("{}") // { messaging: 90, content: 85, social: 92 }
-  alerts      Json     @default("[]") // Active alerts
-  recordedAt  DateTime @default(now()) @map("recorded_at")
+  id         String   @id @default(uuid())
+  userId     String   @map("user_id")
+  score      Float // 0-100
+  components Json     @default("{}") // { messaging: 90, content: 85, social: 92 }
+  alerts     Json     @default("[]") // Active alerts
+  recordedAt DateTime @default(now()) @map("recorded_at")
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -659,16 +660,16 @@ model SafetyScore {
 // ─── Weekly Plans ─────────────────────────────────────────────────────────────
 
 model WeeklyPlan {
-  id          String   @id @default(uuid())
-  userId      String   @map("user_id")
-  weekStart   DateTime @map("week_start")
-  weekEnd     DateTime @map("week_end")
-  aiDraft     Json     @default("[]") @map("ai_draft") // AI suggested activities
-  finalPlan   Json     @default("[]") @map("final_plan")
-  focusPillars Json    @default("[]") @map("focus_pillars")
-  isFinalized Boolean  @default(false) @map("is_finalized")
-  createdAt   DateTime @default(now()) @map("created_at")
-  updatedAt   DateTime @updatedAt @map("updated_at")
+  id           String   @id @default(uuid())
+  userId       String   @map("user_id")
+  weekStart    DateTime @map("week_start")
+  weekEnd      DateTime @map("week_end")
+  aiDraft      Json     @default("[]") @map("ai_draft") // AI suggested activities
+  finalPlan    Json     @default("[]") @map("final_plan")
+  focusPillars Json     @default("[]") @map("focus_pillars")
+  isFinalized  Boolean  @default(false) @map("is_finalized")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -679,14 +680,14 @@ model WeeklyPlan {
 // ─── Notifications ────────────────────────────────────────────────────────────
 
 model Notification {
-  id        String   @id @default(uuid())
-  userId    String   @map("user_id")
-  type      String   // LOW_SLEEP_ALERT | QUEST_COMPLETE | SKILL_GAP | SAFETY_ALERT | etc.
+  id        String    @id @default(uuid())
+  userId    String    @map("user_id")
+  type      String // LOW_SLEEP_ALERT | QUEST_COMPLETE | SKILL_GAP | SAFETY_ALERT | etc.
   title     String
   body      String
-  data      Json     @default("{}")
-  isRead    Boolean  @default(false) @map("is_read")
-  createdAt DateTime @default(now()) @map("created_at")
+  data      Json      @default("{}")
+  isRead    Boolean   @default(false) @map("is_read")
+  createdAt DateTime  @default(now()) @map("created_at")
   readAt    DateTime? @map("read_at")
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -700,7 +701,7 @@ model Notification {
 model AuditLog {
   id         BigInt   @id @default(autoincrement())
   actorId    String   @map("actor_id")
-  action     String   // UUP_SYNC | QUEST_APPROVE | FUND_RELEASE | etc.
+  action     String // UUP_SYNC | QUEST_APPROVE | FUND_RELEASE | etc.
   targetType String?  @map("target_type")
   targetId   String?  @map("target_id")
   payload    Json     @default("{}")
@@ -731,20 +732,20 @@ model AnalyticsEvent {
 }
 
 model OnboardingStatus {
-  id             String   @id @default(uuid())
-  userId         String   @unique @map("user_id")
-  currentStep    Int      @default(0) @map("current_step")
-  totalSteps     Int      @default(5) @map("total_steps")
-  completed      Boolean  @default(false)
-  skipped        Boolean  @default(false)
-  profileComplete Boolean @default(false) @map("profile_complete")
-  doterNamed     Boolean  @default(false) @map("doter_named")
-  firstQuestDone Boolean  @default(false) @map("first_quest_done")
-  tourCompleted  Boolean  @default(false) @map("tour_completed")
-  role           String   @default("CHILD")
-  metadata       Json     @default("{}")
-  createdAt      DateTime @default(now()) @map("created_at")
-  updatedAt      DateTime @updatedAt @map("updated_at")
+  id              String   @id @default(uuid())
+  userId          String   @unique @map("user_id")
+  currentStep     Int      @default(0) @map("current_step")
+  totalSteps      Int      @default(5) @map("total_steps")
+  completed       Boolean  @default(false)
+  skipped         Boolean  @default(false)
+  profileComplete Boolean  @default(false) @map("profile_complete")
+  doterNamed      Boolean  @default(false) @map("doter_named")
+  firstQuestDone  Boolean  @default(false) @map("first_quest_done")
+  tourCompleted   Boolean  @default(false) @map("tour_completed")
+  role            String   @default("CHILD")
+  metadata        Json     @default("{}")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -757,15 +758,15 @@ model OnboardingStatus {
 
 /// Tutor session response / interaction log (enhances existing TutoringSession)
 model TutorInteraction {
-  id           String   @id @default(uuid())
-  sessionId    String   @map("session_id")
-  userId       String   @map("user_id")
-  role         String   // 'user' | 'tutor'
-  content      String
-  intent       String?  // WANTS_ANSWER | CONFUSED | HINT_REQUEST | EXPLORING
-  confidence   Float?   // AI confidence 0-1
-  comprehension Float?  // Estimated comprehension 0-1
-  createdAt    DateTime @default(now()) @map("created_at")
+  id            String   @id @default(uuid())
+  sessionId     String   @map("session_id")
+  userId        String   @map("user_id")
+  role          String // 'user' | 'tutor'
+  content       String
+  intent        String? // WANTS_ANSWER | CONFUSED | HINT_REQUEST | EXPLORING
+  confidence    Float? // AI confidence 0-1
+  comprehension Float? // Estimated comprehension 0-1
+  createdAt     DateTime @default(now()) @map("created_at")
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -776,15 +777,15 @@ model TutorInteraction {
 
 /// Tutor memory (short-term per session, long-term across sessions)
 model TutorMemory {
-  id        String   @id @default(uuid())
-  userId    String   @map("user_id")
-  type      String   // SHORT_TERM | LONG_TERM | TOPIC_GRAPH
-  key       String   // memory key / topic identifier
-  value     Json     // memory value
-  weight    Float    @default(1.0) // relevance weight
+  id        String    @id @default(uuid())
+  userId    String    @map("user_id")
+  type      String // SHORT_TERM | LONG_TERM | TOPIC_GRAPH
+  key       String // memory key / topic identifier
+  value     Json // memory value
+  weight    Float     @default(1.0) // relevance weight
   expiresAt DateTime? @map("expires_at")
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -795,17 +796,17 @@ model TutorMemory {
 
 /// Topic mastery tracking per student
 model TopicMastery {
-  id          String   @id @default(uuid())
-  userId      String   @map("user_id")
-  subject     String
-  topic       String
-  masteryLevel Float   @default(0) @map("mastery_level") // 0.0 - 1.0
-  confidence  Float    @default(0) @map("confidence")
-  attempts    Int      @default(0)
-  correctPct  Float    @default(0) @map("correct_pct")
+  id            String    @id @default(uuid())
+  userId        String    @map("user_id")
+  subject       String
+  topic         String
+  masteryLevel  Float     @default(0) @map("mastery_level") // 0.0 - 1.0
+  confidence    Float     @default(0) @map("confidence")
+  attempts      Int       @default(0)
+  correctPct    Float     @default(0) @map("correct_pct")
   lastPracticed DateTime? @map("last_practiced")
-  createdAt   DateTime @default(now()) @map("created_at")
-  updatedAt   DateTime @updatedAt @map("updated_at")
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -815,20 +816,20 @@ model TopicMastery {
 
 /// Tutor analytics snapshot
 model TutorAnalytics {
-  id             String   @id @default(uuid())
-  userId         String   @map("user_id")
-  totalSessions  Int      @default(0) @map("total_sessions")
-  totalInteractions Int  @default(0) @map("total_interactions")
-  avgConfidence  Float    @default(0) @map("avg_confidence")
-  avgComprehension Float @default(0) @map("avg_comprehension")
-  struggleCount  Int      @default(0) @map("struggle_count")
-  hintRequests   Int      @default(0) @map("hint_requests")
-  learningVelocity Float  @default(0) @map("learning_velocity") // topics mastered per week
-  retentionScore  Float   @default(0) @map("retention_score") // 0-100
-  totalTimeSpent  Int     @default(0) @map("total_time_spent") // seconds
-  completedSessions Int  @default(0) @map("completed_sessions")
-  lastActiveAt   DateTime? @map("last_active_at")
-  snapshotDate   DateTime @default(now()) @map("snapshot_date")
+  id                String    @id @default(uuid())
+  userId            String    @map("user_id")
+  totalSessions     Int       @default(0) @map("total_sessions")
+  totalInteractions Int       @default(0) @map("total_interactions")
+  avgConfidence     Float     @default(0) @map("avg_confidence")
+  avgComprehension  Float     @default(0) @map("avg_comprehension")
+  struggleCount     Int       @default(0) @map("struggle_count")
+  hintRequests      Int       @default(0) @map("hint_requests")
+  learningVelocity  Float     @default(0) @map("learning_velocity") // topics mastered per week
+  retentionScore    Float     @default(0) @map("retention_score") // 0-100
+  totalTimeSpent    Int       @default(0) @map("total_time_spent") // seconds
+  completedSessions Int       @default(0) @map("completed_sessions")
+  lastActiveAt      DateTime? @map("last_active_at")
+  snapshotDate      DateTime  @default(now()) @map("snapshot_date")
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -843,11 +844,11 @@ model TutorEvaluation {
   sessionId         String   @map("session_id")
   userId            String   @map("user_id")
   interactionId     String?  @map("interaction_id")
-  qualityScore      Float    @default(0) @map("quality_score")       // 0-1 how good was the tutor response
-  hallucinationRisk Float    @default(0) @map("hallucination_risk")   // 0-1 risk of hallucination
+  qualityScore      Float    @default(0) @map("quality_score") // 0-1 how good was the tutor response
+  hallucinationRisk Float    @default(0) @map("hallucination_risk") // 0-1 risk of hallucination
   safetyCheck       Boolean  @default(true) @map("safety_check")
-  responseRelevance Float    @default(0) @map("response_relevance")   // 0-1
-  studentFeedback   Float?   @map("student_feedback")                // student rating 0-5
+  responseRelevance Float    @default(0) @map("response_relevance") // 0-1
+  studentFeedback   Float?   @map("student_feedback") // student rating 0-5
   evaluatedAt       DateTime @default(now()) @map("evaluated_at")
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -863,16 +864,16 @@ model TutorEvaluation {
 
 /// Doter reward / badge system
 model DoterReward {
-  id          String   @id @default(uuid())
-  userId      String   @map("user_id")
-  type        String   // BADGE | UNLOCKABLE | VISUAL_EVOLUTION | MILESTONE
-  name        String
-  description String?
-  iconUrl     String?  @map("icon_url")
-  tier        String   // BRONZE | SILVER | GOLD | PLATINUM | DIAMOND
-  triggerType String?  @map("trigger_type") // STREAK | MASTERY | QUEST | ACHIEVEMENT
-  triggerValue Float?  @map("trigger_value")
-  earnedAt    DateTime @default(now()) @map("earned_at")
+  id           String   @id @default(uuid())
+  userId       String   @map("user_id")
+  type         String // BADGE | UNLOCKABLE | VISUAL_EVOLUTION | MILESTONE
+  name         String
+  description  String?
+  iconUrl      String?  @map("icon_url")
+  tier         String // BRONZE | SILVER | GOLD | PLATINUM | DIAMOND
+  triggerType  String?  @map("trigger_type") // STREAK | MASTERY | QUEST | ACHIEVEMENT
+  triggerValue Float?   @map("trigger_value")
+  earnedAt     DateTime @default(now()) @map("earned_at")
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -885,8 +886,8 @@ model EvolutionTrigger {
   id          String   @id @default(uuid())
   name        String
   description String?
-  condition   Json     // { type: 'STREAK', threshold: 7 } or { type: 'XP', threshold: 5000 }
-  effect      Json     // { state: 'HATCHLING', xpBonus: 100 }
+  condition   Json // { type: 'STREAK', threshold: 7 } or { type: 'XP', threshold: 5000 }
+  effect      Json // { state: 'HATCHLING', xpBonus: 100 }
   active      Boolean  @default(true)
   createdAt   DateTime @default(now()) @map("created_at")
 
@@ -899,20 +900,20 @@ model EvolutionTrigger {
 
 /// Subscription plan definitions
 model BillingPlan {
-  id          String   @id @default(uuid())
-  stripePriceId String? @unique @map("stripe_price_id")
-  name        String   // FREE | PRO | ENTERPRISE
-  description String?
-  priceUsd    Float    @map("price_usd")
-  interval    String   @default("month") // month | year
-  features    Json     @default("[]")    // ["tutor", "ventures", "escrow", "analytics"]
-  maxUsers    Int      @default(1)       @map("max_users")
-  maxVentures Int      @default(0)       @map("max_ventures")
-  maxStorageMb Int     @default(100)     @map("max_storage_mb")
-  active      Boolean  @default(true)
-  sortOrder   Int      @default(0)       @map("sort_order")
-  createdAt   DateTime @default(now())   @map("created_at")
-  updatedAt   DateTime @updatedAt        @map("updated_at")
+  id            String   @id @default(uuid())
+  stripePriceId String?  @unique @map("stripe_price_id")
+  name          String // FREE | PRO | ENTERPRISE
+  description   String?
+  priceUsd      Float    @map("price_usd")
+  interval      String   @default("month") // month | year
+  features      Json     @default("[]") // ["tutor", "ventures", "escrow", "analytics"]
+  maxUsers      Int      @default(1) @map("max_users")
+  maxVentures   Int      @default(0) @map("max_ventures")
+  maxStorageMb  Int      @default(100) @map("max_storage_mb")
+  active        Boolean  @default(true)
+  sortOrder     Int      @default(0) @map("sort_order")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
 
   subscriptions Subscription[]
 
@@ -921,21 +922,21 @@ model BillingPlan {
 
 /// Customer subscriptions
 model Subscription {
-  id              String    @id @default(uuid())
-  userId          String    @map("user_id")
-  planId          String    @map("plan_id")
-  stripeSubscriptionId String? @unique @map("stripe_subscription_id")
-  stripeCustomerId String?  @map("stripe_customer_id")
-  status          String    @default("active") // active | past_due | canceled | trialing
-  currentPeriodStart DateTime? @map("current_period_start")
-  currentPeriodEnd   DateTime? @map("current_period_end")
-  canceledAt      DateTime? @map("canceled_at")
-  trialEnd        DateTime? @map("trial_end")
-  metadata        Json      @default("{}")
-  createdAt       DateTime  @default(now()) @map("created_at")
-  updatedAt       DateTime  @updatedAt @map("updated_at")
+  id                   String    @id @default(uuid())
+  userId               String    @map("user_id")
+  planId               String    @map("plan_id")
+  stripeSubscriptionId String?   @unique @map("stripe_subscription_id")
+  stripeCustomerId     String?   @map("stripe_customer_id")
+  status               String    @default("active") // active | past_due | canceled | trialing
+  currentPeriodStart   DateTime? @map("current_period_start")
+  currentPeriodEnd     DateTime? @map("current_period_end")
+  canceledAt           DateTime? @map("canceled_at")
+  trialEnd             DateTime? @map("trial_end")
+  metadata             Json      @default("{}")
+  createdAt            DateTime  @default(now()) @map("created_at")
+  updatedAt            DateTime  @updatedAt @map("updated_at")
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user User        @relation(fields: [userId], references: [id], onDelete: Cascade)
   plan BillingPlan @relation(fields: [planId], references: [id])
 
   @@index([userId])
@@ -966,11 +967,11 @@ model Invoice {
 
 /// Usage metering for tenant billing
 model UsageRecord {
-  id          String   @id @default(uuid())
-  userId      String   @map("user_id")
-  metric      String   // API_CALLS | STORAGE_MB | TUTOR_SESSIONS | AI_TOKENS
-  value       Float
-  recordedAt  DateTime @default(now()) @map("recorded_at")
+  id         String   @id @default(uuid())
+  userId     String   @map("user_id")
+  metric     String // API_CALLS | STORAGE_MB | TUTOR_SESSIONS | AI_TOKENS
+  value      Float
+  recordedAt DateTime @default(now()) @map("recorded_at")
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -984,16 +985,16 @@ model UsageRecord {
 
 /// Multi-device sync sessions
 model SyncSession {
-  id          String   @id @default(uuid())
-  userId      String   @map("user_id")
-  deviceId    String   @map("device_id")
-  deviceName  String?  @map("device_name")
-  deviceType  String   @default("web") @map("device_type") // web | mobile | tablet
-  lastSyncAt  DateTime? @map("last_sync_at")
-  stateHash   String?  @map("state_hash") // hash of synced state for conflict detection
-  metadata    Json     @default("{}")
-  createdAt   DateTime @default(now()) @map("created_at")
-  updatedAt   DateTime @updatedAt @map("updated_at")
+  id         String    @id @default(uuid())
+  userId     String    @map("user_id")
+  deviceId   String    @map("device_id")
+  deviceName String?   @map("device_name")
+  deviceType String    @default("web") @map("device_type") // web | mobile | tablet
+  lastSyncAt DateTime? @map("last_sync_at")
+  stateHash  String?   @map("state_hash") // hash of synced state for conflict detection
+  metadata   Json      @default("{}")
+  createdAt  DateTime  @default(now()) @map("created_at")
+  updatedAt  DateTime  @updatedAt @map("updated_at")
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -1003,16 +1004,16 @@ model SyncSession {
 
 /// Conflict resolution log
 model SyncConflict {
-  id          String   @id @default(uuid())
-  userId      String   @map("user_id")
-  deviceId    String   @map("device_id")
-  resourceType String  @map("resource_type") // UUP | PROFILE | SETTINGS
-  resourceId  String   @map("resource_id")
-  localValue  Json     @map("local_value")
-  remoteValue Json     @map("remote_value")
-  resolution  String   @default("pending") // pending | local_wins | remote_wins | merged
-  resolvedAt  DateTime? @map("resolved_at")
-  createdAt   DateTime @default(now()) @map("created_at")
+  id           String    @id @default(uuid())
+  userId       String    @map("user_id")
+  deviceId     String    @map("device_id")
+  resourceType String    @map("resource_type") // UUP | PROFILE | SETTINGS
+  resourceId   String    @map("resource_id")
+  localValue   Json      @map("local_value")
+  remoteValue  Json      @map("remote_value")
+  resolution   String    @default("pending") // pending | local_wins | remote_wins | merged
+  resolvedAt   DateTime? @map("resolved_at")
+  createdAt    DateTime  @default(now()) @map("created_at")
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
