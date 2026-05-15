@@ -71,7 +71,8 @@ services:
       - '4000:4000'
     environment:
       API_PORT: 4000
-      DATABASE_URL: postgresql://udb:${DB_PASSWORD:-udb}@pgbouncer:6432/udb?schema=public
+      DATABASE_URL: postgresql://udb:${DB_PASSWORD:-udb}@pgbouncer:6432/udb?schema=public&pgbouncer=true
+      DIRECT_URL: postgresql://udb:${DB_PASSWORD:-udb}@postgres:5432/udb?schema=public
       REDIS_URL: redis://redis:6379
       JWT_SECRET: ${JWT_SECRET}
       NODE_ENV: production
