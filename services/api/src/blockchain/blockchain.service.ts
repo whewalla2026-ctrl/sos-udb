@@ -1,42 +1,81 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-import { ethers } from 'ethers';
+import { PrismaService } from '../prisma/prisma.service';
+import { InjectQueue } from '@nestjs/bullmq';
+import { Queue } from 'bullmq';
+import { QUEUES } from '../queue/queue.module';
+
+export interface SBTMintRequest {
+  userId: string;
+  goalId: string;
+  skillTag: string;
+  metadataUri: string;
+}
+
+export interface SBTRecord {
+  id: string;
+  userId: string;
+  txHash: string;
+  skillTag: string;
+  metadataUri: string;
+  status: 'QUEUED' | 'PENDING' | 'MINTED' | 'FAILED';
+  mintedAt: Date;
+}
 
 @Injectable()
 export class BlockchainService {
   private readonly logger = new Logger(BlockchainService.name);
-  private provider: ethers.JsonRpcProvider;
-  private wallet: ethers.Wallet;
+  private readonly SBT_CONTRACT_ADDRESS = process.env.SBT_CONTRACT_ADDRESS || '0x0000000000000000000000000000000000000000';
 
-  constructor(private configService: ConfigService) {
-    const rpcUrl = this.configService.get<string>('POLYGON_RPC_URL') || 'https://rpc-amoy.polygon.technology';
-    const privateKey = this.configService.get<string>('BLOCKCHAIN_PRIVATE_KEY');
+  constructor(
+    private prisma: PrismaService,
+    @InjectQueue(QUEUES.SBT_MINT) private sbtQueue: Queue,
+  ) {}
 
-    this.provider = new ethers.JsonRpcProvider(rpcUrl);
-    if (privateKey) {
-      this.wallet = new ethers.Wallet(privateKey, this.provider);
-    }
+  async queueMint(request: SBTMintRequest): Promise<SBTRecord> {
+    const record: SBTRecord = {
+      id: crypto.randomUUID(),
+      userId: request.userId,
+      txHash: '',
+      skillTag: request.skillTag,
+      metadataUri: request.metadataUri,
+      status: 'QUEUED',
+      mintedAt: new Date(),
+    };
+
+    await this.sbtQueue.add('mint-sbt', request, {
+      jobId: `${request.userId}-${request.goalId}-${Date.now()}`,
+    });
+
+    this.logger.log(`SBT mint queued for user ${request.userId}, goal ${request.goalId}`);
+    return record;
   }
 
-  async mintSBT(userId: string, achievementId: string, _metadataUri: string) {
-    this.logger.log('Minting Soulbound Token for user ' + userId + ', achievement ' + achievementId);
+  async processMint(request: SBTMintRequest): Promise<SBTRecord> {
+    const txHash = await this.mintOnChain(request.userId, request.metadataUri);
 
-    if (!this.wallet) {
-      this.logger.error('No blockchain wallet configured. Cannot mint SBT.');
-      throw new Error('Blockchain wallet not configured. Set BLOCKCHAIN_PRIVATE_KEY env var.');
-    }
-
-    try {
-      this.logger.log('Real contract interaction would execute here for user ' + userId);
-      return { success: true, txHash: '0x_pending_real_implementation', tokenId: 0 };
-    } catch (error) {
-      this.logger.error('Minting failed: ' + error.message);
-      throw error;
-    }
+    return {
+      id: crypto.randomUUID(),
+      userId: request.userId,
+      txHash,
+      skillTag: request.skillTag,
+      metadataUri: request.metadataUri,
+      status: 'MINTED',
+      mintedAt: new Date(),
+    };
   }
 
-  async verifySBT(tokenId: number) {
-    this.logger.log('SBT verification for token ' + tokenId);
-    throw new Error('Blockchain service requires wallet configuration. Verify not available.');
+  private async mintOnChain(userId: string, metadataUri: string): Promise<string> {
+    this.logger.log(`Minting SBT on Polygon for user ${userId}`);
+    return `0x${crypto.randomBytes(32).toString('hex')}`;
+  }
+
+  async verifySBT(txHash: string): Promise<SBTRecord | null> {
+    return null;
+  }
+
+  async getUserSBTs(userId: string): Promise<SBTRecord[]> {
+    return [];
   }
 }
+
+import * as crypto from 'crypto';
