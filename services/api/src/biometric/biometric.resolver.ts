@@ -1,37 +1,62 @@
-import { Resolver, Query, Mutation, Args, InputType, Field, Int } from '@nestjs/graphql';
+import { Resolver, Query, Mutation, Args, InputType, Field, Int, ObjectType } from '@nestjs/graphql';
 import { UseGuards } from '@nestjs/common';
 import { GqlAuthGuard } from '../auth/guards/gql-auth.guard';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
-import { BiometricService } from './biometric.service';
+import { BiometricService, BiometricEntry } from './biometric.service';
 import { GraphQLJSON } from 'graphql-type-json';
 
 @InputType()
-class BiometricInput {
+class BiometricSyncInput {
   @Field(() => Int, { nullable: true }) sleepHours?: number;
-  @Field(() => Int, { nullable: true }) focusScore?: number;
-  @Field(() => Int, { nullable: true }) stressLevel?: number;
-  @Field({ nullable: true }) notes?: string;
+  @Field(() => Int, { nullable: true }) hrv?: number;
+  @Field(() => Int, { nullable: true }) stressIndex?: number;
+  @Field(() => Int, { nullable: true }) restingHr?: number;
+  @Field(() => Int, { nullable: true }) steps?: number;
+  @Field({ nullable: true }) source?: 'healthkit' | 'googlefit' | 'manual';
+}
+
+@ObjectType()
+class BiometricSyncResult {
+  @Field() ingested: number;
+  @Field() duplicates: number;
+  @Field(() => [String]) errors: string[];
+}
+
+@ObjectType()
+class ChronotypeResult {
+  @Field() chronotype: string;
 }
 
 @Resolver()
 export class BiometricResolver {
   constructor(private bio: BiometricService) {}
 
-  @Mutation(() => GraphQLJSON)
+  @Mutation(() => BiometricSyncResult)
   @UseGuards(GqlAuthGuard)
-  async logBiometric(@CurrentUser() user: any, @Args('data') data: BiometricInput) {
-    return this.bio.logBiometric(user.id, { ...data, source: 'MANUAL' });
+  async syncBiometricData(@CurrentUser() user: any, @Args('entries', { type: () => [BiometricSyncInput] }) entries: BiometricSyncInput[]) {
+    const formattedEntries: BiometricEntry[] = entries.map(e => ({
+      time: new Date(),
+      userId: user.id,
+      sleepHours: e.sleepHours,
+      hrv: e.hrv,
+      stressIndex: e.stressIndex,
+      restingHr: e.restingHr,
+      steps: e.steps,
+      source: e.source || 'manual',
+    }));
+    return this.bio.syncEntries(user.id, formattedEntries);
   }
 
   @Query(() => GraphQLJSON)
   @UseGuards(GqlAuthGuard)
-  async biometricHistory(@CurrentUser() user: any, @Args('days', { defaultValue: 30 }) days: number) {
-    return this.bio.getBiometricHistory(user.id, days);
+  async biometricDailySummary(@CurrentUser() user: any, @Args('date', { defaultValue: () => new Date() }) date: Date) {
+    return this.bio.getDailySummary(user.id, date);
   }
 
-  @Query(() => GraphQLJSON)
+  @Query(() => ChronotypeResult)
   @UseGuards(GqlAuthGuard)
-  async focusPeak(@CurrentUser() user: any) {
-    return this.bio.analyzeFocusPeak(user.id);
+  async myChronotype(@CurrentUser() user: any) {
+    const chronotype = await this.bio.calculateChronotype(user.id);
+    return { chronotype };
   }
 }

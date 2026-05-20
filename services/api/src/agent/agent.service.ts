@@ -36,6 +36,26 @@ export class AgentService {
     this.logger.debug(`Heartbeat from ${userId}, focus score: ${focusScore}`);
   }
 
+  async receiveHeartbeatFallback(userId: string, fallbackScore: number): Promise<void> {
+    const focusScore = fallbackScore || 0.5;
+
+    await this.prisma.$executeRaw`
+      INSERT INTO agent_heartbeats (id, user_id, timestamp, app_usage, focus_score, agent_version, platform, created_at)
+      VALUES (
+        gen_random_uuid(),
+        ${userId},
+        NOW(),
+        ${JSON.stringify([{ source: 'in-platform', fallback: true }])},
+        ${focusScore},
+        'in-platform-fallback',
+        'none',
+        NOW()
+      )
+    `;
+
+    this.logger.debug(`Fallback heartbeat from ${userId}, focus score: ${focusScore}`);
+  }
+
   private calculateFocusScore(appUsage: { appName: string; category: string; durationSec: number }[]): number {
     const productiveCategories = ['productive', 'educational'];
     const totalTime = appUsage.reduce((sum, app) => sum + app.durationSec, 0);
