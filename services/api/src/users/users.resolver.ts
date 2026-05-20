@@ -6,6 +6,7 @@ import { Roles } from '../auth/decorators/roles.decorator';
 import { UserRole } from '../shared/user-role';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { UsersService } from './users.service';
+import { GdprService } from './gdpr.service';
 import { ObjectType, Field, InputType } from '@nestjs/graphql';
 import { GraphQLJSON } from 'graphql-type-json';
 
@@ -39,9 +40,25 @@ import { GraphQLJSON } from 'graphql-type-json';
   @Field({ nullable: true }) timezone?: string;
 }
 
+@ObjectType() class GdprDeletionResponse {
+  @Field() deletionId: string;
+  @Field() scheduledDate: string;
+}
+
+@ObjectType() class GdprConsentStatus {
+  @Field(() => GraphQLJSON) coppaConsent: any;
+  @Field() gdprDeleteRequested: boolean;
+  @Field(() => [GraphQLJSON]) consentHistory: any[];
+}
+
+@InputType() class ConsentInput {
+  @Field() consentType: string;
+  @Field() granted: boolean;
+}
+
 @Resolver()
 export class UsersResolver {
-  constructor(private users: UsersService) {}
+  constructor(private users: UsersService, private gdpr: GdprService) {}
 
   @Query(() => UserType)
   @UseGuards(GqlAuthGuard)
@@ -66,5 +83,35 @@ export class UsersResolver {
   @UseGuards(GqlAuthGuard)
   async dashboardData(@CurrentUser() user: any) {
     return this.users.getDashboardData(user.id);
+  }
+
+  @Query(() => GraphQLJSON)
+  @UseGuards(GqlAuthGuard)
+  async exportUserData(@CurrentUser() user: any) {
+    return this.gdpr.exportUserData(user.id);
+  }
+
+  @Mutation(() => GdprDeletionResponse)
+  @UseGuards(GqlAuthGuard)
+  async requestDeletion(@CurrentUser() user: any) {
+    return this.gdpr.requestDeletion(user.id);
+  }
+
+  @Mutation(() => Boolean)
+  @UseGuards(GqlAuthGuard)
+  async cancelDeletion(@CurrentUser() user: any) {
+    return this.gdpr.cancelDeletionRequest(user.id);
+  }
+
+  @Query(() => GdprConsentStatus)
+  @UseGuards(GqlAuthGuard)
+  async getConsentStatus(@CurrentUser() user: any) {
+    return this.gdpr.getConsentStatus(user.id);
+  }
+
+  @Mutation(() => Boolean)
+  @UseGuards(GqlAuthGuard)
+  async recordConsent(@CurrentUser() user: any, @Args('consent') consent: ConsentInput) {
+    return this.gdpr.recordConsent(user.id, consent.consentType, consent.granted);
   }
 }
