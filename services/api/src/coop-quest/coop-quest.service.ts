@@ -90,7 +90,7 @@ export class CoopQuestService {
     await this.uupSync.sync({
       source: 'gamification',
       userId: childId,
-      data: { gamification: { coin_balance: childPoints } },
+      data: { gamification: { coin_balance: childPoints } as any },
       actorId: parentId,
       actorRole: 'PARENT',
     });
@@ -98,7 +98,7 @@ export class CoopQuestService {
     await this.uupSync.sync({
       source: 'gamification',
       userId: parentId,
-      data: { gamification: { coin_balance: parentPoints } },
+      data: { gamification: { coin_balance: parentPoints } as any },
       actorId: parentId,
       actorRole: 'PARENT',
     });

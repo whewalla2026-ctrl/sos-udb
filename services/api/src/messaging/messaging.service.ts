@@ -64,6 +64,14 @@ export class MessagingService {
     return { messages: [], nextCursor: undefined };
   }
 
+  async getInbox(userId: string): Promise<Message[]> {
+    return [];
+  }
+
+  async getConversation(userId: string, withUserId: string): Promise<Message[]> {
+    return [];
+  }
+
   async reportMessage(messageId: string, reporterId: string, reason: string): Promise<void> {
     this.eventEmitter.emit('message:reported', { messageId, reporterId, reason });
   }

@@ -9,7 +9,8 @@ import { PrismaModule } from '../prisma/prisma.module';
 })
 export class AuditModule {}
 
-import { Injectable, Resolver, Query, Args, Int } from '@nestjs/graphql';
+import { Injectable } from '@nestjs/common';
+import { Resolver, Query, Args, Int } from '@nestjs/graphql';
 import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()

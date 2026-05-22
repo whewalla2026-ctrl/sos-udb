@@ -1,5 +1,6 @@
 import { Resolver, Query, Mutation, Args, ID, ObjectType, Field, Int } from '@nestjs/graphql';
 import { GamificationService, DoterState } from './gamification.service';
+import { UUPSyncService } from '../uup-sync/uup-sync.service';
 
 @ObjectType()
 export class DoterStatus {
@@ -51,11 +52,14 @@ export class PointsBalance {
 
 @Resolver(() => DoterStatus)
 export class GamificationResolver {
-  constructor(private gamificationService: GamificationService) {}
+  constructor(
+    private gamificationService: GamificationService,
+    private uupSync: UUPSyncService,
+  ) {}
 
   @Query(() => DoterStatus)
   async doterStatus(@Args('userId', { type: () => ID }) userId: string) {
-    const uup = await this.uupSync?.getUUP(userId);
+    const uup = await this.uupSync.getUUP(userId);
     return {
       level: uup?.gamification?.doter_level || 1,
       state: uup?.gamification?.doter_state || 'NEUTRAL',
@@ -101,8 +105,3 @@ export class GamificationResolver {
     return this.gamificationService.deactivateStreakFreeze(userId);
   }
 }
-
-import { UUPSyncService } from '../uup-sync/uup-sync.service';
-
-GamificationResolver.prototype.uupSync = null;
-GamificationResolver = Object.assign(GamificationResolver, { uupSync: null });

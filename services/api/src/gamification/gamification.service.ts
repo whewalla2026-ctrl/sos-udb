@@ -58,7 +58,7 @@ export class GamificationService {
       await this.uupSync.sync({
         source: 'gamification',
         userId,
-        data: { gamification: { doter_state: newState } },
+        data: { gamification: { doter_state: newState } as any },
         actorId: 'system',
         actorRole: 'ADMIN',
       });
@@ -137,7 +137,7 @@ export class GamificationService {
         gamification: {
           coin_balance: (uup.gamification?.coin_balance || 0) + amount,
           xp: (uup.gamification?.xp || 0) + amount,
-        },
+        } as any,
       },
       actorId: 'system',
       actorRole: 'ADMIN',
@@ -190,7 +190,7 @@ export class GamificationService {
             doter_state: 'RESTING',
             streak_freeze_available: (uup.gamification?.streak_freeze_available || 0),
             last_streak_freeze_auto: new Date().toISOString(),
-          },
+          } as any,
         },
         actorId: 'system',
         actorRole: 'ADMIN',
@@ -207,7 +207,7 @@ export class GamificationService {
           gamification: {
             doter_state: 'RESTING',
             streak_freeze_available: (uup.gamification?.streak_freeze_available || 1) - 1,
-          },
+          } as any,
         },
         actorId: userId,
         actorRole: 'CHILD',
@@ -224,7 +224,7 @@ export class GamificationService {
     await this.uupSync.sync({
       source: 'gamification',
       userId,
-      data: { gamification: { doter_state: previousState || 'NEUTRAL' } },
+      data: { gamification: { doter_state: previousState || 'NEUTRAL' } as any },
       actorId: 'system',
       actorRole: 'ADMIN',
     });

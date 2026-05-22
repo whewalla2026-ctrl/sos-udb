@@ -179,6 +179,10 @@ export class SafetyService {
     return 'stable';
   }
 
+  async getLatestSafetyScore(userId: string): Promise<SafetyScoreResult | null> {
+    return this.calculateSafetyScore(userId);
+  }
+
   async getSafetyScoreHistory(userId: string, days: number = 30): Promise<any[]> {
     const startDate = new Date(Date.now() - days * 24 * 60 * 60 * 1000);
     

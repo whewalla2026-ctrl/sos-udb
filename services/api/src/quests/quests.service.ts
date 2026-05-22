@@ -142,9 +142,17 @@ export class QuestsService {
     // Sync UUP gamification pillar
     const user = await this.prisma.user.findUnique({ where: { id: quest.userId } });
     const uup = user?.uupData as any;
-    await this.uupSync.syncUUP(quest.userId, 'gamification', {
-      xp: (uup?.gamification?.xp ?? 0) + quest.xpReward,
-      coin_balance: (uup?.gamification?.coin_balance ?? 0) + quest.coinReward,
+    await this.uupSync.sync({
+      source: 'gamification',
+      userId: quest.userId,
+      data: {
+        gamification: {
+          xp: (uup?.gamification?.xp ?? 0) + quest.xpReward,
+          coin_balance: (uup?.gamification?.coin_balance ?? 0) + quest.coinReward,
+        } as any,
+      },
+      actorId: approverId,
+      actorRole: 'ADMIN',
     });
 
     // Audit

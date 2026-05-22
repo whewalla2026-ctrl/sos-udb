@@ -19,7 +19,7 @@ export class AcademicService {
     const gaps = await this.prisma.skillGap.findMany({ where: { userId } });
     const gapMap: Record<string, number> = {};
     gaps.forEach(g => { gapMap[g.subject] = g.gapScore; });
-    await this.uupSync.syncUUP(userId, 'academic', { skill_gaps: gapMap });
+    await this.uupSync.sync({ source: 'academic', userId, data: { academic: { skill_gaps: gapMap } as any }, actorId: userId, actorRole: 'ADMIN' });
 
     return gap;
   }

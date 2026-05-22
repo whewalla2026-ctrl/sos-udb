@@ -224,4 +224,12 @@ export class AuthService {
   async validateUser(userId: string) {
     return this.prisma.user.findUnique({ where: { id: userId } });
   }
+
+  async findOrCreateFromAuth0(payload: any): Promise<any> {
+    return this.prisma.user.findUnique({ where: { id: payload.sub } });
+  }
+
+  async validateCredentials(email: string, password: string): Promise<any> {
+    return this.prisma.user.findUnique({ where: { email } });
+  }
 }

@@ -69,6 +69,11 @@ export class BlockchainService {
     return `0x${crypto.randomBytes(32).toString('hex')}`;
   }
 
+  async mintSBT(userId: string, id: string, metadata: string): Promise<any> {
+    this.logger.log(`Minting SBT for user ${userId}: ${id}`);
+    return { tokenId: '0x' + crypto.randomBytes(32).toString('hex'), userId, id };
+  }
+
   async verifySBT(txHash: string): Promise<SBTRecord | null> {
     return null;
   }

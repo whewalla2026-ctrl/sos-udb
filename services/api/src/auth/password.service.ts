@@ -1,6 +1,6 @@
-import { Injectable } from '@nestjs/config';
+import { Injectable } from '@nestjs/common';
 import * as argon2 from 'argon2';
-import * as bcrypt from 'bcrypt';
+import * as bcrypt from 'bcryptjs';
 
 export interface PasswordHashResult {
   hash: string;
@@ -11,14 +11,7 @@ export interface PasswordHashResult {
 export class PasswordService {
   private readonly SALT_ROUNDS = 10;
 
-  constructor() {
-    argon2.defaults = {
-      memoryCost: 65536,
-      timeCost: 3,
-      parallelism: 1,
-      type: argon2.argon2id,
-    };
-  }
+  constructor() {}
 
   async hash(password: string): Promise<PasswordHashResult> {
     const hash = await argon2.hash(password, {

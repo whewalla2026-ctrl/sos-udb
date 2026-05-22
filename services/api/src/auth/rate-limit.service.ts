@@ -75,7 +75,7 @@ export class GranularRateLimitService {
         ttl: 60000,
         limit: 10,
         keyGenerator: (req: Request) => this.getClientIp(req),
-      },
+      } as any,
       {
         name: 'graphql-mutation',
         ttl: 60000,
@@ -84,7 +84,7 @@ export class GranularRateLimitService {
           const user = (req as any).user;
           return user?.id || this.getClientIp(req);
         },
-      },
+      } as any,
       {
         name: 'graphql-query',
         ttl: 60000,
@@ -93,7 +93,7 @@ export class GranularRateLimitService {
           const user = (req as any).user;
           return user?.id || this.getClientIp(req);
         },
-      },
+      } as any,
       {
         name: 'file-upload',
         ttl: 60000,
@@ -102,13 +102,13 @@ export class GranularRateLimitService {
           const user = (req as any).user;
           return user?.id || this.getClientIp(req);
         },
-      },
+      } as any,
       {
         name: 'default',
         ttl: 60000,
         limit: 600,
         keyGenerator: (req: Request) => this.getClientIp(req),
-      },
+      } as any,
     ];
   }
 }

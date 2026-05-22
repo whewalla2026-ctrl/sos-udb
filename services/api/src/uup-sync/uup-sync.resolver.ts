@@ -5,7 +5,7 @@ import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { UserRole } from '../shared/user-role';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
-import { UUPSyncService, ConflictResolution } from './uup-sync.service';
+import { UUPSyncService } from './uup-sync.service';
 import { ObjectType, Field, InputType, Int, registerEnumType } from '@nestjs/graphql';
 import { GraphQLJSON } from 'graphql-type-json';
 
@@ -168,7 +168,7 @@ export class UupSyncResolver {
     @CurrentUser() user: any,
     @Args('input') input: ResolveConflictInput,
   ) {
-    return this.uupSync.resolveConflict(user.id, input.conflictId, input.resolution as ConflictResolution);
+    return this.uupSync.resolveConflict(user.id, input.conflictId, input.resolution as any);
   }
 
   @Mutation(() => EnqueueResult)
