@@ -85,9 +85,9 @@ export class OfflineTutorService {
       
       await this.prisma.auditLog.create({
         data: {
-          userId: request.userId,
+          actorId: request.userId,
           action: 'TUTOR_OFFLINE_ASSIGNMENT_BLOCKED',
-          details: JSON.stringify({ sessionId, message: request.message }),
+          payload: JSON.stringify({ sessionId, message: request.message }),
         },
       });
 
@@ -228,9 +228,9 @@ export class OfflineTutorService {
       try {
         await this.prisma.auditLog.create({
           data: {
-            userId: session.userId,
-            action: 'TUTOR_OFFLINE_MESSAGE',
-            details: JSON.stringify({
+          actorId: session.userId,
+          action: 'TUTOR_OFFLINE_MESSAGE',
+          payload: JSON.stringify({
               sessionId,
               role: message.role,
               content: message.content,

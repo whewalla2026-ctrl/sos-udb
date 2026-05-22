@@ -77,15 +77,17 @@ export class PlannerService {
       const physicalBlocks = 1;
       const creativeBlocks = 1;
 
+      let creativeIdx = 0;
       for (let i = 0; i < cognitiveBlocks; i++) {
         slots.push(this.createSlot(day, chronotypeSchedule.cognitive[i], 'cognitive', 'Academic Focus', `Scheduled at ${chronotypeSchedule.cognitive[i]} due to your ${chronotype} peak`, []));
+        creativeIdx = i;
       }
 
       if (day === 0 || day === 3 || day === 6) {
         slots.push(this.createSlot(day, '14:00', 'physical', 'Physical Activity', 'Scheduled after lunch for optimal benefit', []));
       }
 
-      slots.push(this.createSlot(day, chronotypeSchedule.creative[i % 2], 'creative', 'Creative Play', 'Creative activities during low-focus window', []));
+      slots.push(this.createSlot(day, chronotypeSchedule.creative[creativeIdx % 2], 'creative', 'Creative Play', 'Creative activities during low-focus window', []));
     }
 
     return slots;

@@ -1,6 +1,6 @@
 import { Controller, Post, Body, Headers, UseGuards } from '@nestjs/common';
 import { AgentService, AgentHeartbeat } from './agent.service';
-import { FeatureFlagService } from '../feature-flags/feature-flags.service';
+import { FeatureFlagService } from '../feature-flags/feature-flag.service';
 
 @Controller('agent')
 export class AgentController {

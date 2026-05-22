@@ -1,12 +1,12 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { UupSyncService } from '../uup-sync/uup-sync.service';
+import { UUPSyncService } from '../uup-sync/uup-sync.service';
 import { QuestPillar } from '../shared/prisma-enums';
 
 @Injectable()
 export class AcademicService {
   private readonly logger = new Logger(AcademicService.name);
-  constructor(private prisma: PrismaService, private uupSync: UupSyncService) {}
+  constructor(private prisma: PrismaService, private uupSync: UUPSyncService) {}
 
   async updateSkillGap(userId: string, subject: string, pillar: QuestPillar, gapScore: number) {
     const gap = await this.prisma.skillGap.upsert({

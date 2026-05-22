@@ -4,13 +4,13 @@ import { BiometricService } from './biometric.service';
 import { BiometricResolver } from './biometric.resolver';
 import { BiometricController } from './biometric.controller';
 import { ChronotypeCronService } from './chronotype-cron.service';
-import { UupSyncModule } from '../uup-sync/uup-sync.module';
+import { UUPSyncModule } from '../uup-sync/uup-sync.module';
 import { RedisModule } from '../redis/redis.module';
 import { FeatureFlagsModule } from '../feature-flags/feature-flags.module';
 
 @Module({
   imports: [
-    UupSyncModule,
+    UUPSyncModule,
     RedisModule,
     FeatureFlagsModule,
     ScheduleModule.forRoot(),

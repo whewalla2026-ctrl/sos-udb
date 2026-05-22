@@ -1,6 +1,6 @@
 import { Injectable, Logger, NotFoundException, ForbiddenException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { UupSyncService } from '../uup-sync/uup-sync.service';
+import { UUPSyncService } from '../uup-sync/uup-sync.service';
 import { PointsService } from '../points/points.service';
 import { MetricsService } from '../shared/metrics.controller';
 import { QuestStatus, QuestPillar } from '../shared/prisma-enums';
@@ -12,7 +12,7 @@ export class QuestsService {
 
   constructor(
     private prisma: PrismaService,
-    private uupSync: UupSyncService,
+    private uupSync: UUPSyncService,
     private points: PointsService,
     private metrics: MetricsService,
   ) {}

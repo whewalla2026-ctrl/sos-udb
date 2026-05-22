@@ -14,10 +14,10 @@ export class GdprService {
         quests: true,
         pointsLedger: true,
         notifications: true,
-        familyLinksAsParent: { include: { child: true } },
-        familyLinksAsChild: { include: { parent: true } },
+        parentLinks: { include: { child: true } },
+        childLinks: { include: { parent: true } },
       },
-    });
+    }) as any;
 
     if (!user) {
       throw new Error('User not found');
@@ -64,7 +64,7 @@ export class GdprService {
         id: p.id,
         amount: p.amount,
         balanceAfter: p.balanceAfter,
-        reason: p.reason,
+        description: p.description,
         createdAt: p.createdAt,
       })),
       notifications: user.notifications.map(n => ({
@@ -76,11 +76,11 @@ export class GdprService {
         createdAt: n.createdAt,
       })),
       familyLinks: {
-        asParent: user.familyLinksAsParent.map(f => ({
+        asParent: user.parentLinks.map(f => ({
           childId: f.childId,
           childName: f.child.displayName,
         })),
-        asChild: user.familyLinksAsChild.map(f => ({
+        asChild: user.childLinks.map(f => ({
           parentId: f.parentId,
           parentName: f.parent.displayName,
         })),
@@ -111,9 +111,9 @@ export class GdprService {
 
     await this.prisma.auditLog.create({
       data: {
-        userId,
+        actorId: userId,
         action: 'GDPR_DELETE_REQUESTED',
-        details: JSON.stringify({
+        payload: JSON.stringify({
           requestedAt: new Date().toISOString(),
           scheduledDeletion: scheduledDate.toISOString(),
         }),
@@ -144,9 +144,9 @@ export class GdprService {
 
     await this.prisma.auditLog.create({
       data: {
-        userId,
+        actorId: userId,
         action: 'GDPR_DELETE_CANCELLED',
-        details: JSON.stringify({ cancelledAt: new Date().toISOString() }),
+        payload: JSON.stringify({ cancelledAt: new Date().toISOString() }),
       },
     });
 
@@ -156,9 +156,9 @@ export class GdprService {
   async recordConsent(userId: string, consentType: string, granted: boolean): Promise<boolean> {
     await this.prisma.auditLog.create({
       data: {
-        userId,
+        actorId: userId,
         action: 'GDPR_CONSENT',
-        details: JSON.stringify({
+        payload: JSON.stringify({
           consentType,
           granted,
           recordedAt: new Date().toISOString(),
@@ -180,7 +180,7 @@ export class GdprService {
     });
 
     const auditLogs = await this.prisma.auditLog.findMany({
-      where: { userId, action: 'GDPR_CONSENT' },
+      where: { actorId: userId, action: 'GDPR_CONSENT' },
       orderBy: { createdAt: 'desc' },
       take: 20,
     });
@@ -191,7 +191,7 @@ export class GdprService {
         date: user?.coppaConsentDate,
       },
       gdprDeleteRequested: user?.gdprDeleteRequested ?? false,
-      consentHistory: auditLogs.map(log => JSON.parse(log.details)),
+      consentHistory: auditLogs.map(log => JSON.parse(log.payload as string)),
     };
   }
 }

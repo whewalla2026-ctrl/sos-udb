@@ -3,7 +3,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { UUPSyncService } from '../uup-sync/uup-sync.service';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { RedisService } from '../redis/redis.service';
-import { FeatureFlagService } from '../feature-flags/feature-flags.service';
+import { FeatureFlagService } from '../feature-flags/feature-flag.service';
 
 export interface BiometricEntry {
   time: Date;
@@ -91,37 +91,40 @@ export class BiometricService implements OnModuleInit {
       userId,
       data: {
         biometric: {
+          chronotype: 'neutral',
           avg_sleep_hours: avg_sleep || undefined,
           stress_index: avg_stress || undefined,
           hrv_baseline: avg_hrv || undefined,
-          resting_hr_baseline: avg_resting_hr || undefined,
           last_sync: new Date().toISOString(),
         },
-      },
+      } as any,
       actorId: 'system',
       actorRole: 'ADMIN',
     });
   }
 
   private async triggerDoterTransition(userId: string): Promise<void> {
-    const uup = await this.uupSync.getUUP(userId);
-    const { sleep_hours, stress_index } = uup.biometric || {};
+    const uup: any = await this.uupSync.getUUP(userId);
+    const biometric: any = uup.biometric || {};
+    const sleepHours = biometric.avg_sleep_hours;
+    const stressIndex = biometric.stress_index;
+    const gamification: any = uup.gamification || {};
 
-    let newState = uup.gamification?.doter_state || 'NEUTRAL';
+    let newState = gamification.doter_state || 'NEUTRAL';
 
-    if (sleep_hours !== undefined && sleep_hours < 6) {
+    if (sleepHours !== undefined && sleepHours < 6) {
       newState = 'SLUGGISH';
-    } else if (stress_index !== undefined && stress_index > 0.7) {
+    } else if (stressIndex !== undefined && stressIndex > 0.7) {
       newState = 'SLUGGISH';
-    } else if (sleep_hours !== undefined && sleep_hours >= 8 && (stress_index === undefined || stress_index < 0.3)) {
+    } else if (sleepHours !== undefined && sleepHours >= 8 && (stressIndex === undefined || stressIndex < 0.3)) {
       newState = 'ENERGETIC';
     }
 
-    if (newState !== uup.gamification?.doter_state) {
+    if (newState !== gamification.doter_state) {
       await this.uupSync.sync({
         source: 'gamification',
         userId,
-        data: { gamification: { doter_state: newState } },
+        data: { gamification: { doter_state: newState } } as any,
         actorId: 'system',
         actorRole: 'ADMIN',
       });
@@ -193,34 +196,38 @@ export class BiometricService implements OnModuleInit {
 
   private async grantStreakFreeze(userId: string): Promise<void> {
     const redisKey = `streak_freeze_auto:${userId}`;
-    await this.redis.set(redisKey, '1', 30 * 24 * 60 * 60);
+    await this.redis.setex(redisKey, 30 * 24 * 60 * 60, '1');
 
     await this.prisma.pointsLedger.create({
       data: {
         userId,
+        transactionType: 'EARN',
         amount: 1,
         balanceAfter: 0,
-        reason: 'STREAK_FREEZE_AUTO_GRANT',
+        source: 'STREAK_REWARD',
+        description: 'STREAK_FREEZE_AUTO_GRANT',
+        metadata: { grantedAt: new Date().toISOString() },
+        status: 'SETTLED',
       },
     });
 
     await this.prisma.auditLog.create({
       data: {
-        userId,
+        actorId: userId,
         action: 'STREAK_FREEZE_AUTO_GRANT',
-        details: JSON.stringify({
+        payload: JSON.stringify({
           grantedAt: new Date().toISOString(),
           reason: 'Biometric conditions met (BR-06)',
         }),
       },
     });
 
-    const uup = await this.uupSync.getUUP(userId);
+    const uup: any = await this.uupSync.getUUP(userId);
     if (uup.gamification?.doter_state !== 'RESTING') {
       await this.uupSync.sync({
         source: 'gamification',
         userId,
-        data: { gamification: { doter_state: 'RESTING' } },
+        data: { gamification: { doter_state: 'RESTING' } } as any,
         actorId: 'system',
         actorRole: 'ADMIN',
       });

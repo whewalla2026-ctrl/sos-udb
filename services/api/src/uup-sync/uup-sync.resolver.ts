@@ -5,7 +5,7 @@ import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { UserRole } from '../shared/user-role';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
-import { UupSyncService, ConflictResolution } from './uup-sync.service';
+import { UUPSyncService, ConflictResolution } from './uup-sync.service';
 import { ObjectType, Field, InputType, Int, registerEnumType } from '@nestjs/graphql';
 import { GraphQLJSON } from 'graphql-type-json';
 
@@ -104,7 +104,7 @@ class OfflineChangeInput {
 
 @Resolver()
 export class UupSyncResolver {
-  constructor(private uupSync: UupSyncService) {}
+  constructor(private uupSync: UUPSyncService) {}
 
   @Query(() => GraphQLJSON)
   @UseGuards(GqlAuthGuard)

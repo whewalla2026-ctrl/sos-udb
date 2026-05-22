@@ -40,18 +40,18 @@ export class ChronotypeCronService {
           userId: user.id,
           data: {
             biometric: {
-              chronotype,
+              chronotype: chronotype as 'morning_logic' | 'afternoon_creative' | 'evening_social' | 'neutral',
             },
-          },
+          } as any,
           actorId: 'system',
           actorRole: 'ADMIN',
         });
 
         await this.prisma.auditLog.create({
           data: {
-            userId: user.id,
+            actorId: user.id,
             action: 'CHRONOTYPE_UPDATED',
-            details: JSON.stringify({ chronotype, updatedAt: new Date().toISOString() }),
+            payload: JSON.stringify({ chronotype, updatedAt: new Date().toISOString() }),
           },
         });
 

@@ -21,7 +21,7 @@ import { PointsModule } from './points/points.module';
 import { GoalsModule } from './goals/goals.module';
 import { ActivitiesModule } from './activities/activities.module';
 import { BiometricModule } from './biometric/biometric.module';
-import { UupSyncModule } from './uup-sync/uup-sync.module';
+import { UUPSyncModule } from './uup-sync/uup-sync.module';
 import { AcademicModule } from './academic/academic.module';
 import { MessagingModule } from './messaging/messaging.module';
 import { EvidenceModule } from './evidence/evidence.module';
@@ -84,7 +84,7 @@ import { createGraphQLMetricsPlugin } from './shared/graphql-metrics.plugin';
     GoalsModule,
     ActivitiesModule,
     BiometricModule,
-    UupSyncModule,
+    UUPSyncModule,
     AcademicModule,
     MessagingModule,
     EvidenceModule,
