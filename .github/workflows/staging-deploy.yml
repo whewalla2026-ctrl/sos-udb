@@ -61,10 +61,41 @@ jobs:
         with:
           version: ${{ env.PNPM_VERSION }}
       - run: pnpm install --frozen-lockfile
+        env:
+          DATABASE_URL: postgresql://udb:udb@localhost:5432/udb?schema=public
+          DIRECT_URL: postgresql://udb:udb@localhost:5432/udb?schema=public
       - run: pnpm run typecheck
+        env:
+          DATABASE_URL: postgresql://udb:udb@localhost:5432/udb?schema=public
+          DIRECT_URL: postgresql://udb:udb@localhost:5432/udb?schema=public
       - run: pnpm run build
+        env:
+          DATABASE_URL: postgresql://udb:udb@localhost:5432/udb?schema=public
+          DIRECT_URL: postgresql://udb:udb@localhost:5432/udb?schema=public
       - run: pnpm run lint
+        env:
+          DATABASE_URL: postgresql://udb:udb@localhost:5432/udb?schema=public
+          DIRECT_URL: postgresql://udb:udb@localhost:5432/udb?schema=public
       - run: pnpm run test
+        env:
+          DATABASE_URL: postgresql://udb:udb@localhost:5432/udb?schema=public
+          DIRECT_URL: postgresql://udb:udb@localhost:5432/udb?schema=public
+      - name: Prisma migration check
+        run: npx prisma migrate deploy
+        working-directory: services/api
+        env:
+          DATABASE_URL: postgresql://udb:udb@localhost:5432/udb?schema=public
+          DIRECT_URL: postgresql://udb:udb@localhost:5432/udb?schema=public
+      - name: Integration tests
+        run: pnpm run test:integration
+        env:
+          DATABASE_URL: postgresql://udb:udb@localhost:5432/udb?schema=public
+          DIRECT_URL: postgresql://udb:udb@localhost:5432/udb?schema=public
+      - name: E2E tests
+        run: pnpm run test:e2e
+        env:
+          DATABASE_URL: postgresql://udb:udb@localhost:5432/udb?schema=public
+          DIRECT_URL: postgresql://udb:udb@localhost:5432/udb?schema=public
 
   deploy:
     name: Build & Deploy (Docker Compose)

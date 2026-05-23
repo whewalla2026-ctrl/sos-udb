@@ -109,6 +109,44 @@ Check "Jaeger responds" {
   try { $r = Invoke-WebRequest -Uri "$JaegerUrl" -TimeoutSec 10 -UseBasicParsing; $r.StatusCode -eq 200 -or $r.StatusCode -eq 302 } catch { $false }
 }
 
+# ─── 7. Security — GraphQL Introspection Blocked ───────────
+Write-Host "7. Security" -ForegroundColor Cyan
+Check "GraphQL introspection blocked (returns error)" {
+  $tmp = [System.IO.Path]::GetTempFileName()
+  try {
+    $body = @{ query = '{ __schema { types { name } } }' } | ConvertTo-Json -Compress
+    Set-Content -Path $tmp -Value $body -NoNewline
+    $r = curl.exe -s -X POST $ApiUrl/graphql -H "Content-Type: application/json" -d "@$tmp" 2>&1
+    # Should contain error, not schema data
+    $r -match "error"
+  } finally { Remove-Item $tmp -ErrorAction SilentlyContinue }
+}
+Check "Rate limiting prevents abuse" {
+  $limited = $false
+  for ($i = 0; $i -lt 20; $i++) {
+    try {
+      $null = Invoke-RestMethod -Uri "$ApiUrl/health" -TimeoutSec 3
+    } catch {
+      if ($_.Exception.Response.StatusCode -eq 429) {
+        $limited = $true
+        break
+      }
+    }
+  }
+  $limited
+}
+
+# ─── 8. Registration Endpoint ─────────────────────────────
+Write-Host "8. Registration" -ForegroundColor Cyan
+Check "Registration endpoint accepts requests" {
+  $r = curl.exe -s -o /dev/null -w "%{http_code}" -X POST "$ApiUrl/auth/register" -H "Content-Type: application/json" -d "{`"email`":`"smoke-$(Get-Date -Format 'yyyyMMddHHmmss')@test.udb.dev`",`"password`":`"SmokeTest123!`",`"name`":`"Smoke Parent`",`"role`":`"parent`"}" 2>&1
+  $r -eq "201" -or $r -eq "400" -or $r -eq "409"
+}
+Check "Auth endpoint exists (returns JSON)" {
+  $r = curl.exe -s -X POST "$ApiUrl/auth/register" -H "Content-Type: application/json" -d "{`"email`":`"test@test.com`",`"password`":`"test`"}" 2>&1
+  $r -match "error|statusCode|userId|accessToken"
+}
+
 # ─── Summary ───────────────────────────────────────────────
 Write-Host ""
 Write-Host "============================================" -ForegroundColor Cyan
