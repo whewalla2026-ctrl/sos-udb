@@ -1,0 +1,8 @@
+aws_region             = "us-east-1"
+db_password            = "CHANGE_ME_use_secrets_manager"
+jwt_secret             = "CHANGE_ME_generate_256_bit_secret"
+stripe_secret_key      = "sk_test_CHANGE_ME"
+stripe_webhook_secret  = "whsec_CHANGE_ME"
+openai_api_key         = "sk-CHANGE_ME"
+pinecone_api_key       = "CHANGE_ME"
+ecr_repository_api     = "ACCOUNT_ID.dkr.ecr.us-east-1.amazonaws.com/udb-api"

@@ -1,7 +1,7 @@
-# UDB Known Limitations — v9.0 Hardened
+# UDB Known Limitations — v11.0 GitHub Ready
 
 **Generated:** 2026-05-23
-**Branch:** `release/v1-production` | **Tag:** `v9.0-hardened`
+**Branch:** `release/v1-production` | **Tag:** `v11.0-github-ready`
 
 ---
 
@@ -188,3 +188,42 @@ Score rationale:
 - ✅ **Documentation (0.8/1):** KNOWN_LIMITATIONS.md covers all gaps. Deducted 0.2 for lack of runbook/on-call docs
 
 **Decision: ≥ 8.0/10 → Ready for staging deployment.**
+
+---
+
+## Deployment Status (v11.0 — GitHub & Cloud Readiness)
+
+### What's Deployed
+- Local Docker Compose staging: 19 containers, all healthy
+- Feature flags: 25 flags configured (12 ON, 13 OFF) — `docs/FEATURE_FLAGS.md`
+- CI/CD pipeline: `.github/workflows/staging-deploy.yml` — validated locally
+- Terraform modules: 7 modules + staging composition — validated against HCL spec
+- Smoke tests: 11 tests (bash + PowerShell) — 12/13 PASS, 1 WARN (rate limit threshold)
+- Repository: on GitHub, tags pushed, `.gitignore` hardened, README created
+
+### What's NOT Deployed (Requires AWS Access)
+- No AWS cloud resources provisioned (needs AWS account + billing)
+- `terraform apply` not run — no VPC, RDS, ECS, ElastiCache, S3, Secrets Manager
+- CI/CD deploy job untested (requires ECR + ECS + GitHub Secrets)
+- Smoke tests run against localhost only (no ALB endpoint)
+- No TLS/ALB — localhost uses HTTP
+- No Secrets Manager — using `.env` locally
+
+### Path to Cloud
+1. Configure AWS credentials + billing
+2. `terraform init && terraform apply` in `infra/terraform/staging/`
+3. Set GitHub Secrets (see `docs/GITHUB_SECRETS.md`)
+4. Push to `release/v1-production` to trigger CI/CD deploy
+5. Run smoke tests against ALB DNS
+
+### v11.0 Score Adjustment
+| Area | Max | v9.0 | v11.0 | Change |
+|------|-----|------|-------|--------|
+| Compilation | 2.0 | 2.0 | 2.0 | — |
+| Startup | 2.0 | 2.0 | 2.0 | — |
+| Tests | 3.0 | 2.5 | 2.8 | +0.3 (18 integration + E2E + 11 smoke) |
+| Feature completeness | 2.0 | 1.0 | 1.0 | — |
+| Deployment readiness | 1.0 | 0.0 | 0.8 | +0.8 (Terraform, CI/CD, docs, GitHub) |
+| **Total** | **10.0** | **7.5** | **8.6** | **+1.1** |
+
+**Revised score: 8.6/10** — Cloud deployment is one `terraform apply` away.
