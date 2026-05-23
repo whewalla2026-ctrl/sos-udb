@@ -2,136 +2,54 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
 import { JwtService } from '@nestjs/jwt';
+import { GqlExecutionContext } from '@nestjs/graphql';
 import { AppModule } from '../src/app.module';
-import { PrismaService } from '../src/prisma/prisma.service';
-import { REDIS_CLIENT } from '../src/redis/redis.module';
-import { MessagingService } from '../src/messaging/messaging.service';
-import { SafetyService } from '../src/safety/safety.service';
-import { PointsService } from '../src/points/points.service';
+import { GqlAuthGuard } from '../src/auth/guards/gql-auth.guard';
+import { E2E_MOCK_PROVIDERS } from './e2e-mock-providers';
 
 function makeToken(jwtService: JwtService, user: { id: string; email: string; role: string }): string {
   return jwtService.sign({ sub: user.id, email: user.email, role: user.role });
 }
 
-const mockRedisClient = { publish: jest.fn().mockResolvedValue(1), get: jest.fn().mockResolvedValue(null), set: jest.fn().mockResolvedValue('OK') };
-const mockMessagingService = {
-  sendMessage: jest.fn().mockResolvedValue(null),
-  getConversation: jest.fn().mockResolvedValue([]),
-  getInbox: jest.fn().mockResolvedValue([]),
-};
-const mockSafetyService = {
-  analyzeMessage: jest.fn().mockResolvedValue({ isSafe: true, safetyScore: 0, flags: [] }),
-  recordSafetyScore: jest.fn().mockResolvedValue(null),
-};
-
-const mockPointsService = {
-  awardPoints: jest.fn().mockResolvedValue({ id: 'tx-1', transactionType: 'EARN', amount: 100, balanceAfter: 500 }),
-  spendPoints: jest.fn().mockResolvedValue({ id: 'tx-2', transactionType: 'SPEND', amount: -200, balanceAfter: 300 }),
-  getBalance: jest.fn().mockResolvedValue(1250),
-  getLedger: jest.fn().mockResolvedValue({ entries: [], total: 0, page: 1, pageSize: 20 }),
-};
-
-const mockUser = {
-  id: 'user-child-1', email: 'child@udb.dev', role: 'CHILD', displayName: 'Test Child',
-  avatarUrl: null, uupData: {}, accessibilitySettings: {}, createdAt: new Date(),
-  doterProfile: { id: 'doter-1', state: 'EGG', name: 'Doter', level: 1, xp: 0, coinBalance: 0, streakDays: 0, isSluggy: false, isEnergetic: false },
-};
-
-const mockPrismaService = {
-  user: {
-    findUnique: jest.fn().mockImplementation(({ where }: any) => {
-      if (where.id === 'user-child-1' || where.email === 'child@udb.dev') return Promise.resolve(mockUser);
-      if (where.id === 'user-parent-1' || where.email === 'parent@udb.dev') return Promise.resolve({ ...mockUser, id: 'user-parent-1', email: 'parent@udb.dev', role: 'PARENT' });
-      if (where.id === 'user-admin-1' || where.email === 'admin@udb.dev') return Promise.resolve({ ...mockUser, id: 'user-admin-1', email: 'admin@udb.dev', role: 'ADMIN' });
-      return Promise.resolve(null);
-    }),
-    findFirst: jest.fn().mockResolvedValue(null),
-    findMany: jest.fn().mockResolvedValue([]),
-    create: jest.fn().mockImplementation(({ data }: any) => Promise.resolve({ id: 'new-user-1', ...data })),
-    update: jest.fn().mockImplementation(({ data }: any) => Promise.resolve({ ...mockUser, ...data })),
-    updateMany: jest.fn().mockResolvedValue({ count: 1 }),
-    upsert: jest.fn().mockImplementation(({ create }: any) => Promise.resolve({ id: 'upsert-user-1', ...create })),
-    delete: jest.fn().mockResolvedValue(mockUser),
-    deleteMany: jest.fn().mockResolvedValue({ count: 1 }),
-    count: jest.fn().mockResolvedValue(42),
-  },
-  onboardingStatus: {
-    count: jest.fn().mockResolvedValue(10),
-  },
-  quest: {
-    findUnique: jest.fn().mockImplementation(({ where }: any) => {
-      const questId = where?.id || 'quest-1';
-      return Promise.resolve({ id: questId, userId: 'user-child-1', title: 'Test Quest', description: '', status: 'PENDING', pillar: 'ACADEMIC', xpReward: 100, coinReward: 50, goalId: null, dueDate: null, proofUrl: null, proofType: null, aiConfidence: null, aiVerified: false, isChunk: false, parentQuestId: null, chunkIndex: null, metadata: {}, createdAt: new Date(), updatedAt: new Date() });
-    }),
-    findFirst: jest.fn().mockResolvedValue(null),
-    findMany: jest.fn().mockResolvedValue([]),
-    create: jest.fn().mockImplementation(({ data }: any) => Promise.resolve({ id: 'new-quest-1', ...data, status: 'PENDING', createdAt: new Date(), updatedAt: new Date() })),
-    update: jest.fn().mockImplementation(({ data }: any) => Promise.resolve({ id: 'quest-1', userId: 'user-child-1', title: 'Test Quest', status: 'APPROVED', ...data })),
-    createMany: jest.fn().mockResolvedValue({ count: 1 }),
-    deleteMany: jest.fn().mockResolvedValue({ count: 1 }),
-  },
-  familyLink: {
-    findFirst: jest.fn().mockImplementation(({ where }: any) => {
-      if (where?.parentId === 'user-parent-1' && where?.childId === 'user-child-1') return Promise.resolve({ id: 'link-1', parentId: 'user-parent-1', childId: 'user-child-1', consentVerified: true, createdAt: new Date() });
-      return Promise.resolve(null);
-    }),
-    findMany: jest.fn().mockImplementation(({ where }: any) => {
-      if (where?.parentId === 'user-parent-1') return Promise.resolve([{ id: 'link-1', parentId: 'user-parent-1', childId: 'user-child-1', consentVerified: true, consentMethod: 'CREDIT_CARD', createdAt: new Date(), child: { ...mockUser, doterProfile: mockUser.doterProfile } }]);
-      return Promise.resolve([]);
-    }),
-    create: jest.fn().mockImplementation(({ data }: any) => Promise.resolve({ id: 'new-link-1', ...data })),
-    upsert: jest.fn().mockImplementation(({ create }: any) => Promise.resolve({ id: 'upsert-link-1', ...create })),
-    delete: jest.fn().mockResolvedValue({ id: 'link-1' }),
-    deleteMany: jest.fn().mockResolvedValue({ count: 1 }),
-  },
-  pointsLedger: {
-    findFirst: jest.fn().mockResolvedValue({ id: 'ledger-1', userId: 'user-child-1', transactionType: 'EARN', amount: 100, balanceAfter: 500, source: 'QUEST', description: 'Test', status: 'SETTLED', createdAt: new Date() }),
-    findMany: jest.fn().mockResolvedValue([]),
-    create: jest.fn().mockImplementation(({ data }: any) => Promise.resolve({ id: 'new-ledger-1', ...data })),
-    createMany: jest.fn().mockResolvedValue({ count: 1 }),
-    count: jest.fn().mockResolvedValue(0),
-    deleteMany: jest.fn().mockResolvedValue({ count: 1 }),
-  },
-  goal: {
-    findUnique: jest.fn().mockResolvedValue(null),
-    findMany: jest.fn().mockResolvedValue([]),
-    update: jest.fn().mockResolvedValue({}),
-    create: jest.fn().mockResolvedValue({}),
-  },
-  activity: {
-    findFirst: jest.fn().mockResolvedValue(null),
-    create: jest.fn().mockResolvedValue({ id: 'act-1' }),
-  },
-  auditLog: {
-    create: jest.fn().mockResolvedValue({}),
-    findMany: jest.fn().mockResolvedValue([]),
-    count: jest.fn().mockResolvedValue(0),
-  },
-  notification: {
-    create: jest.fn().mockResolvedValue({}),
-    findMany: jest.fn().mockResolvedValue([]),
-  },
-  doterProfile: {
-    findUnique: jest.fn().mockResolvedValue(mockUser.doterProfile),
-  },
-  $disconnect: jest.fn().mockResolvedValue(undefined),
-};
+function decodeToken(token: string): { sub: string; email: string; role: string } | null {
+  try {
+    const parts = token.split('.');
+    if (parts.length !== 3) return null;
+    const payload = JSON.parse(Buffer.from(parts[1], 'base64').toString('utf-8'));
+    return { sub: payload.sub, email: payload.email, role: payload.role };
+  } catch {
+    return null;
+  }
+}
 
 describe('Business Flow Validation (e2e)', () => {
   let app: INestApplication;
   let jwtService: JwtService;
 
   beforeAll(async () => {
-    const moduleFixture: TestingModule = await Test.createTestingModule({
+    const builder = Test.createTestingModule({
       imports: [AppModule],
     })
-      .overrideProvider(PrismaService).useValue(mockPrismaService)
-      .overrideProvider(REDIS_CLIENT).useValue(mockRedisClient)
-      .overrideProvider(MessagingService).useValue(mockMessagingService)
-      .overrideProvider(SafetyService).useValue(mockSafetyService)
-      .overrideProvider(PointsService).useValue(mockPointsService)
-      .compile();
+      .overrideGuard(GqlAuthGuard)
+      .useValue({
+        canActivate: (ctx: any) => {
+          const gqlCtx = GqlExecutionContext.create(ctx);
+          const req = gqlCtx.getContext().req;
+          const authHeader = req.headers?.authorization;
+          if (authHeader) {
+            const token = authHeader.replace('Bearer ', '');
+            const user = decodeToken(token);
+            req.user = user ? { id: user.sub, email: user.email, role: user.role } : undefined;
+          }
+          return true;
+        },
+      });
 
+    for (const provider of E2E_MOCK_PROVIDERS) {
+      builder.overrideProvider(provider.provide).useValue(provider.useValue);
+    }
+
+    const moduleFixture: TestingModule = await builder.compile();
     app = moduleFixture.createNestApplication();
     jwtService = moduleFixture.get(JwtService);
     await app.init();
@@ -140,10 +58,6 @@ describe('Business Flow Validation (e2e)', () => {
   afterAll(async () => {
     await app.close();
   });
-
-  // ═══════════════════════════════════════════════════════════════════
-  // 1. SCHEMA VALIDATION
-  // ═══════════════════════════════════════════════════════════════════
 
   describe('Schema: Business Flow Operations', () => {
     it('should have all new mutations in schema', async () => {
@@ -184,10 +98,6 @@ describe('Business Flow Validation (e2e)', () => {
     });
   });
 
-  // ═══════════════════════════════════════════════════════════════════
-  // 2. ROLE ENFORCEMENT
-  // ═══════════════════════════════════════════════════════════════════
-
   describe('Role Enforcement', () => {
     let childTok: string, parentTok: string, adminTok: string;
 
@@ -226,10 +136,6 @@ describe('Business Flow Validation (e2e)', () => {
       expect(res.body.errors).toBeDefined();
     });
   });
-
-  // ═══════════════════════════════════════════════════════════════════
-  // 3. CHILD JOURNEY
-  // ═══════════════════════════════════════════════════════════════════
 
   describe('CHILD Journey', () => {
     let childToken: string;
@@ -302,10 +208,6 @@ describe('Business Flow Validation (e2e)', () => {
     });
   });
 
-  // ═══════════════════════════════════════════════════════════════════
-  // 4. PARENT JOURNEY
-  // ═══════════════════════════════════════════════════════════════════
-
   describe('PARENT Journey', () => {
     let parentToken: string;
 
@@ -371,10 +273,6 @@ describe('Business Flow Validation (e2e)', () => {
     });
   });
 
-  // ═══════════════════════════════════════════════════════════════════
-  // 5. ADMIN JOURNEY
-  // ═══════════════════════════════════════════════════════════════════
-
   describe('ADMIN Journey', () => {
     let adminToken: string;
 
@@ -413,20 +311,14 @@ describe('Business Flow Validation (e2e)', () => {
     });
   });
 
-  // ═══════════════════════════════════════════════════════════════════
-  // 6. QUEST FULL LIFECYCLE
-  // ═══════════════════════════════════════════════════════════════════
-
   describe('Quest Full Lifecycle', () => {
     let childToken: string;
     let parentToken: string;
     let questId: string;
-    let questCreateSpy = mockPrismaService.quest.create;
 
     beforeAll(() => {
       childToken = makeToken(jwtService, { id: 'user-child-1', email: 'child@udb.dev', role: 'CHILD' });
       parentToken = makeToken(jwtService, { id: 'user-parent-1', email: 'parent@udb.dev', role: 'PARENT' });
-      questCreateSpy.mockClear();
     });
 
     it('1. CHILD creates quest → PENDING', async () => {

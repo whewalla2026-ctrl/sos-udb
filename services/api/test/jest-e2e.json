@@ -2,8 +2,8 @@
   "moduleFileExtensions": ["js", "json", "ts"],
   "rootDir": "../",
   "testEnvironment": "node",
-  "testRegex": "health.e2e-spec.ts$",
-  "testPathIgnorePatterns": ["/node_modules/", "app\\.e2e", "business-flows", "firebase-auth", "e2e-phase2", "phase2"],
+  "testRegex": ".*e2e-spec\\.ts$",
+  "testPathIgnorePatterns": ["/node_modules/"],
   "transform": {
     "^.+\\.ts$": "ts-jest"
   },

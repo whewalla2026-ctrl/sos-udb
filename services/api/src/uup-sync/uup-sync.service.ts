@@ -142,22 +142,22 @@ export class UUPSyncService {
   private async checkTriggers(uup: UUP, source: string): Promise<string[]> {
     const events: string[] = [];
 
-    if (uup.biometric.avg_sleep_hours !== undefined && uup.biometric.avg_sleep_hours < 6) {
+    if (uup.biometric?.avg_sleep_hours !== undefined && uup.biometric.avg_sleep_hours < 6) {
       events.push('doter:state:sluggish');
     }
 
-    if (uup.biometric.stress_index !== undefined && uup.biometric.stress_index > 0.7) {
+    if (uup.biometric?.stress_index !== undefined && uup.biometric.stress_index > 0.7) {
       events.push('safety:stress:alert');
     }
 
-    if (uup.gamification.xp !== undefined) {
+    if (uup.gamification?.xp !== undefined) {
       const level = Math.floor(uup.gamification.xp / 1000) + 1;
-      if (level > uup.gamification.doter_level) {
+      if (level > (uup.gamification?.doter_level ?? 0)) {
         events.push('doter:evolve');
       }
     }
 
-    if (uup.academic.workload_forecast !== undefined && uup.academic.workload_forecast > 0.85) {
+    if (uup.academic?.workload_forecast !== undefined && uup.academic.workload_forecast > 0.85) {
       events.push('planner:overload:warning');
     }
 

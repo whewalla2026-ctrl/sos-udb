@@ -36,6 +36,7 @@ import { MarketplaceModule } from './marketplace/marketplace.module';
 import { OnboardingModule } from './onboarding/onboarding.module';
 import { AnalyticsModule } from './analytics/analytics.module';
 import { MonitoringModule } from './monitoring/monitoring.module';
+import { QueueModule } from './queue/queue.module';
 import { MetricsModule } from './shared/metrics.module';
 import { MetricsService } from './shared/metrics.controller';
 import { HealthModule } from './health/health.module';
@@ -99,6 +100,7 @@ import { createGraphQLMetricsPlugin } from './shared/graphql-metrics.plugin';
     OnboardingModule,
     AnalyticsModule,
     MonitoringModule,
+    QueueModule,
     MetricsModule,
     HealthModule,
     TutorModule,

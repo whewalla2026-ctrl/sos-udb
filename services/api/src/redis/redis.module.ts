@@ -1,6 +1,7 @@
 import { Module, Global } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import Redis from 'ioredis';
+import { RedisService } from './redis.service';
 
 export const REDIS_CLIENT = 'REDIS_CLIENT';
 
@@ -11,7 +12,6 @@ export const REDIS_CLIENT = 'REDIS_CLIENT';
       provide: REDIS_CLIENT,
       inject: [ConfigService],
       useFactory: (config: ConfigService) => {
-        // In test environments, avoid depending on a real Redis instance.
         if (process.env.NODE_ENV === 'test' || process.env.DISABLE_REAL_REDIS === 'true') {
           return { publish: async (..._args: any[]) => 1 } as any;
         }
@@ -21,7 +21,8 @@ export const REDIS_CLIENT = 'REDIS_CLIENT';
         return client;
       },
     },
+    RedisService,
   ],
-  exports: [REDIS_CLIENT],
+  exports: [REDIS_CLIENT, RedisService],
 })
 export class RedisModule {}
