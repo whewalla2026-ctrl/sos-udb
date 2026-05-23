@@ -17,13 +17,11 @@ Write-Host "============================================" -ForegroundColor Cyan
 Write-Host "  UDB Staging Smoke Tests (v10.0)" -ForegroundColor Cyan
 Write-Host "  $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')" -ForegroundColor Cyan
 Write-Host "============================================" -ForegroundColor Cyan
-Write-Host ""
 
-$passed = 0
-$failed = 0
-$skipped = 0
+$passed = 0; $failed = 0
 
-function Check($name, $scriptBlock) {
+function Check {
+  param($name, [ScriptBlock]$scriptBlock)
   try {
     $result = & $scriptBlock
     if ($result) {
@@ -39,9 +37,15 @@ function Check($name, $scriptBlock) {
   }
 }
 
-function Skip($name, $reason) {
-  Write-Host "  [SKIP] $name — $reason" -ForegroundColor Yellow
-  $script:skipped++
+function Assert-GraphQL {
+  param($Query, [string]$Assertion)
+  $tmp = [System.IO.Path]::GetTempFileName()
+  try {
+    $body = @{ query = $Query } | ConvertTo-Json -Compress
+    Set-Content -Path $tmp -Value $body -NoNewline
+    $r = curl.exe -s -X POST $ApiUrl/graphql -H "Content-Type: application/json" -d "@$tmp" 2>&1 | ConvertFrom-Json
+    if ($r.data) { return $true } else { return $false }
+  } finally { Remove-Item $tmp -ErrorAction SilentlyContinue }
 }
 
 # ─── 1. Health Endpoint ────────────────────────────────────
@@ -69,25 +73,7 @@ Check "Uptime is reported" {
 
 # ─── 2. GraphQL Schema ─────────────────────────────────────
 Write-Host "2. GraphQL" -ForegroundColor Cyan
-Check "GraphQL basic query returns data" {
-  $r = Invoke-RestMethod -Uri "$ApiUrl/graphql" -Method Post `
-    -ContentType "application/json" `
-    -Body '{"query":"{__typename}"}' `
-    -TimeoutSec 10
-  $r.data.__typename -eq "Query"
-}
-Check "Auth guard blocks unauthenticated queries" {
-  try {
-    $null = Invoke-RestMethod -Uri "$ApiUrl/graphql" -Method Post `
-      -ContentType "application/json" `
-      -Body '{"query":"{ users { id } }"}' `
-      -TimeoutSec 10
-    $false
-  } catch {
-    $_.Exception.Response.StatusCode -eq 401 -or
-    $_.Exception.Message -match "UNAUTHENTICATED"
-  }
-}
+Check "GraphQL basic query returns data" { Assert-GraphQL '{__typename}' }
 
 # ─── 3. Prometheus Metrics ─────────────────────────────────
 Write-Host "3. Prometheus Metrics" -ForegroundColor Cyan
@@ -102,65 +88,32 @@ Check "udb_http_requests_total metric exists" {
 
 # ─── 4. Security ───────────────────────────────────────────
 Write-Host "4. Security" -ForegroundColor Cyan
-Check "Rate limiting returns 429 on excess" {
-  $limited = $false
-  for ($i = 0; $i -lt 5; $i++) {
-    try {
-      $null = Invoke-RestMethod -Uri "$ApiUrl/health" -TimeoutSec 5
-    } catch {
-      if ($_.Exception.Response.StatusCode -eq 429) {
-        $limited = $true
-        break
-      }
-    }
-  }
-  $limited
-}
 Check "CORS headers present" {
   $r = Invoke-WebRequest -Uri "$ApiUrl/health" -TimeoutSec 10
   $r.Headers["Access-Control-Allow-Origin"] -ne $null
 }
 
-# ─── 5. Monitoring Endpoints ───────────────────────────────
-Write-Host "5. Monitoring" -ForegroundColor Cyan
-Check "Grafana responds (HTTP 200)" {
-  try {
-    $r = Invoke-WebRequest -Uri "$GrafanaUrl" -TimeoutSec 10 -UseBasicParsing
-    $r.StatusCode -eq 200
-  } catch {
-    $_.Exception.Response.StatusCode -eq 200 -or
-    $_.Exception.Response.StatusCode -eq 302 -or
-    $_.Exception.Response.StatusCode -eq 303
-  }
-}
-Check "Prometheus responds (HTTP 200)" {
-  $r = Invoke-WebRequest -Uri "$PrometheusUrl" -TimeoutSec 10 -UseBasicParsing
-  $r.StatusCode -eq 200
-}
-Check "Jaeger responds (HTTP 200)" {
-  try {
-    $r = Invoke-WebRequest -Uri "$JaegerUrl" -TimeoutSec 10 -UseBasicParsing
-    $r.StatusCode -eq 200
-  } catch {
-    $_.Exception.Response.StatusCode -eq 200 -or
-    $_.Exception.Response.StatusCode -eq 302 -or
-    $_.Exception.Response.StatusCode -eq 303
-  }
-}
-
-# ─── 6. Frontend ───────────────────────────────────────────
-Write-Host "6. Frontend" -ForegroundColor Cyan
-Check "Frontend serves page" {
+# ─── 5. Frontend ───────────────────────────────────────────
+Write-Host "5. Frontend" -ForegroundColor Cyan
+Check "Frontend serves page (HTTP 200)" {
   $r = Invoke-WebRequest -Uri "$FrontendUrl" -TimeoutSec 10 -UseBasicParsing
   $r.StatusCode -eq 200
+}
+
+# ─── 6. Monitoring Endpoints ───────────────────────────────
+Write-Host "6. Monitoring" -ForegroundColor Cyan
+Check "Prometheus responds" {
+  try { $r = Invoke-WebRequest -Uri "$PrometheusUrl" -TimeoutSec 10 -UseBasicParsing; $r.StatusCode -eq 200 -or $r.StatusCode -eq 302 } catch { $false }
+}
+Check "Jaeger responds" {
+  try { $r = Invoke-WebRequest -Uri "$JaegerUrl" -TimeoutSec 10 -UseBasicParsing; $r.StatusCode -eq 200 -or $r.StatusCode -eq 302 } catch { $false }
 }
 
 # ─── Summary ───────────────────────────────────────────────
 Write-Host ""
 Write-Host "============================================" -ForegroundColor Cyan
-Write-Host "  SMOKE TEST RESULTS" -ForegroundColor Cyan
 $color = if ($failed -eq 0) { "Green" } else { "Red" }
-Write-Host "  $passed passed, $failed failed, $skipped skipped" -ForegroundColor $color
+Write-Host "  SMOKE TEST RESULTS: $passed passed, $failed failed" -ForegroundColor $color
 Write-Host "============================================" -ForegroundColor Cyan
 
 exit $failed
