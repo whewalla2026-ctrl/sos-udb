@@ -1,0 +1,159 @@
+name: Staging Deploy (v10.0)
+
+on:
+  push:
+    branches:
+      - release/v1-production
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      skip_tests:
+        description: 'Skip test phase'
+        required: false
+        type: boolean
+        default: false
+
+concurrency:
+  group: staging-deploy-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  NODE_VERSION: 20
+  PNPM_VERSION: 9
+  API_PORT: 4000
+  FRONTEND_PORT: 3030
+
+jobs:
+  test:
+    name: Test Suite
+    if: ${{ !inputs.skip_tests }}
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: udb
+          POSTGRES_PASSWORD: udb
+          POSTGRES_DB: udb
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready -U udb
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      - uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm run typecheck
+      - run: pnpm run build
+      - run: pnpm run lint
+      - run: pnpm run test
+
+  deploy:
+    name: Build & Deploy (Docker Compose)
+    needs: [test]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      - uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+      - run: pnpm install --frozen-lockfile
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and start stack
+        run: |
+          docker compose -f docker-compose.prod.yml up -d --build
+          echo "Waiting for services to be healthy..."
+          sleep 30
+
+      - name: Run Prisma migrations
+        run: npx prisma migrate deploy
+        working-directory: services/api
+        env:
+          DATABASE_URL: postgresql://udb:udb@localhost:5432/udb?schema=public
+          DIRECT_URL: postgresql://udb:udb@localhost:5432/udb?schema=public
+
+      - name: Verify API health
+        run: |
+          for i in $(seq 1 12); do
+            STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:${{ env.API_PORT }}/health || echo "000")
+            if [ "$STATUS" = "200" ]; then
+              echo "API is healthy (attempt $i)"
+              curl -s http://localhost:${{ env.API_PORT }}/health
+              exit 0
+            fi
+            echo "Waiting for API... (attempt $i, status=$STATUS)"
+            sleep 10
+          done
+          echo "API failed to become healthy"
+          docker compose -f docker-compose.prod.yml logs api
+          exit 1
+
+  smoke:
+    name: Smoke Tests
+    needs: [deploy]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install PowerShell Core
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y powershell || true
+
+      - name: Run smoke tests
+        run: pwsh -File scripts/smoke-test-staging.ps1
+        env:
+          ApiUrl: http://localhost:4000
+          FrontendUrl: http://localhost:3030
+          GrafanaUrl: http://localhost:3005
+          PrometheusUrl: http://localhost:9090
+          JaegerUrl: http://localhost:16686
+
+      - name: Smoke test failure — collect logs
+        if: failure()
+        run: |
+          docker compose -f docker-compose.prod.yml logs --tail=50 api
+          docker compose -f docker-compose.prod.yml logs --tail=50 frontend
+
+  readiness:
+    name: Readiness Gate
+    needs: [smoke]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+          echo "============================================"
+          echo "  UDB Staging Deployment — READY"
+          echo "  $(date -u '+%Y-%m-%d %H:%M:%S UTC')"
+          echo "============================================"
+          echo ""
+          echo "All phases complete:"
+          echo "  [PASS] Test Suite"
+          echo "  [PASS] Build & Deploy"
+          echo "  [PASS] Smoke Tests"
+          echo ""
+          echo "Tag: v10.0-staging-deployed"
