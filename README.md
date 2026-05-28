@@ -15,16 +15,35 @@ pnpm dev
 
 ## Architecture
 
-| Component | Tech | Location |
-|-----------|------|----------|
-| API | NestJS (TypeScript) | `services/api/` |
-| Frontend | Next.js 14 | `apps/web/` |
-| AI Services | Python/FastAPI | `services/ai-mentor/` |
-| Database | PostgreSQL 15 + TimescaleDB | Docker / RDS |
-| Cache | Redis 7 | Docker / ElastiCache |
-| Queue | BullMQ | Redis |
-| Monitoring | Prometheus + Grafana + Jaeger + Loki | Docker / AWS |
-| Tracing | OpenTelemetry | OTel Collector |
+### Services (Microservices)
+| Service | Port | Technology | Role |
+|---------|------|-----------|------|
+| Gateway | 3000 | Node.js | API gateway, request routing to microservices |
+| Auth | 3001 | Node.js | Authentication, COPPA VPC enforcement |
+| Planner | 3002 | Node.js | Learning plans, schedules, chronotype scheduling |
+| AI | 3003 | Node.js | AI tutor, vision analysis, skill gap analysis |
+| Monitoring | 3004 | Node.js | Health checks, metrics, alert routing |
+| API | 4000 | NestJS | GraphQL, business logic, all core features |
+| Frontend | 3030 | Next.js 14 | 40-route web application (auth, dashboard, admin) |
+
+### Infrastructure
+| Service | Port | Role |
+|---------|------|------|
+| PostgreSQL 16 | 5432 | Primary database (27 tables, 2 migrations) |
+| PgBouncer | 6432 | Connection pooling |
+| Redis 7 | 6379 | Cache, sessions, BullMQ queues |
+| Nginx | 80/443 | Reverse proxy, TLS termination |
+
+### Observability
+| Service | Port | Role |
+|---------|------|------|
+| Prometheus | 9090 | Metrics collection (1 active target) |
+| Grafana | 3005 | Dashboards (admin/admin123) |
+| Jaeger | 16686 | Distributed tracing |
+| Loki | 3100 | Log aggregation |
+| AlertManager | 9093 | Alert routing |
+| OTel Collector | 4318 | Telemetry pipeline (OTLP) |
+| Promtail | — | Log shipping to Loki |
 
 ## Testing
 
