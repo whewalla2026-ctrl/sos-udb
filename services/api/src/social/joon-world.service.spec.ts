@@ -1,20 +1,62 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { JoonWorldService } from './joon-world.service';
 import { EventEmitter2 } from '@nestjs/event-emitter';
+import { REDIS_CLIENT } from '../redis/redis.constants';
+
+const DEFAULT_PODS = {
+  'library-1': { id: 'library-1', template: 'library', name: 'Study Library', maxUsers: 4, currentUsers: 0, isApproved: true },
+  'lab-1': { id: 'lab-1', template: 'lab', name: 'Science Lab', maxUsers: 4, currentUsers: 0, isApproved: true },
+  'art-1': { id: 'art-1', template: 'art-studio', name: 'Creative Studio', maxUsers: 4, currentUsers: 0, isApproved: true },
+};
+
+function createMockRedis() {
+  const store: Record<string, string> = {};
+  const hashStores: Record<string, Record<string, string>> = {};
+
+  for (const [id, pod] of Object.entries(DEFAULT_PODS)) {
+    store[`joon-world:pod:${id}`] = JSON.stringify(pod);
+  }
+
+  return {
+    get: jest.fn((key: string) => Promise.resolve(store[key] || null)),
+    set: jest.fn((key: string, value: string) => { store[key] = value; return Promise.resolve('OK'); }),
+    exists: jest.fn((key: string) => Promise.resolve(store[key] ? 1 : 0)),
+    del: jest.fn((key: string) => { const n = store[key] ? 1 : 0; delete store[key]; return Promise.resolve(n); }),
+    hlen: jest.fn((key: string) => Promise.resolve(Object.keys(hashStores[key] || {}).length)),
+    hset: jest.fn((key: string, field: string, value: string) => {
+      if (!hashStores[key]) hashStores[key] = {};
+      hashStores[key][field] = value;
+      return Promise.resolve(1);
+    }),
+    hdel: jest.fn((key: string, field: string) => {
+      if (hashStores[key] && hashStores[key][field]) {
+        delete hashStores[key][field];
+        return Promise.resolve(1);
+      }
+      return Promise.resolve(0);
+    }),
+    hgetall: jest.fn((key: string) => Promise.resolve(hashStores[key] || {})),
+    scan: jest.fn(async (cursor: string, _type: string, _pattern: string, _count: string) => {
+      const keys = Object.keys(store).filter(k => !k.endsWith(':sessions'));
+      return ['0', keys];
+    }),
+  };
+}
 
 describe('JoonWorldService', () => {
   let service: JoonWorldService;
-
-  const mockEventEmitter = {
-    emit: jest.fn(),
-  };
+  let mockRedis: ReturnType<typeof createMockRedis>;
+  let mockEventEmitter: { emit: jest.Mock };
 
   beforeEach(async () => {
-    jest.clearAllMocks();
+    mockRedis = createMockRedis();
+    mockEventEmitter = { emit: jest.fn() };
+
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         JoonWorldService,
         { provide: EventEmitter2, useValue: mockEventEmitter },
+        { provide: REDIS_CLIENT, useValue: mockRedis },
       ],
     }).compile();
 
@@ -48,18 +90,22 @@ describe('JoonWorldService', () => {
     });
 
     it('should throw when pod is full', async () => {
-      await service.joinPod('library-1', 'user-1', 13);
-      await service.joinPod('library-1', 'user-2', 13);
-      await service.joinPod('library-1', 'user-3', 13);
-      await service.joinPod('library-1', 'user-4', 13);
+      const podKey = 'joon-world:pod:library-1';
+      const pod = JSON.parse((await mockRedis.get(podKey))!);
+      pod.currentUsers = 4;
+      await mockRedis.set(podKey, JSON.stringify(pod));
+      for (let i = 0; i < 4; i++) {
+        await mockRedis.hset('joon-world:pod:library-1:sessions', `user-${i}`, JSON.stringify({ userId: `user-${i}` }));
+      }
 
       await expect(service.joinPod('library-1', 'user-5', 13)).rejects.toThrow('Pod is full');
     });
 
     it('should throw when pod is not approved', async () => {
-      const pod = (service as any).pods.get('library-1');
+      const podKey = 'joon-world:pod:library-1';
+      const pod = JSON.parse((await mockRedis.get(podKey))!);
       pod.isApproved = false;
-      (service as any).pods.set('library-1', pod);
+      await mockRedis.set(podKey, JSON.stringify(pod));
 
       await expect(service.joinPod('library-1', 'user-1', 13)).rejects.toThrow('Pod not approved');
     });
@@ -136,7 +182,6 @@ describe('JoonWorldService', () => {
       await service.joinPod('library-1', 'user-2', 13);
       await service.joinPod('library-1', 'user-3', 13);
       await service.joinPod('library-1', 'user-4', 13);
-      (service as any).pods.get('library-1').currentUsers = 4;
 
       const pods = await service.getAvailablePods(13);
       expect(pods.find(p => p.id === 'library-1')).toBeUndefined();

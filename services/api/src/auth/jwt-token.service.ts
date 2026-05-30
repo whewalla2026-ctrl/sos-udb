@@ -1,6 +1,8 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable, UnauthorizedException, Inject } from '@nestjs/common';
 import { JwtService as NestJwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
+import { REDIS_CLIENT } from '../redis/redis.constants';
+import Redis from 'ioredis';
 import * as crypto from 'crypto';
 
 export interface AccessTokenPayload {
@@ -22,11 +24,12 @@ export interface RefreshTokenPayload {
 
 @Injectable()
 export class JwtTokenService {
-  private readonly refreshTokens = new Map<string, { userId: string; expiresAt: number; familyId?: string }>();
+  private readonly REFRESH_TTL = 24 * 60 * 60;
 
   constructor(
     private jwtService: NestJwtService,
     private configService: ConfigService,
+    @Inject(REDIS_CLIENT) private redis: Redis,
   ) {}
 
   generateAccessToken(user: { id: string; email: string; role: string; familyId?: string; age?: number }): string {
@@ -47,7 +50,7 @@ export class JwtTokenService {
     });
   }
 
-  generateRefreshToken(user: { id: string; familyId?: string }): string {
+  async generateRefreshToken(user: { id: string; familyId?: string }): Promise<string> {
     const jti = crypto.randomUUID();
     const payload: RefreshTokenPayload = {
       sub: user.id,
@@ -61,11 +64,11 @@ export class JwtTokenService {
       algorithm: 'HS256',
     });
 
-    this.refreshTokens.set(jti, {
-      userId: user.id,
-      expiresAt: Date.now() + 24 * 60 * 60 * 1000,
-      familyId: user.familyId,
-    });
+    await this.redis.setex(
+      `jwt:refresh:${jti}`,
+      this.REFRESH_TTL,
+      JSON.stringify({ userId: user.id, familyId: user.familyId }),
+    );
 
     return refreshToken;
   }
@@ -79,36 +82,30 @@ export class JwtTokenService {
       throw new UnauthorizedException('Invalid token type');
     }
 
-    const stored = this.refreshTokens.get(decoded.jti);
-    if (!stored || stored.userId !== user.id) {
+    const raw = await this.redis.get(`jwt:refresh:${decoded.jti}`);
+    if (!raw) {
+      throw new UnauthorizedException('Token not recognized');
+    }
+    const stored = JSON.parse(raw);
+    if (stored.userId !== user.id) {
       throw new UnauthorizedException('Token not recognized');
     }
 
-    if (Date.now() > stored.expiresAt) {
-      this.refreshTokens.delete(decoded.jti);
-      throw new UnauthorizedException('Refresh token expired');
-    }
-
-    this.refreshTokens.delete(decoded.jti);
+    await this.redis.del(`jwt:refresh:${decoded.jti}`);
 
     return {
       accessToken: this.generateAccessToken(user),
-      refreshToken: this.generateRefreshToken({ id: user.id, familyId: user.familyId }),
+      refreshToken: await this.generateRefreshToken({ id: user.id, familyId: user.familyId }),
     };
   }
 
-  revokeRefreshToken(jti: string): void {
-    this.refreshTokens.delete(jti);
+  async revokeRefreshToken(jti: string): Promise<void> {
+    await this.redis.del(`jwt:refresh:${jti}`);
   }
 
-  isRefreshTokenValid(jti: string): boolean {
-    const stored = this.refreshTokens.get(jti);
-    if (!stored) return false;
-    if (Date.now() > stored.expiresAt) {
-      this.refreshTokens.delete(jti);
-      return false;
-    }
-    return true;
+  async isRefreshTokenValid(jti: string): Promise<boolean> {
+    const raw = await this.redis.get(`jwt:refresh:${jti}`);
+    return raw !== null;
   }
 
   getAccessTokenExpiry(): Date {

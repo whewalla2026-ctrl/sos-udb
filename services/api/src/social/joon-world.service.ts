@@ -1,5 +1,7 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, Inject } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
+import { REDIS_CLIENT } from '../redis/redis.constants';
+import Redis from 'ioredis';
 
 export interface PodSession {
   podId: string;
@@ -28,20 +30,41 @@ export interface Pod {
 @Injectable()
 export class JoonWorldService {
   private readonly logger = new Logger(JoonWorldService.name);
-  private pods = new Map<string, Pod>();
-  private sessions = new Map<string, PodSession[]>();
+  private readonly POD_KEY_PREFIX = 'joon-world:pod:';
+  private readonly DEFAULT_PODS = [
+    { id: 'library-1', template: 'library' as const, name: 'Study Library', maxUsers: 4, currentUsers: 0, isApproved: true },
+    { id: 'lab-1', template: 'lab' as const, name: 'Science Lab', maxUsers: 4, currentUsers: 0, isApproved: true },
+    { id: 'art-1', template: 'art-studio' as const, name: 'Creative Studio', maxUsers: 4, currentUsers: 0, isApproved: true },
+  ];
 
-  constructor(private eventEmitter: EventEmitter2) {
+  constructor(
+    private eventEmitter: EventEmitter2,
+    @Inject(REDIS_CLIENT) private redis: Redis,
+  ) {
     this.initializeDefaultPods();
   }
 
-  private initializeDefaultPods() {
-    const templates: Pod[] = [
-      { id: 'library-1', template: 'library', name: 'Study Library', maxUsers: 4, currentUsers: 0, isApproved: true },
-      { id: 'lab-1', template: 'lab', name: 'Science Lab', maxUsers: 4, currentUsers: 0, isApproved: true },
-      { id: 'art-1', template: 'art-studio', name: 'Creative Studio', maxUsers: 4, currentUsers: 0, isApproved: true },
-    ];
-    templates.forEach(p => this.pods.set(p.id, p));
+  private async initializeDefaultPods() {
+    for (const pod of this.DEFAULT_PODS) {
+      const key = `${this.POD_KEY_PREFIX}${pod.id}`;
+      const exists = await this.redis.exists(key);
+      if (!exists) {
+        await this.redis.set(key, JSON.stringify(pod));
+      }
+    }
+  }
+
+  private async getPod(podId: string): Promise<Pod | null> {
+    const raw = await this.redis.get(`${this.POD_KEY_PREFIX}${podId}`);
+    return raw ? JSON.parse(raw) : null;
+  }
+
+  private async savePod(pod: Pod): Promise<void> {
+    await this.redis.set(`${this.POD_KEY_PREFIX}${pod.id}`, JSON.stringify(pod));
+  }
+
+  private sessionKey(podId: string): string {
+    return `${this.POD_KEY_PREFIX}${podId}:sessions`;
   }
 
   async joinPod(podId: string, userId: string, age: number): Promise<PodSession> {
@@ -52,10 +75,12 @@ export class JoonWorldService {
       }
     }
 
-    const pod = this.pods.get(podId);
+    const pod = await this.getPod(podId);
     if (!pod) throw new Error('Pod not found');
     if (!pod.isApproved) throw new Error('Pod not approved');
-    if (pod.currentUsers >= pod.maxUsers) throw new Error('Pod is full');
+
+    const sessionCount = await this.redis.hlen(this.sessionKey(podId));
+    if (sessionCount >= pod.maxUsers) throw new Error('Pod is full');
 
     const session: PodSession = {
       podId,
@@ -65,12 +90,9 @@ export class JoonWorldService {
       avatarColor: this.generateAvatarColor(),
     };
 
-    const podSessions = this.sessions.get(podId) || [];
-    podSessions.push(session);
-    this.sessions.set(podId, podSessions);
-
-    pod.currentUsers++;
-    this.pods.set(podId, pod);
+    await this.redis.hset(this.sessionKey(podId), userId, JSON.stringify(session));
+    pod.currentUsers = sessionCount + 1;
+    await this.savePod(pod);
 
     this.eventEmitter.emit('pod:user:joined', { podId, userId });
 
@@ -78,17 +100,16 @@ export class JoonWorldService {
   }
 
   async leavePod(podId: string, userId: string): Promise<void> {
-    const podSessions = this.sessions.get(podId) || [];
-    const filtered = podSessions.filter(s => s.userId !== userId);
-    this.sessions.set(podId, filtered);
-
-    const pod = this.pods.get(podId);
-    if (pod) {
-      pod.currentUsers = Math.max(0, pod.currentUsers - 1);
-      this.pods.set(podId, pod);
+    const removed = await this.redis.hdel(this.sessionKey(podId), userId);
+    if (removed > 0) {
+      const pod = await this.getPod(podId);
+      if (pod) {
+        const remaining = await this.redis.hlen(this.sessionKey(podId));
+        pod.currentUsers = remaining;
+        await this.savePod(pod);
+      }
+      this.eventEmitter.emit('pod:user:left', { podId, userId });
     }
-
-    this.eventEmitter.emit('pod:user:left', { podId, userId });
   }
 
   async sendMessage(podId: string, userId: string, message: string, age: number): Promise<PodMessage> {
@@ -126,14 +147,35 @@ export class JoonWorldService {
   }
 
   async getAvailablePods(age: number): Promise<Pod[]> {
-    return Array.from(this.pods.values()).filter(p => {
+    const keys: string[] = [];
+    let cursor = '0';
+    do {
+      const [nextCursor, found] = await (this.redis as any).scan(cursor, 'MATCH', `${this.POD_KEY_PREFIX}*`, 'COUNT', '100');
+      cursor = nextCursor;
+      for (const key of found) {
+        if (!key.endsWith(':sessions')) {
+          keys.push(key);
+        }
+      }
+    } while (cursor !== '0');
+
+    const pods: Pod[] = [];
+    for (const key of keys) {
+      const raw = await this.redis.get(key);
+      if (raw) {
+        pods.push(JSON.parse(raw));
+      }
+    }
+
+    return pods.filter(p => {
       if (age < 13 && !p.isApproved) return false;
       return p.currentUsers < p.maxUsers;
     });
   }
 
   async getPodUsers(podId: string): Promise<PodSession[]> {
-    return this.sessions.get(podId) || [];
+    const raw = await this.redis.hgetall(this.sessionKey(podId));
+    return Object.values(raw).map(v => JSON.parse(v));
   }
 
   async getUserSBTs(userId: string): Promise<any[]> {

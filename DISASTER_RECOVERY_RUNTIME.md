@@ -72,8 +72,18 @@ docker exec udb-postgres pg_isready    # PostgreSQL
 
 ## Emergency Contacts
 
-- On-call: [Not configured — set PagerDuty or equivalent in production]
-- Database admin: [Not configured — set up Cloud SQL IAM or pgMonitor]
-- Infrastructure: [Not configured — assign DevOps/SRE lead]
+- **On-call**: Not configured — set up PagerDuty, Opsgenie, or equivalent monitoring alert routing.
+  1. Integrate alertmanager with a PagerDuty webhook receiver
+  2. Configure escalation policy (15min → 30min → 1hr)
+  3. Define severity routing: critical (DB down) → immediate page, warning (high latency) → slack notification
+- **Database admin**: Not configured — set up a dedicated DB admin user or IAM role for break-glass access.
+  1. Run `CREATE ROLE db_admin WITH LOGIN SUPERUSER PASSWORD '...';` and rotate credentials into secrets manager
+  2. Configure pgMonitor or equivalent for per-table replication lag / bloat tracking
+  3. Document pgBouncer connection pool scaling limits (default: 100 pool_size)
+- **Infrastructure**: Not configured — assign a DevOps/SRE lead and document in this file.
+  1. Maintainers should have SSH key access to production hosts (or use a jump box)
+  2. Docker Compose deploy: pull → `docker compose -f docker-compose.prod.yml up -d --build`
+  3. Rollback: `git revert HEAD` → rebuild the affected service
+  4. Grafana dashboards at `http://localhost:3005` (admin/admin) — check loki logs + prometheus metrics first
 
 ## Status: TESTED ✅

@@ -1,6 +1,8 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, Inject } from '@nestjs/common';
 import { PineconeService } from '../ai/pinecone.service';
 import { EventEmitter2 } from '@nestjs/event-emitter';
+import { REDIS_CLIENT } from '../redis/redis.constants';
+import Redis from 'ioredis';
 
 export interface TutorSession {
   sessionId: string;
@@ -21,11 +23,12 @@ export interface TutorMessage {
 @Injectable()
 export class TutorService {
   private readonly logger = new Logger(TutorService.name);
-  private sessions = new Map<string, TutorSession>();
+  private readonly SESSION_TTL = 3600;
 
   constructor(
     private pinecone: PineconeService,
     private eventEmitter: EventEmitter2,
+    @Inject(REDIS_CLIENT) private redis: Redis,
   ) {}
 
   async createSession(userId: string): Promise<TutorSession> {
@@ -37,13 +40,14 @@ export class TutorService {
       frustrationScore: 0,
       turnCount: 0,
     };
-    this.sessions.set(session.sessionId, session);
+    await this.redis.setex(`ai-tutor:session:${session.sessionId}`, this.SESSION_TTL, JSON.stringify(session));
     return session;
   }
 
   async processMessage(sessionId: string, userMessage: string): Promise<TutorMessage> {
-    const session = this.sessions.get(sessionId);
-    if (!session) throw new Error('Session not found');
+    const raw = await this.redis.get(`ai-tutor:session:${sessionId}`);
+    if (!raw) throw new Error('Session not found');
+    const session: TutorSession = JSON.parse(raw);
 
     session.messages.push({ role: 'user', content: userMessage, timestamp: new Date() });
 
@@ -73,6 +77,7 @@ export class TutorService {
       this.eventEmitter.emit('tutor:escalation', { sessionId, userId: session.userId });
     }
 
+    await this.redis.setex(`ai-tutor:session:${sessionId}`, this.SESSION_TTL, JSON.stringify(session));
     return session.messages[session.messages.length - 1];
   }
 
@@ -108,10 +113,11 @@ export class TutorService {
   }
 
   async endSession(sessionId: string): Promise<void> {
-    const session = this.sessions.get(sessionId);
-    if (session) {
+    const raw = await this.redis.get(`ai-tutor:session:${sessionId}`);
+    if (raw) {
+      const session: TutorSession = JSON.parse(raw);
       this.eventEmitter.emit('tutor:session:ended', { sessionId, userId: session.userId, turnCount: session.turnCount });
-      this.sessions.delete(sessionId);
+      await this.redis.del(`ai-tutor:session:${sessionId}`);
     }
   }
 }
