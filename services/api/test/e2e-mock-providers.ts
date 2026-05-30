@@ -1,6 +1,6 @@
 import { getQueueToken } from '@nestjs/bullmq';
 import { PrismaService } from '../src/prisma/prisma.service';
-import { REDIS_CLIENT } from '../src/redis/redis.module';
+import { REDIS_CLIENT } from '../src/redis/redis.constants';
 import { RedisService } from '../src/redis/redis.service';
 import { MessagingService } from '../src/messaging/messaging.service';
 import { SafetyService } from '../src/safety/safety.service';

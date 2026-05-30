@@ -20,17 +20,17 @@ route:
 receivers:
   - name: 'default'
     webhook_configs:
-      - url: 'http://nestjs-graphql:4000/monitoring/alert'
+      - url: 'http://api:4000/monitoring/alert'
         send_resolved: true
 
   - name: 'critical'
     webhook_configs:
-      - url: 'http://nestjs-graphql:4000/monitoring/alert'
+      - url: 'http://api:4000/monitoring/alert'
         send_resolved: true
 
   - name: 'info'
     webhook_configs:
-      - url: 'http://nestjs-graphql:4000/monitoring/alert'
+      - url: 'http://api:4000/monitoring/alert'
         send_resolved: false
 
 inhibit_rules:

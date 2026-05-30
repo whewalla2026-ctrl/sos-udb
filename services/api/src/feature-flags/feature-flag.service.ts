@@ -1,5 +1,7 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Inject, OnModuleInit } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { REDIS_CLIENT } from '../redis/redis.constants';
+import Redis from 'ioredis';
 
 export interface FeatureFlag {
   name: string;
@@ -10,31 +12,48 @@ export interface FeatureFlag {
 }
 
 @Injectable()
-export class FeatureFlagService {
+export class FeatureFlagService implements OnModuleInit {
   private flags = new Map<string, FeatureFlag>();
+  private readonly FLAG_HASH_KEY = 'feature-flags';
 
-  constructor(private configService: ConfigService) {
-    this.initializeDefaultFlags();
+  constructor(
+    private configService: ConfigService,
+    @Inject(REDIS_CLIENT) private redis: Redis,
+  ) {}
+
+  async onModuleInit() {
+    await this.initializeDefaultFlags();
   }
 
-  private initializeDefaultFlags() {
+  private async initializeDefaultFlags() {
+    const existing = await this.redis.hgetall(this.FLAG_HASH_KEY);
+    if (existing && Object.keys(existing).length > 0) {
+      for (const [name, json] of Object.entries(existing)) {
+        this.flags.set(name, JSON.parse(json));
+      }
+      return;
+    }
+
     const defaults: FeatureFlag[] = [
       { name: 'offline-tutor', enabled: false, createdAt: new Date(), updatedAt: new Date() },
       { name: 'biometric-feed', enabled: false, createdAt: new Date(), updatedAt: new Date() },
-      { name: 'electron-agent', enabled: false, createdAt: new Date(), updatedAt: new Date() },
+      { name: 'desktop-agent', enabled: false, createdAt: new Date(), updatedAt: new Date() },
       { name: 'safety-score', enabled: true, createdAt: new Date(), updatedAt: new Date() },
       { name: 'data-export', enabled: true, createdAt: new Date(), updatedAt: new Date() },
-      { name: 'joon-world', enabled: false, createdAt: new Date(), updatedAt: new Date() },
+      { name: 'joon-world', enabled: true, createdAt: new Date(), updatedAt: new Date() },
       { name: 'co-op-quests', enabled: false, createdAt: new Date(), updatedAt: new Date() },
       { name: 'messaging', enabled: true, createdAt: new Date(), updatedAt: new Date() },
       { name: 'institutional', enabled: false, createdAt: new Date(), updatedAt: new Date() },
       { name: 'quest-store', enabled: false, createdAt: new Date(), updatedAt: new Date() },
-      { name: 'ai-feedback', enabled: false, createdAt: new Date(), updatedAt: new Date() },
+      { name: 'ai-feedback', enabled: true, createdAt: new Date(), updatedAt: new Date() },
       { name: 'skill-gap-analysis', enabled: true, createdAt: new Date(), updatedAt: new Date() },
-      { name: 'streak-freeze-auto', enabled: false, createdAt: new Date(), updatedAt: new Date() },
+      { name: 'streak-freeze-auto', enabled: true, createdAt: new Date(), updatedAt: new Date() },
     ];
 
-    defaults.forEach(f => this.flags.set(f.name, f));
+    for (const flag of defaults) {
+      this.flags.set(flag.name, flag);
+      await this.redis.hset(this.FLAG_HASH_KEY, flag.name, JSON.stringify(flag));
+    }
   }
 
   async isEnabled(flagName: string, userId?: string): Promise<boolean> {
@@ -66,6 +85,7 @@ export class FeatureFlagService {
       flag.enabled = enabled;
       flag.rolloutPercentage = rolloutPercentage;
       flag.updatedAt = new Date();
+      await this.redis.hset(this.FLAG_HASH_KEY, flagName, JSON.stringify(flag));
     }
   }
 

@@ -1,6 +1,8 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, Inject } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { EventEmitter2 } from '@nestjs/event-emitter';
+import { REDIS_CLIENT } from '../redis/redis.constants';
+import Redis from 'ioredis';
 
 export interface OfflineTutorSession {
   sessionId: string;
@@ -30,16 +32,17 @@ export interface OfflineTutorRequest {
 @Injectable()
 export class OfflineTutorService {
   private readonly logger = new Logger(OfflineTutorService.name);
-  private sessions = new Map<string, OfflineTutorSession>();
+  private readonly SESSION_TTL = 3600;
 
   constructor(
     private prisma: PrismaService,
     private eventEmitter: EventEmitter2,
+    @Inject(REDIS_CLIENT) private redis: Redis,
   ) {}
 
   async processOfflineMessage(request: OfflineTutorRequest): Promise<{ response: string; sessionId: string; isOfflineMode: boolean }> {
     const sessionId = request.sessionId || crypto.randomUUID();
-    let session = this.sessions.get(sessionId);
+    let session = await this.getSession(sessionId);
 
     if (!session) {
       session = await this.createSession(request.userId, sessionId);
@@ -64,6 +67,8 @@ export class OfflineTutorService {
         synced: false,
       });
       session.turnCount++;
+
+      await this.saveSession(session);
       
       return {
         response,
@@ -82,7 +87,9 @@ export class OfflineTutorService {
         synced: false,
       });
       session.turnCount++;
-      
+
+      await this.saveSession(session);
+
       await this.prisma.auditLog.create({
         data: {
           actorId: request.userId,
@@ -108,11 +115,26 @@ export class OfflineTutorService {
     });
     session.turnCount++;
 
+    await this.saveSession(session);
+
     return {
       response: scaffold,
       sessionId: session.sessionId,
       isOfflineMode: true,
     };
+  }
+
+  private async getSession(sessionId: string): Promise<OfflineTutorSession | null> {
+    const raw = await this.redis.get(`offline-tutor:session:${sessionId}`);
+    return raw ? JSON.parse(raw) : null;
+  }
+
+  private async saveSession(session: OfflineTutorSession): Promise<void> {
+    await this.redis.setex(
+      `offline-tutor:session:${session.sessionId}`,
+      this.SESSION_TTL,
+      JSON.stringify(session),
+    );
   }
 
   private async createSession(userId: string, sessionId: string): Promise<OfflineTutorSession> {
@@ -123,7 +145,7 @@ export class OfflineTutorService {
       turnCount: 0,
       isOffline: true,
     };
-    this.sessions.set(sessionId, session);
+    await this.saveSession(session);
     return session;
   }
 
@@ -213,7 +235,7 @@ export class OfflineTutorService {
   }
 
   async syncSession(sessionId: string): Promise<{ synced: boolean; pending: number }> {
-    const session = this.sessions.get(sessionId);
+    const session = await this.getSession(sessionId);
     if (!session) {
       return { synced: false, pending: 0 };
     }
@@ -246,6 +268,7 @@ export class OfflineTutorService {
     }
 
     session.syncedAt = new Date();
+    await this.saveSession(session);
     const stillPending = session.messages.filter(m => !m.synced).length;
 
     return { synced: stillPending === 0, pending: stillPending };
@@ -253,11 +276,21 @@ export class OfflineTutorService {
 
   async getOfflineSessions(userId: string): Promise<OfflineTutorSession[]> {
     const sessions: OfflineTutorSession[] = [];
-    for (const [_, session] of this.sessions) {
-      if (session.userId === userId) {
-        sessions.push(session);
+    let cursor = '0';
+    do {
+      const [nextCursor, keys] = await (this.redis as any).scan(cursor, 'MATCH', 'offline-tutor:session:*', 'COUNT', '100');
+      cursor = nextCursor;
+      if (keys.length > 0) {
+        const rawValues = await this.redis.mget(...keys);
+        for (const raw of rawValues) {
+          if (!raw) continue;
+          const session: OfflineTutorSession = JSON.parse(raw);
+          if (session.userId === userId) {
+            sessions.push(session);
+          }
+        }
       }
-    }
+    } while (cursor !== '0');
     return sessions;
   }
 

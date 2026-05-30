@@ -5,7 +5,7 @@ import { ConfigService } from '@nestjs/config';
 import * as admin from 'firebase-admin';
 import * as crypto from 'crypto';
 import * as fs from 'fs';
-import { REDIS_CLIENT } from '../redis/redis.module';
+import { REDIS_CLIENT } from '../redis/redis.constants';
 import Redis from 'ioredis';
 import { UserRole } from '../shared/user-role';
 import { MetricsService } from '../shared/metrics.controller';

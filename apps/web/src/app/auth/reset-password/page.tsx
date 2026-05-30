@@ -1,6 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { api } from '../../../lib/api';
 
 export default function ResetPasswordPage() {
   var [token, setToken] = useState('');
@@ -23,12 +24,7 @@ export default function ResetPasswordPage() {
     setLoading(true);
     setError('');
     try {
-      var res = await fetch('/api/auth/reset-password', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ token, newPassword }) });
-      if (!res.ok) {
-        if (res.status === 404) throw new Error('Password reset service is not available. Please contact support.');
-        var err = await res.json().catch(() => ({ error: 'Reset failed' }));
-        throw new Error(err.error || 'Reset failed');
-      }
+      await api.resetPassword(token, newPassword);
       setDone(true);
     } catch (err: any) {
       setError(err.message);

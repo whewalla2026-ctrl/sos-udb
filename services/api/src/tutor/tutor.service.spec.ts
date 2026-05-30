@@ -3,7 +3,7 @@ import { TutorService } from './tutor.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { AiService } from '../ai/ai.service';
 import { ConfigService } from '@nestjs/config';
-import { REDIS_CLIENT } from '../redis/redis.module';
+import { REDIS_CLIENT } from '../redis/redis.constants';
 import { MetricsService } from '../shared/metrics.controller';
 
 describe('TutorService', () => {

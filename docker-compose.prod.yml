@@ -1,6 +1,6 @@
 services:
   postgres:
-    image: postgres:16-alpine
+    image: timescale/timescaledb:2.17.2-pg16
     container_name: udb-postgres
     restart: unless-stopped
     environment:
@@ -61,6 +61,145 @@ services:
         limits: { memory: 256M }
         reservations: { memory: 128M }
 
+  gateway:
+    build:
+      context: .
+      dockerfile: services/api/prisma/phase3/Dockerfile.gateway
+    container_name: udb-gateway
+    restart: unless-stopped
+    ports:
+      - '3000:3000'
+    environment:
+      GATEWAY_PORT: 3000
+      AUTH_SERVICE_HOST: auth-service
+      AUTH_SERVICE_PORT: 3001
+      PLANNER_SERVICE_HOST: planner-service
+      PLANNER_SERVICE_PORT: 3002
+      AI_SERVICE_HOST: ai-service
+      AI_SERVICE_PORT: 3003
+      MONITORING_SERVICE_HOST: monitoring-service
+      MONITORING_SERVICE_PORT: 3004
+      REDIS_URL: redis://redis:6379
+      DATABASE_URL: postgresql://udb:${DB_PASSWORD:-udb}@pgbouncer:6432/udb?schema=public
+      JWT_SECRET: ${JWT_SECRET}
+      NODE_ENV: production
+    depends_on:
+      redis: { condition: service_healthy }
+      postgres: { condition: service_healthy }
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:3000/gateway/health']
+      interval: 30s
+      timeout: 10s
+      start_period: 30s
+      retries: 3
+    deploy:
+      resources:
+        limits: { memory: 256M }
+        reservations: { memory: 128M }
+
+  auth-service:
+    build:
+      context: .
+      dockerfile: services/api/prisma/phase3/Dockerfile.auth
+    container_name: udb-auth
+    restart: unless-stopped
+    environment:
+      AUTH_SERVICE_PORT: 3001
+      REDIS_URL: redis://redis:6379
+      DATABASE_URL: postgresql://udb:${DB_PASSWORD:-udb}@pgbouncer:6432/udb?schema=public
+      JWT_SECRET: ${JWT_SECRET}
+      NODE_ENV: production
+    depends_on:
+      redis: { condition: service_healthy }
+      postgres: { condition: service_healthy }
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:3001/auth/health']
+      interval: 30s
+      timeout: 10s
+      start_period: 30s
+      retries: 3
+    deploy:
+      resources:
+        limits: { memory: 256M }
+        reservations: { memory: 128M }
+
+  planner-service:
+    build:
+      context: .
+      dockerfile: services/api/prisma/phase3/Dockerfile.planner
+    container_name: udb-planner
+    restart: unless-stopped
+    environment:
+      PLANNER_SERVICE_PORT: 3002
+      REDIS_URL: redis://redis:6379
+      DATABASE_URL: postgresql://udb:${DB_PASSWORD:-udb}@pgbouncer:6432/udb?schema=public
+      NODE_ENV: production
+    depends_on:
+      redis: { condition: service_healthy }
+      postgres: { condition: service_healthy }
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:3002/planner/health']
+      interval: 30s
+      timeout: 10s
+      start_period: 30s
+      retries: 3
+    deploy:
+      resources:
+        limits: { memory: 256M }
+        reservations: { memory: 128M }
+
+  ai-service:
+    build:
+      context: .
+      dockerfile: services/api/prisma/phase3/Dockerfile.ai
+    container_name: udb-ai
+    restart: unless-stopped
+    environment:
+      AI_SERVICE_PORT: 3003
+      REDIS_URL: redis://redis:6379
+      DATABASE_URL: postgresql://udb:${DB_PASSWORD:-udb}@pgbouncer:6432/udb?schema=public
+      AI_COST_PER_HINT: '0.0004'
+      AI_BUDGET_PER_USER_MONTHLY: '0.50'
+      NODE_ENV: production
+    depends_on:
+      redis: { condition: service_healthy }
+      postgres: { condition: service_healthy }
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:3003/ai/health']
+      interval: 30s
+      timeout: 10s
+      start_period: 30s
+      retries: 3
+    deploy:
+      resources:
+        limits: { memory: 256M }
+        reservations: { memory: 128M }
+
+  monitoring-service:
+    build:
+      context: .
+      dockerfile: services/api/prisma/phase3/Dockerfile.monitoring
+    container_name: udb-monitoring
+    restart: unless-stopped
+    environment:
+      MONITORING_SERVICE_PORT: 3004
+      REDIS_URL: redis://redis:6379
+      DATABASE_URL: postgresql://udb:${DB_PASSWORD:-udb}@pgbouncer:6432/udb?schema=public
+      NODE_ENV: production
+    depends_on:
+      redis: { condition: service_healthy }
+      postgres: { condition: service_healthy }
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:3004/monitoring/health']
+      interval: 30s
+      timeout: 10s
+      start_period: 30s
+      retries: 3
+    deploy:
+      resources:
+        limits: { memory: 256M }
+        reservations: { memory: 128M }
+
   api:
     build:
       context: .
@@ -116,6 +255,29 @@ services:
         limits: { memory: 256M }
         reservations: { memory: 128M }
 
+  nginx:
+    build:
+      context: infra/nginx
+      dockerfile: Dockerfile.nginx
+    container_name: udb-nginx
+    restart: unless-stopped
+    ports:
+      - '80:80'
+      - '443:443'
+    volumes:
+      - ./infra/nginx/nginx.conf.template:/etc/nginx/nginx.conf.template
+      - ./infra/nginx/test-certs:/etc/nginx/certs:ro
+    environment:
+      DOMAIN: ${DOMAIN:-localhost}
+      NGINX_ENVSUBST_TEMPLATE_SUFFIX: '.template'
+    depends_on:
+      api: { condition: service_healthy }
+      frontend: { condition: service_healthy }
+    deploy:
+      resources:
+        limits: { memory: 128M }
+        reservations: { memory: 64M }
+
   otel-collector:
     image: otel/opentelemetry-collector-contrib:latest
     container_name: udb-otel-collector
@@ -129,6 +291,65 @@ services:
       resources:
         limits: { memory: 256M }
         reservations: { memory: 128M }
+
+  loki:
+    image: grafana/loki:2.9.0
+    container_name: udb-loki
+    restart: unless-stopped
+    ports:
+      - '3100:3100'
+    volumes:
+      - ./infra/loki/loki-config.yml:/etc/loki/local-config.yaml:ro
+      - loki_data:/loki
+    command: -config.file=/etc/loki/local-config.yaml
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:3100/ready']
+      interval: 30s
+      timeout: 10s
+      start_period: 15s
+      retries: 3
+    deploy:
+      resources:
+        limits: { memory: 256M }
+        reservations: { memory: 128M }
+
+  alertmanager:
+    image: prom/alertmanager:latest
+    container_name: udb-alertmanager
+    restart: unless-stopped
+    ports:
+      - '9093:9093'
+    volumes:
+      - ./infra/alertmanager/config.yml:/etc/alertmanager/alertmanager.yml:ro
+    command:
+      - '--config.file=/etc/alertmanager/alertmanager.yml'
+      - '--storage.path=/alertmanager'
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:9093/-/healthy']
+      interval: 30s
+      timeout: 10s
+      start_period: 15s
+      retries: 3
+    deploy:
+      resources:
+        limits: { memory: 128M }
+        reservations: { memory: 64M }
+
+  promtail:
+    image: grafana/promtail:2.9.0
+    container_name: udb-promtail
+    restart: unless-stopped
+    volumes:
+      - ./infra/loki/promtail-config.yml:/etc/promtail/config.yml:ro
+      - /var/log:/var/log:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    command: -config.file=/etc/promtail/config.yml
+    depends_on:
+      loki: { condition: service_healthy }
+    deploy:
+      resources:
+        limits: { memory: 128M }
+        reservations: { memory: 64M }
 
   jaeger:
     image: jaegertracing/all-in-one:latest
@@ -184,8 +405,29 @@ services:
         limits: { memory: 256M }
         reservations: { memory: 128M }
 
+  db-backup:
+    build:
+      context: infra/backup
+      dockerfile: Dockerfile.backup
+    container_name: udb-db-backup
+    restart: unless-stopped
+    environment:
+      DB_URL: postgresql://udb:${DB_PASSWORD:-udb}@pgbouncer:6432/udb
+    volumes:
+      - db_backups:/backups
+    depends_on:
+      pgbouncer: { condition: service_healthy }
+    command: >
+      sh -c '/usr/local/bin/backup.sh; while true; do sleep 21600 && /usr/local/bin/backup.sh; done'
+    deploy:
+      resources:
+        limits: { memory: 128M }
+        reservations: { memory: 64M }
+
 volumes:
   postgres_data:
   redis_data:
   prometheus_data:
   grafana_data:
+  loki_data:
+  db_backups:

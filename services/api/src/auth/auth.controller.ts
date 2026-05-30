@@ -1,12 +1,13 @@
-import { Controller, Post, Get, Body, Req, Res, HttpCode, Inject } from '@nestjs/common';
+import { Controller, Post, Get, Body, Req, Res, HttpCode, Inject, Logger } from '@nestjs/common';
 import { AuthService } from './auth.service';
+import { MailService } from '../mail/mail.service';
 import { Request, Response } from 'express';
 import * as crypto from 'crypto';
 import { PrismaService } from '../prisma/prisma.service';
 import { MetricsService } from '../shared/metrics.controller';
 import { JwtService } from '@nestjs/jwt';
 import { UserRole } from '../shared/user-role';
-import { REDIS_CLIENT } from '../redis/redis.module';
+import { REDIS_CLIENT } from '../redis/redis.constants';
 import Redis from 'ioredis';
 
 const ACCESS_TOKEN_COOKIE = 'access_token';
@@ -36,11 +37,14 @@ function clearAuthCookies(res: Response) {
 
 @Controller('auth')
 export class AuthController {
+  private readonly logger = new Logger(AuthController.name);
+
   constructor(
     private authService: AuthService,
     private prisma: PrismaService,
     private jwt: JwtService,
     private metrics: MetricsService,
+    private mail: MailService,
     @Inject(REDIS_CLIENT) private redis: Redis,
   ) {}
 
@@ -99,6 +103,10 @@ export class AuthController {
 
     this.metrics.signupsTotal.inc({ role });
     setAuthCookies(res, accessToken, refreshToken);
+
+    if (user.email) {
+      this.mail.sendWelcomeEmail(user.email, user.displayName || 'User');
+    }
 
     return {
       userId: user.id,
@@ -193,6 +201,94 @@ export class AuthController {
     }
     clearAuthCookies(res);
     return { success: true };
+  }
+
+  @Post('forgot-password')
+  @HttpCode(200)
+  async forgotPassword(@Body() body: { email: string }) {
+    const { email } = body;
+    if (!email) {
+      return { error: 'Email is required' };
+    }
+
+    const user = await this.prisma.user.findUnique({ where: { email } });
+    if (!user) {
+      return { success: true, message: 'If an account exists, a reset link has been sent.' };
+    }
+
+    const token = crypto.randomUUID();
+    await this.redis.set(`reset:${token}`, user.id, 'EX', 3600);
+
+    const sent = await this.mail.sendPasswordResetEmail(email, token);
+    if (!sent) {
+      this.metrics.authFailures.inc({ reason: 'email_failed' });
+    }
+
+    this.logger.log(`Password reset token generated for ${email}`);
+
+    return {
+      success: true,
+      message: 'If an account exists, a reset link has been sent.',
+      ...(process.env.NODE_ENV !== 'production' ? { devToken: token } : {}),
+    };
+  }
+
+  @Post('reset-password')
+  @HttpCode(200)
+  async resetPassword(@Body() body: { token: string; newPassword: string }) {
+    const { token, newPassword } = body;
+    if (!token || !newPassword || newPassword.length < 8) {
+      return { error: 'Invalid token or password (min 8 chars)' };
+    }
+
+    const userId = await this.redis.get(`reset:${token}`);
+    if (!userId) {
+      return { error: 'Invalid or expired reset token' };
+    }
+
+    const user = await this.prisma.user.findUnique({ where: { id: userId } });
+    if (!user) {
+      return { error: 'User not found' };
+    }
+
+    const passwordHash = crypto.createHash('sha256').update(newPassword).digest('hex');
+    await this.redis.set(`cred:${user.id}`, passwordHash, 'EX', 365 * 24 * 60 * 60);
+    await this.redis.del(`reset:${token}`);
+
+    this.logger.log(`Password reset completed for ${user.email}`);
+
+    return { success: true, message: 'Password reset successfully' };
+  }
+
+  @Post('change-password')
+  @HttpCode(200)
+  async changePassword(@Body() body: { email: string; currentPassword: string; newPassword: string }) {
+    const { email, currentPassword, newPassword } = body;
+    if (!email || !currentPassword || !newPassword || newPassword.length < 8) {
+      return { error: 'Email, current password, and new password (min 8 chars) required' };
+    }
+
+    const user = await this.prisma.user.findUnique({ where: { email } });
+    if (!user) {
+      return { error: 'User not found' };
+    }
+
+    const storedHash = await this.redis.get(`cred:${user.id}`);
+    if (!storedHash) {
+      return { error: 'No credentials stored' };
+    }
+
+    const currentHash = crypto.createHash('sha256').update(currentPassword).digest('hex');
+    if (storedHash !== currentHash) {
+      return { error: 'Current password is incorrect' };
+    }
+
+    const newHash = crypto.createHash('sha256').update(newPassword).digest('hex');
+    await this.redis.set(`cred:${user.id}`, newHash, 'EX', 365 * 24 * 60 * 60);
+
+    this.logger.log(`Password changed for ${email}`);
+
+    return { success: true, message: 'Password changed successfully' };
   }
 
   @Get('me')

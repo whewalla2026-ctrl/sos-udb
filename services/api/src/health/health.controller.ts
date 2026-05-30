@@ -1,6 +1,6 @@
 import { Controller, Get, Inject, Logger } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { REDIS_CLIENT } from '../redis/redis.module';
+import { REDIS_CLIENT } from '../redis/redis.constants';
 import Redis from 'ioredis';
 
 const startTime = Date.now();
