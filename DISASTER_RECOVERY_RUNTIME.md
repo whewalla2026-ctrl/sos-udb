@@ -72,8 +72,8 @@ docker exec udb-postgres pg_isready    # PostgreSQL
 
 ## Emergency Contacts
 
-- On-call: TODO
-- Database admin: TODO
-- Infrastructure: TODO
+- On-call: [Not configured — set PagerDuty or equivalent in production]
+- Database admin: [Not configured — set up Cloud SQL IAM or pgMonitor]
+- Infrastructure: [Not configured — assign DevOps/SRE lead]
 
 ## Status: TESTED ✅
