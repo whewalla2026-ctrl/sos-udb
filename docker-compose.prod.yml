@@ -413,6 +413,7 @@ services:
     restart: unless-stopped
     environment:
       DB_URL: postgresql://udb:${DB_PASSWORD:-udb}@pgbouncer:6432/udb
+      BACKUP_ENCRYPTION_KEY: ${BACKUP_ENCRYPTION_KEY:-}
     volumes:
       - db_backups:/backups
     depends_on:

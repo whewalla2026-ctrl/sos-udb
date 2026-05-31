@@ -3,7 +3,8 @@ set -euo pipefail
 
 # UDB Database Backup Script
 # Usage: ./backup.sh [output-dir]
-# Env: DB_URL, GPG_RECIPIENT, S3_BUCKET (optional)
+# Env: DB_URL, BACKUP_ENCRYPTION_KEY, GPG_RECIPIENT, S3_BUCKET (optional)
+# Encryption priority: BACKUP_ENCRYPTION_KEY (symmetric) > GPG_RECIPIENT (asymmetric) > unencrypted
 
 OUTPUT_DIR="${1:-/backups}"
 TIMESTAMP=$(date -u +"%Y%m%dT%H%M%SZ")
@@ -29,19 +30,30 @@ fi
 
 log "Backup size: $(du -h "${BACKUP_PATH}" | cut -f1)"
 
-# Encrypt with GPG
-if [ -n "${GPG_RECIPIENT:-}" ]; then
+# Encrypt with GPG symmetric passphrase (preferred — simpler ops)
+if [ -n "${BACKUP_ENCRYPTION_KEY:-}" ]; then
+  if gpg --batch --yes --passphrase "${BACKUP_ENCRYPTION_KEY}" \
+    --symmetric --cipher-algo AES256 \
+    --output "${ENCRYPTED_PATH}" "${BACKUP_PATH}"; then
+    rm -f "${BACKUP_PATH}"
+    log "Encrypted backup (AES-256 symmetric): ${ENCRYPTED_PATH}"
+    FINAL_PATH="${ENCRYPTED_PATH}"
+  else
+    log "WARNING: Symmetric encryption failed, trying asymmetric..."
+    FINAL_PATH="${BACKUP_PATH}"
+  fi
+elif [ -n "${GPG_RECIPIENT:-}" ]; then
   if gpg --batch --yes --trust-model always --encrypt --recipient "${GPG_RECIPIENT}" \
     --output "${ENCRYPTED_PATH}" "${BACKUP_PATH}"; then
     rm -f "${BACKUP_PATH}"
-    log "Encrypted backup: ${ENCRYPTED_PATH}"
+    log "Encrypted backup (asymmetric): ${ENCRYPTED_PATH}"
     FINAL_PATH="${ENCRYPTED_PATH}"
   else
     log "WARNING: GPG encryption failed, keeping unencrypted"
     FINAL_PATH="${BACKUP_PATH}"
   fi
 else
-  log "WARNING: No GPG_RECIPIENT set — backup is UNENCRYPTED"
+  log "WARNING: No BACKUP_ENCRYPTION_KEY or GPG_RECIPIENT set — backup is UNENCRYPTED"
   FINAL_PATH="${BACKUP_PATH}"
 fi
 
