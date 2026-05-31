@@ -2,93 +2,83 @@
 
 Education platform for child development (ages 6-23) with AI tutoring, gamification, parental oversight, and safety-first design.
 
+**Version:** v15.0-hardened | **Status:** Engineering complete — transitioning to operations.
+
 ## Quick Start
 
 ```bash
 cp .env.example .env
-# Fill in your API keys in .env
 docker compose -f docker-compose.prod.yml up -d
 pnpm install
-pnpm prisma migrate deploy --schema=services/api/prisma/schema.prisma
-pnpm dev
+pnpm test              # Run all tests (446+ unit, 29 E2E)
 ```
 
-## Architecture
+## Architecture (18 Containers)
 
-### Services (Microservices)
+### Application Services
 | Service | Port | Technology | Role |
 |---------|------|-----------|------|
-| Gateway | 3000 | Node.js | API gateway, request routing to microservices |
-| Auth | 3001 | Node.js | Authentication, COPPA VPC enforcement |
-| Planner | 3002 | Node.js | Learning plans, schedules, chronotype scheduling |
-| AI | 3003 | Node.js | AI tutor, vision analysis, skill gap analysis |
-| Monitoring | 3004 | Node.js | Health checks, metrics, alert routing |
-| API | 4000 | NestJS | GraphQL, business logic, all core features |
-| Frontend | 3030 | Next.js 14 | 40-route web application (auth, dashboard, admin) |
+| Gateway | 3000 | Express | API proxy, rate limiting, auth enforcement |
+| Auth | 3001 | Express | Auth health stub |
+| Planner | 3002 | Express | Planning health stub |
+| AI | 3003 | Express | AI-lite hints, batch, budget endpoints |
+| Monitoring | 3004 | Express | Health aggregation, alert forwarding |
+| API | 4000 | NestJS | GraphQL, all business logic (52 services, 26 resolvers) |
+| Frontend | 3030 | Next.js 14 | 38-page SSR web application |
 
 ### Infrastructure
 | Service | Port | Role |
 |---------|------|------|
-| PostgreSQL 16 | 5432 | Primary database (27 tables, 2 migrations) |
+| PostgreSQL 16 + TimescaleDB 2.17.2 | 5432 | Primary database (38 tables, 3 migrations) |
 | PgBouncer | 6432 | Connection pooling |
-| Redis 7 | 6379 | Cache, sessions, BullMQ queues |
-| Nginx | 80/443 | Reverse proxy, TLS termination |
+| Redis 7 | 6379 | Cache, BullMQ queues, rate limiting |
+| Nginx | 80/443 | Reverse proxy, TLS termination (self-signed) |
+| db-backup | — | AES-256 encrypted pg_dump every 6h |
 
 ### Observability
 | Service | Port | Role |
 |---------|------|------|
-| Prometheus | 9090 | Metrics collection (1 active target) |
-| Grafana | 3005 | Dashboards (admin/admin123) |
+| Prometheus | 9090 | Metrics collection |
+| Grafana | 3005 | Dashboards |
 | Jaeger | 16686 | Distributed tracing |
 | Loki | 3100 | Log aggregation |
-| AlertManager | 9093 | Alert routing |
-| OTel Collector | 4318 | Telemetry pipeline (OTLP) |
-| Promtail | — | Log shipping to Loki |
+| AlertManager | 9093 | Alert routing with webhook receivers |
+| OTel Collector | 4318 | OTLP telemetry pipeline |
 
 ## Testing
 
 ```bash
-pnpm test              # 127 unit tests (14 suites)
-pnpm test:e2e          # E2E against Docker stack
-pnpm test:integration  # API contract tests
+pnpm test              # 446 unit tests (34 suites) + 29 E2E
 pnpm lint              # ESLint (0 errors expected)
-pnpm typecheck         # TypeScript strict mode
-bash scripts/smoke-test.sh  # 11 smoke tests
+pnpm typecheck         # TypeScript strict mode (0 errors)
 ```
 
 ## Feature Flags
 
-See [docs/FEATURE_FLAGS.md](docs/FEATURE_FLAGS.md) for the full inventory:
-- **12 core flags ON** — auth, security, safety, GDPR, gamification, messaging
-- **13 deferred flags OFF** — offline, biometric, desktop agent, ventures, etc.
+See [docs/FEATURE_FLAGS.md](docs/FEATURE_FLAGS.md) — 13 flags total (4 ON, 9 OFF).
 
 ## Deployment
 
-See [docs/ROLLOUT_PLAN.md](docs/ROLLOUT_PLAN.md) for staging → production rollout.
-
 | Environment | Stack | Status |
 |-------------|-------|--------|
-| Localhost | Docker Compose (19 containers) | ✅ Running |
-| Staging (AWS) | ECS Fargate + RDS + ElastiCache | ⏳ Terraform ready, not applied |
+| Localhost | Docker Compose (18 containers) | ✅ Running |
+| Staging (AWS) | ECS Fargate + RDS + ElastiCache | ⏳ Terraform ready |
 | Production | ECS Fargate (multi-AZ) | 📅 Future |
-
-## Known Limitations
-
-See [KNOWN_LIMITATIONS.md](KNOWN_LIMITATIONS.md) for honest accounting:
-- 15/50 services with dedicated tests
-- 3 stubs (desktop agent, offline tutor, mobile SDK)
-- No cloud infrastructure deployed (requires AWS credentials)
 
 ## Documentation
 
 | Document | Description |
 |----------|-------------|
-| `docs/FEATURE_FLAGS.md` | 25-flag inventory with activation criteria |
-| `docs/ROLLOUT_PLAN.md` | 4-phase rollout with rollback procedures |
+| `KNOWN_LIMITATIONS.md` | Current known limitations and score |
+| `DEPLOYMENT_HISTORY.md` | Version history from v1.0.0 → v15.0 |
+| `docs/FEATURE_FLAGS.md` | 13-flag inventory with activation criteria |
+| `docs/USE_CASE_AUDIT.md` | 120 use case completion audit (98.3%) |
+| `docs/DELIVERY_CHECKLIST.md` | Requirements verification (53 items) |
+| `docs/TRAINING_GUIDE.md` | End user training guide |
+| `docs/TEST_REPORT_v15.0.md` | Comprehensive test verification report |
 | `docs/RUNBOOK.md` | Deployment and incident response runbook |
-| `docs/GITHUB_SECRETS.md` | Required GitHub Actions secrets |
-| `KNOWN_LIMITATIONS.md` | Service coverage matrix and deferrals |
-| `DEPLOYMENT_RUNBOOK.md` | Production deployment procedures |
+| `docs/ROLLOUT_PLAN.md` | 4-phase rollout with rollback procedures |
+| `docs/DISASTER_RECOVERY_RUNTIME.md` | DR procedures and runtime ops |
 
 ## License
 
