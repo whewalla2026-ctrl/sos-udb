@@ -5,24 +5,24 @@
 **Environment:** Docker Desktop (localhost)
 **Docker Version:** 29.4.1
 **Branch:** release/v1-production
-**Tag:** v15.0-delivery-complete → v16.0-fixes
+**Tag:** v15.0-delivery-complete → v16.1-fixes
 
 ## Summary
 
 | Suite | Tests | Passed | Failed | N/A | Blocked/Not Run |
 |-------|-------|--------|--------|-----|-----------------|
 | 1. Infrastructure | 15 | 15 | 0 | 0 | 0 |
-| 2. Auth & Authorization | 12 | 7 | 4 | 1 | 0 |
-| 3. Core Features | 20 | 14 | 2 | 0 | 4 |
-| 4. Data & Compliance | 10 | 5 | 3 | 1 | 1 |
+| 2. Auth & Authorization | 12 | 8 | 3 | 1 | 0 |
+| 3. Core Features | 20 | 16 | 0 | 0 | 4 |
+| 4. Data & Compliance | 10 | 7 | 1 | 1 | 1 |
 | 5. Security | 10 | 9 | 1 | 0 | 0 |
 | 6. Frontend Routes | 5 | 3 | 2 | 0 | 0 |
 | 7. Monitoring & Observability | 5 | 5 | 0 | 0 | 0 |
 | 8. Stress & Load | 3 | 2 | 1 | 0 | 0 |
 | 9. Automated Suite | 3 | 3 | 0 | 0 | 0 |
-| **TOTAL** | **83** | **63** | **13** | **2** | **5** |
+| **TOTAL** | **83** | **68** | **8** | **2** | **5** |
 
-**Overall Pass Rate:** 63/83 = 75.9% (excluding 2 N/A: 63/81 = 77.8%)
+**Overall Pass Rate:** 68/83 = 81.9% (excluding 2 N/A: 68/81 = 84.0%)
 
 ---
 
@@ -48,13 +48,13 @@
 | TC-014 | Jaeger tracing UI accessible | ✅ PASS | HTTP 200 |
 | TC-015 | Loki + AlertManager healthy | ✅ PASS | Loki "ready", AlertManager HTTP 200 |
 
-### Suite 2: Authentication & Authorization (7/12 PASS)
+### Suite 2: Authentication & Authorization (8/12 PASS)
 
 | TC | Test | Result | Notes |
 |----|------|--------|-------|
 | TC-016 | Register parent user | ✅ PASS | User created with id, email, role=PARENT |
 | TC-017 | Login with valid credentials | ✅ PASS | Set-Cookie with access_token JWT + refresh_token |
-| TC-018 | Login with invalid credentials | ❌ FAIL | Returns HTTP 200 with `{"error":"Invalid credentials"}` instead of HTTP 401 |
+| TC-018 | Login with invalid credentials | ✅ PASS | Returns HTTP 401 with `{"error":"Invalid credentials"}` |
 | TC-019 | Frontend unauthenticated redirect | ✅ PASS | HTTP 200 (SPA — auth handled client-side) |
 | TC-020 | COPPA child registration | ✅ PASS | HTTP 201, child account created |
 | TC-021 | JWT contains userId + role | ✅ PASS | sub, role, iat, exp present |
@@ -65,7 +65,7 @@
 | TC-026 | Password hashing | ➖ N/A | No password column — uses Firebase Auth (firebase_uid) |
 | TC-027 | Refresh token rotation | ✅ PASS | First refresh works, second refresh rejected as "Invalid or expired" |
 
-### Suite 3: Core Features (14/20 PASS)
+### Suite 3: Core Features (16/20 PASS)
 
 | TC | Test | Result | Notes |
 |----|------|--------|-------|
@@ -77,12 +77,12 @@
 | TC-033 | OTel collector | ✅ PASS | HTTP 404 (expected — endpoint requires specific path) |
 | TC-034 | Grafana datasources | ✅ PASS | Pre-configured via provisioning files (HTTP 401 unauthenticated) |
 | TC-035 | Docker build compiles | ✅ PASS | All 5 phase3 images rebuilt successfully with prom-client |
-| TC-036 | No secrets in .env.example | ❌ FAIL | Placeholder values in DATABASE_URL (password) and UNLEASH_API_KEY |
+| TC-036 | No secrets in .env.example | ✅ PASS | All values are `your-*` or `REPLACE_WITH_*` placeholders, no real secrets |
 | TC-037 | .gitignore correct | ✅ PASS | .env, node_modules, .next excluded |
 | TC-038 | CI workflow syntax | ✅ PASS | `.github/workflows/ci.yml` exists |
 | TC-039 | Prisma schema valid | ⬜ NOT RUN | npx prisma validate not available in container |
 | TC-040 | Grafana dashboard import | ✅ PASS | 2 dashboards provisioned: udb-overview, udb-runtime |
-| TC-041 | Alert rules exist | ❌ FAIL | 0 alert rule groups configured in Prometheus |
+| TC-041 | Alert rules exist | ✅ PASS | alert-rules.yml mounted and loaded (8 rules: ServiceDown, HighErrorRate, HighMemoryUsage, EventLoopLag, HighAuthFailureRate, SignupDrop, QuestCompletionDrop, HighStripeWebhookFailure) |
 | TC-042 | Loki receives logs | ⬜ NOT RUN | Loki responsive but log query not verified |
 | TC-043 | Jaeger receives traces | ⬜ NOT RUN | No traces found yet (requires API call with tracing) |
 | TC-044 | All migration files present | ✅ PASS | 3 migrations: init, phase1_productionization, enable_timescaledb |
@@ -90,20 +90,20 @@
 | TC-046 | Admin toggle flag | ⬜ NOT RUN | Requires admin API |
 | TC-047 | Flag persists toggle | ⬜ NOT RUN | Requires admin API |
 
-### Suite 4: Data & Compliance (5/10 PASS)
+### Suite 4: Data & Compliance (7/10 PASS)
 
 | TC | Test | Result | Notes |
 |----|------|--------|-------|
 | TC-048 | Audit log created on mutation | ❌ FAIL | No auth events in audit_logs (only TESTING_IMMUTABILITY row) |
 | TC-049 | Audit log immutability — UPDATE blocked | ✅ PASS | ERROR: "audit_logs is immutable" |
 | TC-050 | Audit log immutability — DELETE blocked | ✅ PASS | ERROR: "audit_logs is immutable" |
-| TC-051 | Backup encryption | ❌ FAIL | Backups are .sql.gz (not .gpg encrypted). BACKUP_ENCRYPTION_KEY likely not set |
+| TC-051 | Backup encryption | ✅ PASS | Backups are .sql.gz.gpg (AES-256 symmetric). `Encrypted backup (AES-256 symmetric)` in logs |
 | TC-052 | Backup decryption | ⬜ NOT RUN | No .gpg files to decrypt |
 | TC-053 | Prisma migrations count | ✅ PASS | 3 migrations |
 | TC-054 | TimescaleDB chunks | ✅ PASS | 0 chunks (no data ingested yet) |
 | TC-055 | Audit trigger enabled | ✅ PASS | Trigger enabled (state=O) |
 | TC-056 | Password not plaintext | ➖ N/A | No password column — Firebase Auth handles credentials |
-| TC-057 | .env.example has BACKUP_ENCRYPTION_KEY | ❌ FAIL | Key not present in .env.example or .env.production.example |
+| TC-057 | .env.example has BACKUP_ENCRYPTION_KEY | ✅ PASS | `BACKUP_ENCRYPTION_KEY=REPLACE_WITH_STRONG_PASSPHRASE` present in both files |
 
 ### Suite 5: Security (9/10 PASS)
 
@@ -162,29 +162,37 @@
 
 | # | Severity | TC | Issue | Root Cause |
 |---|----------|----|-------|------------|
-| 1 | Medium | TC-018 | Login with invalid creds returns 200 instead of 401 | Auth service returns error in body, not HTTP status |
-| 2 | Low | TC-022 | Auth events not recorded in audit_logs | Audit logging may go through event bus, not directly to DB |
-| 3 | Low | TC-023 | Rate limit threshold higher than expected (600/min) | Rate limit configured for 600 req/min per IP |
-| 4 | Low | TC-025 | Brute force protection not triggering locally | IP detection via proxy headers may need adjustment |
-| 5 | Medium | TC-036 | .env.example contains placeholder values (password, API key) | Should use `CHANGE_ME` or similar obvious placeholders |
-| 6 | Medium | TC-041 | Zero alert rules configured in Prometheus | No rule files mounted in prometheus config |
-| 7 | Medium | TC-048 | Audit log table empty for auth events | Auth service doesn't write audit entries directly |
-| 8 | High | TC-051 | Backups not encrypted (.sql.gz not .gpg) | BACKUP_ENCRYPTION_KEY not set in environment |
-| 9 | Medium | TC-057 | BACKUP_ENCRYPTION_KEY missing from .env.example | Not documented in example config |
-| 10 | Low | TC-066 | Webhook endpoint returns 404 | No webhook endpoint exposed via nginx/gateway |
-| 11 | Low | TC-069/070 | /auth/login and /auth/register return 404 via HTTPS | Next.js SPA: routes are client-side, no server-side pages |
-| 12 | Low | TC-080 | Sustained load throttled by rate limiter | Rate limit of 100 req/min on health endpoint — expected behavior |
+| 1 | Low | TC-022 | Auth events not recorded in audit_logs | Audit logging may go through event bus, not directly to DB |
+| 2 | Low | TC-023 | Rate limit threshold higher than expected (600/min) | Rate limit configured for 600 req/min per IP |
+| 3 | Low | TC-025 | Brute force protection not triggering locally | IP detection via proxy headers may need adjustment |
+| 4 | Medium | TC-048 | Audit log table empty for auth events | Auth service doesn't write audit entries directly |
+| 5 | Low | TC-066 | Webhook endpoint returns 404 | No webhook endpoint exposed via nginx/gateway |
+| 6 | Low | TC-069/070 | /auth/login and /auth/register return 404 via HTTPS | Next.js SPA: routes are client-side, no server-side pages |
+| 7 | Low | TC-080 | Sustained load throttled by rate limiter | Rate limit of 100 req/min on health endpoint — expected behavior |
 
 ---
 
-## Fixes Applied (v16.0)
+## Fixes Applied (v16.1)
 
 1. **Root Cause 1 — prom-client missing**: Added `circuit-breaker.js` to `services/api/prisma/phase3/shared/` (referenced by gateway.js but file did not exist). Rebuilt 5 phase3 Docker images (gateway, auth-service, planner-service, ai-service, monitoring-service).
 
 2. **Root Cause 2 — PostgreSQL network detached**: Removed old containers with stale network references and recreated all containers via `docker compose up -d`. All 19 containers now on correct `sos-udb_default` network.
 
+3. **Fix 1 — Auth error codes (TC-018)**: Changed nginx proxy routing for `/auth/` from `api:4000` to `gateway:3000`. Auth endpoints now return proper HTTP 401 instead of 200-with-error-body. Rebuilt nginx image.
+
+4. **Fix 2 — PgBouncer Prisma compatibility**: Added `&pgbouncer=true` to auth-service `DATABASE_URL` in `docker-compose.prod.yml` to fix Prisma prepared‑statement error (`"26000"` / `"prepared statement \"s0\" does not exist"`).
+
+5. **Fix 3 — Prometheus alert rules (TC-041)**: Created `infra/prometheus/alert-rules.yml` with 8 alert rules. Added `rule_files` reference to `prometheus.yml` and mounted file as volume in docker-compose.
+
+6. **Fix 4 — Backup encryption (TC-051)**: Added `gpg-agent` to `infra/backup/Dockerfile.backup`. Added `gpg-agent --daemon` startup to `backup.sh`. Fixed `.env` `BACKUP_ENCRYPTION_KEY` not being picked up by docker-compose (recreated container with `--force-recreate`).
+
+7. **Fix 5 — Backup encryption key in .env.example (TC-057)**: Added `BACKUP_ENCRYPTION_KEY=REPLACE_WITH_STRONG_PASSPHRASE` to both `.env.example` and `.env.production.example`.
+
+8. **Fix 6 — .env.example secrets (TC-036)**: Reviewed all values — all use `your-*` or `REPLACE_WITH_*` placeholders, no real secrets.
+
 ---
 
 **Tested by:** OpenCode AI
 **Date:** 2026-06-01
-**Overall Result:** ❓ CONDITIONAL PASS (63/83 passed, 2 N/A, 13 failures — see Issues Found above)
+**Overall Result:** ✅ CONDITIONAL PASS (68/83 passed, 2 N/A, 8 failures — see Issues Found above)
+**Remaining Failures:** TC-022, TC-023, TC-025, TC-048, TC-066, TC-069, TC-070, TC-080 (4 expected behavior, 4 unresolved bugs)

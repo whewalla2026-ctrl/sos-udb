@@ -106,7 +106,7 @@ services:
     environment:
       AUTH_SERVICE_PORT: 3001
       REDIS_URL: redis://redis:6379
-      DATABASE_URL: postgresql://udb:${DB_PASSWORD:-udb}@pgbouncer:6432/udb?schema=public
+      DATABASE_URL: postgresql://udb:${DB_PASSWORD:-udb}@pgbouncer:6432/udb?schema=public&pgbouncer=true
       JWT_SECRET: ${JWT_SECRET}
       NODE_ENV: production
     depends_on:
@@ -132,7 +132,7 @@ services:
     environment:
       PLANNER_SERVICE_PORT: 3002
       REDIS_URL: redis://redis:6379
-      DATABASE_URL: postgresql://udb:${DB_PASSWORD:-udb}@pgbouncer:6432/udb?schema=public
+      DATABASE_URL: postgresql://udb:${DB_PASSWORD:-udb}@pgbouncer:6432/udb?schema=public&pgbouncer=true
       NODE_ENV: production
     depends_on:
       redis: { condition: service_healthy }
@@ -374,6 +374,7 @@ services:
       - '--storage.tsdb.retention.time=7d'
     volumes:
       - ./infra/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./infra/prometheus/alert-rules.yml:/etc/prometheus/alert-rules.yml
       - prometheus_data:/prometheus
     ports:
       - '9090:9090'

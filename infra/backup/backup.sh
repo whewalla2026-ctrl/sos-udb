@@ -30,6 +30,9 @@ fi
 
 log "Backup size: $(du -h "${BACKUP_PATH}" | cut -f1)"
 
+# Start gpg-agent if available (needed for symmetric passphrase in GnuPG 2)
+gpg-agent --daemon 2>/dev/null || true
+
 # Encrypt with GPG symmetric passphrase (preferred — simpler ops)
 if [ -n "${BACKUP_ENCRYPTION_KEY:-}" ]; then
   if gpg --batch --yes --passphrase "${BACKUP_ENCRYPTION_KEY}" \
