@@ -6,9 +6,85 @@
   "editable": true,
   "panels": [
     {
+      "title": "Service Health",
+      "type": "row",
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 0 }
+    },
+    {
+      "title": "API Gateway",
+      "type": "stat",
+      "gridPos": { "h": 4, "w": 4, "x": 0, "y": 1 },
+      "targets": [{ "expr": "up{service=\"gateway\"}", "legendFormat": "" }],
+      "thresholds": [{ "value": 0.5, "color": "red" }, { "value": 1, "color": "green" }],
+      "colorMode": "background",
+      "unit": "none",
+      "mappingType": 1,
+      "valueMaps": [{ "value": "1", "text": "UP" }, { "value": "0", "text": "DOWN" }]
+    },
+    {
+      "title": "Auth Service",
+      "type": "stat",
+      "gridPos": { "h": 4, "w": 4, "x": 4, "y": 1 },
+      "targets": [{ "expr": "up{service=\"auth-service\"}", "legendFormat": "" }],
+      "thresholds": [{ "value": 0.5, "color": "red" }, { "value": 1, "color": "green" }],
+      "colorMode": "background",
+      "unit": "none",
+      "mappingType": 1,
+      "valueMaps": [{ "value": "1", "text": "UP" }, { "value": "0", "text": "DOWN" }]
+    },
+    {
+      "title": "API",
+      "type": "stat",
+      "gridPos": { "h": 4, "w": 4, "x": 8, "y": 1 },
+      "targets": [{ "expr": "up{service=\"api\"}", "legendFormat": "" }],
+      "thresholds": [{ "value": 0.5, "color": "red" }, { "value": 1, "color": "green" }],
+      "colorMode": "background",
+      "unit": "none",
+      "mappingType": 1,
+      "valueMaps": [{ "value": "1", "text": "UP" }, { "value": "0", "text": "DOWN" }]
+    },
+    {
+      "title": "Frontend",
+      "type": "stat",
+      "gridPos": { "h": 4, "w": 4, "x": 12, "y": 1 },
+      "targets": [{ "expr": "up{service=\"frontend\"}", "legendFormat": "" }],
+      "thresholds": [{ "value": 0.5, "color": "red" }, { "value": 1, "color": "green" }],
+      "colorMode": "background",
+      "unit": "none",
+      "mappingType": 1,
+      "valueMaps": [{ "value": "1", "text": "UP" }, { "value": "0", "text": "DOWN" }]
+    },
+    {
+      "title": "PostgreSQL",
+      "type": "stat",
+      "gridPos": { "h": 4, "w": 4, "x": 16, "y": 1 },
+      "targets": [{ "expr": "pg_up", "legendFormat": "" }],
+      "thresholds": [{ "value": 0.5, "color": "red" }, { "value": 1, "color": "green" }],
+      "colorMode": "background",
+      "unit": "none",
+      "mappingType": 1,
+      "valueMaps": [{ "value": "1", "text": "UP" }, { "value": "0", "text": "DOWN" }]
+    },
+    {
+      "title": "Redis",
+      "type": "stat",
+      "gridPos": { "h": 4, "w": 4, "x": 20, "y": 1 },
+      "targets": [{ "expr": "redis_up", "legendFormat": "" }],
+      "thresholds": [{ "value": 0.5, "color": "red" }, { "value": 1, "color": "green" }],
+      "colorMode": "background",
+      "unit": "none",
+      "mappingType": 1,
+      "valueMaps": [{ "value": "1", "text": "UP" }, { "value": "0", "text": "DOWN" }]
+    },
+    {
+      "title": "Traffic & Performance",
+      "type": "row",
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 5 }
+    },
+    {
       "title": "HTTP Request Rate",
       "type": "timeseries",
-      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 0 },
+      "gridPos": { "h": 8, "w": 8, "x": 0, "y": 6 },
       "targets": [
         { "expr": "rate(udb_http_requests_total[1m])", "legendFormat": "{{service}} {{method}}" }
       ]
@@ -16,23 +92,28 @@
     {
       "title": "Request Duration (p95)",
       "type": "timeseries",
-      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 0 },
+      "gridPos": { "h": 8, "w": 8, "x": 8, "y": 6 },
       "targets": [
         { "expr": "histogram_quantile(0.95, sum(rate(udb_http_request_duration_seconds_bucket[1m])) by (le, service))", "legendFormat": "{{service}}" }
       ]
     },
     {
-      "title": "Memory Usage",
+      "title": "Error Rate",
       "type": "timeseries",
-      "gridPos": { "h": 8, "w": 8, "x": 0, "y": 8 },
+      "gridPos": { "h": 8, "w": 8, "x": 16, "y": 6 },
       "targets": [
-        { "expr": "udb_process_resident_memory_bytes / 1024 / 1024", "legendFormat": "{{service}}" }
+        { "expr": "rate(udb_http_requests_total{status=~\"5..\"}[1m])", "legendFormat": "{{service}}" }
       ]
+    },
+    {
+      "title": "Auth & Users",
+      "type": "row",
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 14 }
     },
     {
       "title": "Auth Failures",
       "type": "timeseries",
-      "gridPos": { "h": 8, "w": 8, "x": 8, "y": 8 },
+      "gridPos": { "h": 8, "w": 6, "x": 0, "y": 15 },
       "targets": [
         { "expr": "rate(udb_auth_failures_total[1m])", "legendFormat": "{{reason}}" }
       ]
@@ -40,31 +121,52 @@
     {
       "title": "Signups",
       "type": "timeseries",
-      "gridPos": { "h": 8, "w": 8, "x": 16, "y": 8 },
+      "gridPos": { "h": 8, "w": 6, "x": 6, "y": 15 },
       "targets": [
         { "expr": "rate(udb_signups_total[1h])", "legendFormat": "{{role}}" }
       ]
     },
     {
-      "title": "Quests Completed",
-      "type": "timeseries",
-      "gridPos": { "h": 8, "w": 8, "x": 0, "y": 16 },
-      "targets": [
-        { "expr": "rate(udb_quests_completed_total[1h])", "legendFormat": "{{pillar}}" }
-      ]
-    },
-    {
       "title": "Active Users",
       "type": "timeseries",
-      "gridPos": { "h": 8, "w": 8, "x": 8, "y": 16 },
+      "gridPos": { "h": 8, "w": 6, "x": 12, "y": 15 },
       "targets": [
         { "expr": "udb_active_users", "legendFormat": "{{role}}" }
       ]
     },
     {
+      "title": "Memory Usage (MB)",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 6, "x": 18, "y": 15 },
+      "targets": [
+        { "expr": "udb_process_resident_memory_bytes / 1024 / 1024", "legendFormat": "{{service}}" }
+      ]
+    },
+    {
+      "title": "Platform Activity",
+      "type": "row",
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 23 }
+    },
+    {
+      "title": "Quests Completed",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 8, "x": 0, "y": 24 },
+      "targets": [
+        { "expr": "rate(udb_quests_completed_total[1h])", "legendFormat": "{{pillar}}" }
+      ]
+    },
+    {
+      "title": "Redis Ops Rate",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 8, "x": 8, "y": 24 },
+      "targets": [
+        { "expr": "rate(udb_redis_commands_total[1m])", "legendFormat": "{{service}}" }
+      ]
+    },
+    {
       "title": "Stripe Webhooks",
       "type": "timeseries",
-      "gridPos": { "h": 8, "w": 8, "x": 16, "y": 16 },
+      "gridPos": { "h": 8, "w": 8, "x": 16, "y": 24 },
       "targets": [
         { "expr": "rate(udb_stripe_webhooks_total[5m])", "legendFormat": "{{event}} ({{status}})" }
       ]
