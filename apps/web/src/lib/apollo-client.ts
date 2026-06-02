@@ -1,5 +1,6 @@
 import { ApolloClient, InMemoryCache, createHttpLink, from, Observable } from '@apollo/client';
 import { onError } from '@apollo/client/link/error';
+import { api, setTokens } from './api';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/graphql';
 
@@ -13,25 +14,17 @@ const errorLink = onError(({ graphQLErrors, networkError, operation, forward }) 
     for (const err of graphQLErrors) {
       if (err.extensions?.code === 'UNAUTHENTICATED' || (err.message && err.message.indexOf('Unauthorized') !== -1)) {
         return new Observable((observer) => {
-          fetch(API_URL.replace('/graphql', '') + '/auth/refresh', {
-            method: 'POST',
-            credentials: 'include',
-            headers: { 'Content-Type': 'application/json' },
-          })
-          .then((r) => {
-            if (r.ok) {
-              const oldHeaders = operation.getContext().headers || {};
-              operation.setContext({ headers: { ...oldHeaders } });
-              const subscriber = forward(operation).subscribe({
-                next: (result) => { observer.next(result); },
-                error: (e) => { observer.error(e); },
-                complete: () => { observer.complete(); },
-              });
-              return () => { subscriber.unsubscribe(); };
-            } else {
-              if (typeof window !== 'undefined') { window.location.href = '/auth/login'; }
-              observer.complete();
-            }
+          api.refresh()
+          .then((data) => {
+            setTokens(data.token, data.refreshToken);
+            const oldHeaders = operation.getContext().headers || {};
+            operation.setContext({ headers: { ...oldHeaders } });
+            const subscriber = forward(operation).subscribe({
+              next: (result) => { observer.next(result); },
+              error: (e) => { observer.error(e); },
+              complete: () => { observer.complete(); },
+            });
+            return () => { subscriber.unsubscribe(); };
           })
           .catch(() => {
             if (typeof window !== 'undefined') { window.location.href = '/auth/login'; }

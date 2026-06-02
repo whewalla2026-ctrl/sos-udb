@@ -1,5 +1,13 @@
 var NESTJS_URL = process.env.NEXT_PUBLIC_API_URL ? process.env.NEXT_PUBLIC_API_URL.replace('/graphql', '') : 'http://localhost:4000';
 
+var accessToken: string | null = null;
+var refreshTokenValue: string | null = null;
+
+export function setTokens(access: string | null, refresh: string | null) {
+  accessToken = access;
+  refreshTokenValue = refresh;
+}
+
 var FRIENDLY_ERRORS: Record<number, string> = {
   400: 'Invalid request. Please check your input.',
   401: 'Invalid email or password.',
@@ -21,6 +29,9 @@ function getUserFriendlyMessage(status: number, serverMessage?: string): string 
 
 async function request(method: string, path: string, body?: any) {
   var headers: Record<string, string> = { 'Content-Type': 'application/json' };
+  if (accessToken) {
+    headers['Authorization'] = 'Bearer ' + accessToken;
+  }
   try {
     var res = await fetch(NESTJS_URL + path, {
       method,
@@ -63,7 +74,7 @@ export var api = {
     request('POST', '/auth/login', { email, password }),
 
   refresh: () =>
-    request('POST', '/auth/refresh'),
+    request('POST', '/auth/refresh', { refreshToken: refreshTokenValue }),
 
   validate: () => request('GET', '/auth/me'),
 

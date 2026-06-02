@@ -1,7 +1,7 @@
 'use client';
 
 import { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
-import { api } from './api';
+import { api, setTokens } from './api';
 
 interface AuthUser {
   userId: string;
@@ -45,6 +45,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setLoading(true);
     try {
       var data = await api.login(email, password);
+      setTokens(data.token, data.refreshToken);
       setUser({ userId: data.userId, email: data.email, displayName: data.displayName, role: data.role });
     } catch (err: any) {
       setError(err.message || 'Login failed');
@@ -59,6 +60,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setLoading(true);
     try {
       var data = await api.register(email, password, displayName);
+      setTokens(data.token, data.refreshToken);
       setUser({ userId: data.userId, email: data.email, displayName: data.displayName, role: data.role });
     } catch (err: any) {
       setError(err.message || 'Registration failed');
@@ -72,8 +74,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       await api.logout();
     } catch {
-      // Swallow — cookies cleared server-side regardless
+      // Swallow
     }
+    setTokens(null, null);
     setUser(null);
   }, []);
 

@@ -234,13 +234,15 @@ services:
     build:
       context: apps/web
       dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_API_URL: /graphql
     container_name: udb-frontend
     restart: unless-stopped
     ports:
       - '3030:3030'
     environment:
       PORT: 3030
-      NEXT_PUBLIC_API_URL: http://api:4000/graphql
+      NEXT_PUBLIC_API_URL: /graphql
       NODE_ENV: production
     depends_on:
       api: { condition: service_healthy }

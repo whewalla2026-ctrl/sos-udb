@@ -80,21 +80,11 @@ See [docs/FEATURE_FLAGS.md](docs/FEATURE_FLAGS.md) — 13 flags total (4 ON, 9 O
 | `docs/ROLLOUT_PLAN.md` | 4-phase rollout with rollback procedures |
 | `docs/DISASTER_RECOVERY_RUNTIME.md` | DR procedures and runtime ops |
 
-## Demo v19.0
+## Demo v20.0
 
 All services running via Docker Compose on `https://localhost/`.
 
-**Known Limitation:** `/auth/login` page returns 404 because Nginx proxies all `/auth/*` requests to the gateway (which has no HTML handler). Fix requires nginx config reload (blocked by Docker CLI unresponsiveness).
-
-**Workaround:** Login via curl, then navigate dashboard pages directly with the JWT cookie:
-
-```bash
-curl -sk -X POST https://localhost/auth/login \
-  -H "Content-Type: application/json" \
-  -d '{"email":"sarah.demo@udb.app","password":"DemoParent123!"}'
-```
-
-Pre-seeded demo accounts: Sarah (PARENT), Leo (CHILD), Maya (CHILD), Alex (ADMIN). See `docs/DEMO_SCRIPT.md` for full walkthrough.
+Login page renders at `https://localhost/auth/login` (GET → frontend, POST → gateway/auth-service). Pre-seeded demo accounts: Sarah (PARENT), Leo (CHILD), Maya (CHILD), Alex (ADMIN). See `docs/DEMO_SCRIPT.md` for full walkthrough.
 
 | Demo Account | Email | Password |
 |---|---|---|

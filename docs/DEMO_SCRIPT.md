@@ -41,29 +41,17 @@ Walk through:
 
 ### 2. Authentication & User Roles (3 min)
 
-**Login via API** (since `/auth/login` page routing needs Docker restart):
+**Login via Browser** (login page renders at `https://localhost/auth/login`):
 
-```bash
-# Login as Sarah (Parent)
-curl -sk -X POST https://localhost/auth/login \
-  -H "Content-Type: application/json" \
-  -d '{"email":"sarah.demo@udb.app","password":"DemoParent123!"}'
+1. Open `https://localhost/auth/login` in the browser
+2. Enter `sarah.demo@udb.app` / `DemoParent123!` and click Sign In
+3. Verify redirect to dashboard after successful login
+4. Log out, then try other demo accounts:
+   - Leo: `leo.demo@udb.app` / `DemoKid123!` (CHILD)
+   - Maya: `maya.demo@udb.app` / `DemoTeen123!` (CHILD)
+   - Alex: `admin.demo@udb.app` / `DemoAdmin123!` (ADMIN)
 
-# Login as Leo (Child)
-curl -sk -X POST https://localhost/auth/login \
-  -H "Content-Type: application/json" \
-  -d '{"email":"leo.demo@udb.app","password":"DemoKid123!"}'
-
-# Login as Maya (Child)
-curl -sk -X POST https://localhost/auth/login \
-  -H "Content-Type: application/json" \
-  -d '{"email":"maya.demo@udb.app","password":"DemoTeen123!"}'
-
-# Login as Alex (Admin)
-curl -sk -X POST https://localhost/auth/login \
-  -H "Content-Type: application/json" \
-  -d '{"email":"admin.demo@udb.app","password":"DemoAdmin123!"}'
-```
+> **Note:** Self-signed TLS warning expected — click "Advanced" → "Proceed to localhost".
 
 **Key Points:**
 - Returns JWT token, refresh token, userId, displayName, role
@@ -216,9 +204,6 @@ Browser → https://localhost:443 (Nginx)
 - Onboarding completed
 
 **Next Steps for Production:**
-- Restore Docker CLI access (currently hung — containers running but CLI unresponsive)
-- Rebuild frontend with correct `NEXT_PUBLIC_API_URL` for client-side API calls
-- Fix nginx `/auth/` routing conflict (separate API from page routes)
 - Configure proper TLS certificates (currently self-signed)
 - Set up email service for password reset / welcome emails
 - Configure Stripe webhooks for escrow payments
