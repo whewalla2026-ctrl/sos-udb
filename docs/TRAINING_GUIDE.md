@@ -40,7 +40,7 @@ The Unified Developmental Backbone (UDB) is a family-centered platform that help
 ### Creating Your Account
 
 1. Navigate to the UDB registration page (`/auth/register`).
-2. Enter your email address and create a strong password (min 8 characters, mixed case, numbers).
+2. Enter your email address and create a strong password (at least 12 characters, including uppercase, lowercase, a digit, and a special character).
 3. Select your role: Parent, Teen (13+), or Young Adult (18+).
 4. Complete your profile — timezone, preferred language, accessibility preferences.
 5. If you are a Parent, you will be guided through adding your children.

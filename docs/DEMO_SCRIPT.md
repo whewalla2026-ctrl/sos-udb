@@ -47,8 +47,8 @@ Walk through:
 2. Enter `sarah.demo@udb.app` / `DemoParent123!` and click Sign In
 3. Verify redirect to dashboard after successful login
 4. Log out, then try other demo accounts:
-   - Leo: `leo.demo@udb.app` / `DemoKid123!` (CHILD)
-   - Maya: `maya.demo@udb.app` / `DemoTeen123!` (CHILD)
+   - Leo: `leo.demo@udb.app` / `DemoKidPass123!` (CHILD)
+   - Maya: `maya.demo@udb.app` / `DemoTeenPass123!` (CHILD)
    - Alex: `admin.demo@udb.app` / `DemoAdmin123!` (ADMIN)
 
 > **Note:** Self-signed TLS warning expected — click "Advanced" → "Proceed to localhost".
@@ -131,7 +131,7 @@ Navigate dashboard routes. All return HTTP 200.
 - Pre-built alert rules (8 rules) in `infra/prometheus/alert-rules.yml`
 - Metrics: auth failures, signups, quests, Redis ops, DB pool
 
-**Grafana:** `http://localhost:3005` (admin/admin)
+**Grafana:** `http://localhost:3005` (admin / `GRAFANA_ADMIN_PASSWORD` env var — defaults to `admin123` in dev)
 - Dashboard: "UDB Runtime Overview" at `http://localhost:3005/d/udb-overview`
 - Panels: Service health, request rate, error rate, auth/signups, memory, quests
 - Data sources: Prometheus + Loki (configured)
@@ -218,8 +218,8 @@ Browser → https://localhost:443 (Nginx)
 | Name | Email | Password | Role |
 |------|-------|----------|------|
 | Sarah Johnson | sarah.demo@udb.app | DemoParent123! | PARENT |
-| Leo Johnson | leo.demo@udb.app | DemoKid123! | CHILD |
-| Maya Johnson | maya.demo@udb.app | DemoTeen123! | CHILD |
+| Leo Johnson | leo.demo@udb.app | DemoKidPass123! | CHILD |
+| Maya Johnson | maya.demo@udb.app | DemoTeenPass123! | CHILD |
 | Alex Admin | admin.demo@udb.app | DemoAdmin123! | ADMIN |
 
 ### User IDs
@@ -241,7 +241,7 @@ Browser → https://localhost:443 (Nginx)
 | Auth Register | `POST https://localhost/auth/register` |
 | GraphQL | `POST https://localhost/graphql` |
 | Prometheus | `http://localhost:9090` |
-| Grafana | `http://localhost:3005` (admin/admin) |
+| Grafana | `http://localhost:3005` (admin / `GRAFANA_ADMIN_PASSWORD`) |
 
 ### Key Files
 

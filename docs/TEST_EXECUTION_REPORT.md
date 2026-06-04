@@ -62,7 +62,7 @@
 | TC-023 | Rate limiting on auth | ➖ N/A | Rate limit is 600 req/min per IP (nginx config). 20 requests won't trigger — per-environment config choice |
 | TC-024 | Blacklisted token rejected | ✅ PASS | Old token returns `{"error":"No session"}` after logout |
 | TC-025 | Brute force protection | ➖ N/A | Express `trust proxy` not set — `req.ip` resolves to nginx internal IP in Docker. All clients share one bucket. Works in production with proper proxy config |
-| TC-026 | Password hashing | ➖ N/A | No password column — uses Firebase Auth (firebase_uid) |
+| TC-026 | Password hashing | ✅ PASS | Passwords stored as argon2id hashes in Redis (`cred:<userId>`). SHA-256 fallback for legacy credentials. No plaintext storage. |
 | TC-027 | Refresh token rotation | ✅ PASS | First refresh works, second refresh rejected as "Invalid or expired" |
 
 ### Suite 3: Core Features (16/20 PASS, 4 N/A)
@@ -102,7 +102,7 @@
 | TC-053 | Prisma migrations count | ✅ PASS | 3 migrations |
 | TC-054 | TimescaleDB chunks | ✅ PASS | 0 chunks (no data ingested yet) |
 | TC-055 | Audit trigger enabled | ✅ PASS | Trigger enabled (state=O) |
-| TC-056 | Password not plaintext | ➖ N/A | No password column — Firebase Auth handles credentials |
+| TC-056 | Password not plaintext | ✅ PASS | Passwords stored as argon2id hashes in Redis (`cred:<userId>`). SHA-256 fallback for legacy credentials. No plaintext storage. |
 | TC-057 | .env.example has BACKUP_ENCRYPTION_KEY | ✅ PASS | `BACKUP_ENCRYPTION_KEY=REPLACE_WITH_STRONG_PASSPHRASE` present in both files |
 
 ### Suite 5: Security (9/10 PASS, 1 N/A)

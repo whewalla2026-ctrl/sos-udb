@@ -25,7 +25,7 @@
 | GDPR right-to-be-forgotten | Phase Two §8.2 | ✅ | gdpr.service.ts → cascading delete with MFA re-verification |
 | Audit log immutability | Phase Two §5.1 | ✅ | `audit_logs_immutable` trigger, `prevent_audit_modification()` function |
 | AES-256-GCM at rest | Phase Two §11 | ✅ | backup.sh: `gpg --symmetric --cipher-algo AES256` |
-| Argon2id password hashing | Phase Two §1.1 SEC-01 | ✅ | password.service.ts: scrypt with random salt |
+| Argon2id password hashing | Phase Two §1.1 SEC-01 | ✅ | password.service.ts: argon2id via PasswordService.hash(). SHA-256 fallback for pre-migration credentials with auto-upgrade on login. 14 unit tests passing. |
 | JWT with HTTP-only cookies | Phase Two §4.1 | ✅ | jwt-token.service.ts, Set-Cookie: HttpOnly; Secure; SameSite=Strict |
 | Rate limiting (per-route) | Phase Two §1.1 INFRA-01 | ✅ | Gateway-level Redis sliding window with configurable max/windowMs |
 | GraphQL introspection disabled | Phase Two §4.1 | ✅ | Apollo Server: `introspection: false` |
