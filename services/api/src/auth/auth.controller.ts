@@ -1,5 +1,6 @@
 import { Controller, Post, Get, Body, Req, Res, HttpCode, Inject, Logger } from '@nestjs/common';
 import { AuthService } from './auth.service';
+import { PasswordService } from './password.service';
 import { MailService } from '../mail/mail.service';
 import { Request, Response } from 'express';
 import * as crypto from 'crypto';
@@ -41,6 +42,7 @@ export class AuthController {
 
   constructor(
     private authService: AuthService,
+    private passwordService: PasswordService,
     private prisma: PrismaService,
     private jwt: JwtService,
     private metrics: MetricsService,
@@ -55,8 +57,12 @@ export class AuthController {
     @Res({ passthrough: true }) res: Response,
   ) {
     const { email, password, displayName, role: bodyRole = 'CHILD' } = body;
-    if (!email || !password || password.length < 8) {
-      return { error: 'Invalid email or password (min 8 chars)' };
+    if (!email || !password) {
+      return { error: 'Email and password required' };
+    }
+    const pwStrength = this.passwordService.validatePasswordStrength(password);
+    if (!pwStrength.valid) {
+      return { error: `Password: ${pwStrength.errors.join('; ')}` };
     }
 
     const existing = await this.prisma.user.findUnique({ where: { email } });
@@ -88,9 +94,9 @@ export class AuthController {
       },
     });
 
-    // Store password hash in Redis
-    const passwordHash = crypto.createHash('sha256').update(password).digest('hex');
-    await this.redis.set(`cred:${user.id}`, passwordHash, 'EX', 365 * 24 * 60 * 60);
+    // Store password hash in Redis (argon2id via PasswordService)
+    const { hash: passwordHash } = await this.passwordService.hash(password);
+    await this.redis.set(`cred:${user.id}`, passwordHash);
 
     if (role === UserRole.CHILD) {
       await this.prisma.doterProfile.create({ data: { userId: user.id } });
@@ -113,6 +119,8 @@ export class AuthController {
       email: user.email,
       displayName: user.displayName,
       role: user.role,
+      token: accessToken,
+      refreshToken,
     };
   }
 
@@ -132,15 +140,22 @@ export class AuthController {
       return { error: 'Invalid credentials' };
     }
 
-    // Check password hash in Redis
+    // Check password hash in Redis (argon2id with SHA-256 fallback)
     const storedHash = await this.redis.get(`cred:${user.id}`);
     if (!storedHash) {
       return { error: 'No credentials stored. Register via this service first.' };
     }
 
-    const passwordHash = crypto.createHash('sha256').update(password).digest('hex');
-    if (storedHash !== passwordHash) {
-      return { error: 'Invalid credentials' };
+    const isValid = await this.passwordService.verify(password, storedHash);
+    if (!isValid) {
+      // SHA-256 fallback for pre-migration credentials
+      const sha256Hash = crypto.createHash('sha256').update(password).digest('hex');
+      if (storedHash !== sha256Hash) {
+        return { error: 'Invalid credentials' };
+      }
+      // Auto-upgrade SHA-256 → argon2id on successful login
+      const { hash: newHash } = await this.passwordService.hash(password);
+      await this.redis.set(`cred:${user.id}`, newHash);
     }
 
     const jti = crypto.randomUUID();
@@ -160,6 +175,8 @@ export class AuthController {
       email: user.email,
       displayName: user.displayName,
       role: user.role,
+      token: accessToken,
+      refreshToken,
     };
   }
 
@@ -181,6 +198,8 @@ export class AuthController {
         email: result.user.email,
         displayName: result.user.displayName,
         role: result.user.role,
+        token: result.accessToken,
+        refreshToken: result.refreshToken,
       };
     } catch {
       clearAuthCookies(res);
@@ -251,8 +270,8 @@ export class AuthController {
       return { error: 'User not found' };
     }
 
-    const passwordHash = crypto.createHash('sha256').update(newPassword).digest('hex');
-    await this.redis.set(`cred:${user.id}`, passwordHash, 'EX', 365 * 24 * 60 * 60);
+    const { hash: passwordHash } = await this.passwordService.hash(newPassword);
+    await this.redis.set(`cred:${user.id}`, passwordHash);
     await this.redis.del(`reset:${token}`);
 
     this.logger.log(`Password reset completed for ${user.email}`);
@@ -278,13 +297,17 @@ export class AuthController {
       return { error: 'No credentials stored' };
     }
 
-    const currentHash = crypto.createHash('sha256').update(currentPassword).digest('hex');
-    if (storedHash !== currentHash) {
-      return { error: 'Current password is incorrect' };
+    const isValid = await this.passwordService.verify(currentPassword, storedHash);
+    if (!isValid) {
+      // SHA-256 fallback for pre-migration credentials
+      const sha256Hash = crypto.createHash('sha256').update(currentPassword).digest('hex');
+      if (storedHash !== sha256Hash) {
+        return { error: 'Current password is incorrect' };
+      }
     }
 
-    const newHash = crypto.createHash('sha256').update(newPassword).digest('hex');
-    await this.redis.set(`cred:${user.id}`, newHash, 'EX', 365 * 24 * 60 * 60);
+    const { hash: newHash } = await this.passwordService.hash(newPassword);
+    await this.redis.set(`cred:${user.id}`, newHash);
 
     this.logger.log(`Password changed for ${email}`);
 

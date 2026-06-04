@@ -8,7 +8,7 @@ const crypto = require('crypto');
 const { PrismaClient } = require('@prisma/client');
 const Redis = require('ioredis');
 const { createLogger, correlationId } = require('../shared/logger');
-const { createToken, verifyToken, blacklistToken, createRefreshToken, hashPassword, verifyPassword, ROLES, logAudit, rateLimit } = require('../shared/security');
+const { createToken, verifyToken, blacklistToken, createRefreshToken, hashPassword, verifyPassword, sha256Hash, verifySha256, verifyCredential, argon2Hash, verifyArgon2, isArgon2Hash, ROLES, logAudit, rateLimit } = require('../shared/security');
 const { metricsMiddleware, metricsEndpoint, trackAuthFailure, trackRedisLatency, trackDbPool, trackRefreshReplayRejection, trackJwtRefresh, trackRedisReconnect } = require('../shared/prometheus');
 const eventBus = require('../shared/event-bus');
 
@@ -27,28 +27,41 @@ app.use(express.json({ limit: '50kb' }));
 app.use(correlationId);
 app.use(metricsMiddleware('auth-service'));
 
+function validatePasswordStrength(password) {
+  const errors = [];
+  if (!password || password.length < 12) errors.push('at least 12 characters');
+  if (!/[A-Z]/.test(password)) errors.push('an uppercase letter');
+  if (!/[a-z]/.test(password)) errors.push('a lowercase letter');
+  if (!/[0-9]/.test(password)) errors.push('a digit');
+  if (!/[^A-Za-z0-9]/.test(password)) errors.push('a special character');
+  return { valid: errors.length === 0, errors };
+}
+
 const authRateLimit = rateLimit({ windowMs: 60000, max: 30 });
 
 app.post('/auth/register', authRateLimit, async (req, res) => {
   try {
     const { email, password, displayName } = req.body;  // Intentionally do NOT destructure role - mass assignment protection
-    if (!email || !password || password.length < 8)
-      return res.status(400).json({ error: 'Invalid email or password (min 8 chars)' });
+    if (!email || !password)
+      return res.status(400).json({ error: 'Email and password required' });
+    const pwCheck = validatePasswordStrength(password);
+    if (!pwCheck.valid)
+      return res.status(400).json({ error: 'Password must contain: ' + pwCheck.errors.join(', ') });
     if (typeof email !== 'string' || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
       return res.status(400).json({ error: 'Invalid email format' });
     const existing = await prisma.user.findUnique({ where: { email } });
     if (existing) return res.status(409).json({ error: 'Email already exists' });
-    const passwordHash = hashPassword(password);
     const user = await prisma.user.create({
       data: { firebaseUid: `auth-${Date.now()}`, email, displayName: displayName || email.split('@')[0], role: 'CHILD' }
     });
     const start = Date.now();
-    await redis.hmset(`user:${user.id}`, 'passwordHash', passwordHash, 'email', email, 'role', user.role);
+    const passwordHash = await argon2Hash(password);
+    await redis.set(`cred:${user.id}`, passwordHash);
     trackRedisLatency(Date.now() - start);
     const token = createToken({ userId: user.id, role: user.role, email: user.email, displayName: user.displayName });
     const refreshToken = createRefreshToken(user.id);
     const refreshHash = crypto.createHash('sha256').update(refreshToken).digest('hex');
-    await redis.setex(`refresh:${user.id}:${refreshHash}`, 86400, 'valid');
+    await redis.setex(`refresh:${refreshHash}`, 86400, JSON.stringify({ userId: user.id }));
     await eventBus.publish('user_created', { userId: user.id, email: user.email, role: user.role });
     logAudit('AUTH_REGISTER', { userId: user.id, action: 'register', resource: 'user', ip: req.ip });
     log.info('User registered', { userId: user.id, email: user.email });
@@ -72,22 +85,27 @@ app.post('/auth/login', authRateLimit, async (req, res) => {
       return res.status(401).json({ error: 'Invalid credentials' });
     }
     const start = Date.now();
-    const creds = await redis.hgetall(`user:${user.id}`);
+    const result = await verifyCredential(user.id, password, redis);
     trackRedisLatency(Date.now() - start);
-    if (!creds || !creds.passwordHash) {
-      trackAuthFailure('no_stored_creds', 'auth-service');
-      return res.status(401).json({ error: 'No credentials stored. Register via this service first.' });
-    }
-    if (!verifyPassword(password, creds.passwordHash)) {
+    if (!result.matched) {
       trackAuthFailure('wrong_password', 'auth-service');
       logAudit('AUTH_LOGIN_FAIL', { userId: user.id, action: 'login_failed', resource: 'user', ip: req.ip });
       log.warn('Failed login', { email: user.email });
       return res.status(401).json({ error: 'Invalid credentials' });
     }
+    // Upgrade legacy credential to argon2id on successful login
+    if (result.format !== 'argon2id') {
+      const newHash = await argon2Hash(password);
+      await redis.set(`cred:${user.id}`, newHash);
+      if (result.format === 'scrypt') {
+        await redis.del(`user:${user.id}`);
+      }
+      log.info('Upgraded credential format', { userId: user.id, from: result.format, to: 'argon2id' });
+    }
     const token = createToken({ userId: user.id, role: user.role, email: user.email, displayName: user.displayName });
     const refreshToken = createRefreshToken(user.id);
     const refreshHash = crypto.createHash('sha256').update(refreshToken).digest('hex');
-    await redis.setex(`refresh:${user.id}:${refreshHash}`, 86400, 'valid');
+    await redis.setex(`refresh:${refreshHash}`, 86400, JSON.stringify({ userId: user.id }));
     await eventBus.publish('user_logged_in', { userId: user.id, email: user.email });
     logAudit('AUTH_LOGIN', { userId: user.id, action: 'login', resource: 'user', ip: req.ip });
     log.info('User logged in', { userId: user.id });
@@ -126,7 +144,8 @@ app.post('/auth/reset-password', authRateLimit, async (req, res) => {
   try {
     const { token, newPassword } = req.body;
     if (!token || !newPassword) return res.status(400).json({ error: 'token and newPassword required' });
-    if (newPassword.length < 8) return res.status(400).json({ error: 'Password must be at least 8 characters' });
+    const pwCheck = validatePasswordStrength(newPassword);
+    if (!pwCheck.valid) return res.status(400).json({ error: 'Password must contain: ' + pwCheck.errors.join(', ') });
 
     const tokenHash = crypto.createHash('sha256').update(token).digest('hex');
     const stored = await redis.get(`reset:${tokenHash}`);
@@ -136,8 +155,10 @@ app.post('/auth/reset-password', authRateLimit, async (req, res) => {
     const user = await prisma.user.findUnique({ where: { id: userId } });
     if (!user) return res.status(404).json({ error: 'User not found' });
 
-    const newHash = hashPassword(newPassword);
-    await redis.hset(`user:${userId}`, 'passwordHash', newHash);
+    const newHash = await argon2Hash(newPassword);
+    await redis.set(`cred:${userId}`, newHash);
+    // Clean up legacy scrypt format if it exists
+    await redis.del(`user:${userId}`);
 
     // Revoke ALL refresh tokens
     const refreshKeys = await redis.keys(`refresh:${userId}:*`);
@@ -164,26 +185,26 @@ app.post('/auth/change-password', authRateLimit, async (req, res) => {
       return res.status(400).json({ error: 'email, currentPassword, and newPassword required' });
     if (typeof email !== 'string' || typeof currentPassword !== 'string' || typeof newPassword !== 'string')
       return res.status(400).json({ error: 'Invalid input types' });
-    if (newPassword.length < 8)
-      return res.status(400).json({ error: 'New password must be at least 8 characters' });
+    const pwCheck = validatePasswordStrength(newPassword);
+    if (!pwCheck.valid)
+      return res.status(400).json({ error: 'Password must contain: ' + pwCheck.errors.join(', ') });
     if (currentPassword === newPassword)
       return res.status(400).json({ error: 'New password must differ from current password' });
 
     const user = await prisma.user.findUnique({ where: { email } });
     if (!user) return res.status(404).json({ error: 'User not found' });
 
-    const creds = await redis.hgetall(`user:${user.id}`);
-    if (!creds || !creds.passwordHash)
-      return res.status(401).json({ error: 'No credentials stored. Register via this service first.' });
-
-    if (!verifyPassword(currentPassword, creds.passwordHash)) {
+    const result = await verifyCredential(user.id, currentPassword, redis);
+    if (!result.matched) {
       trackAuthFailure('wrong_password', 'auth-service');
       logAudit('AUTH_CHANGE_PASSWORD_FAIL', { userId: user.id, action: 'change_password_failed', resource: 'password', ip: req.ip });
       return res.status(401).json({ error: 'Current password is incorrect' });
     }
 
-    const newHash = hashPassword(newPassword);
-    await redis.hset(`user:${user.id}`, 'passwordHash', newHash);
+    const newHash = await argon2Hash(newPassword);
+    await redis.set(`cred:${user.id}`, newHash);
+    // Clean up legacy scrypt format if it exists
+    await redis.del(`user:${user.id}`);
 
     // Revoke ALL refresh tokens for this user
     const refreshKeys = await redis.keys(`refresh:${user.id}:*`);
@@ -211,7 +232,7 @@ app.post('/auth/refresh', async (req, res) => {
     if (!decoded || decoded.type !== 'refresh') return res.status(401).json({ error: 'Invalid refresh token' });
     // Verify token exists in Redis storage (rotation check)
     const tokenHash = crypto.createHash('sha256').update(refreshToken).digest('hex');
-    const key = `refresh:${decoded.userId}:${tokenHash}`;
+    const key = `refresh:${tokenHash}`;
     const stored = await redis.get(key);
     if (!stored) {
       trackRefreshReplayRejection();
@@ -224,7 +245,7 @@ app.post('/auth/refresh', async (req, res) => {
     const token = createToken({ userId: decoded.userId, role: decoded.role || 'CHILD' });
     const newRefresh = createRefreshToken(decoded.userId);
     const newHash = crypto.createHash('sha256').update(newRefresh).digest('hex');
-    await redis.setex(`refresh:${decoded.userId}:${newHash}`, 86400, 'valid');
+    await redis.setex(`refresh:${newHash}`, 86400, JSON.stringify({ userId: decoded.userId }));
     trackJwtRefresh('success');
     logAudit('AUTH_REFRESH', { userId: decoded.userId, action: 'token_refresh', resource: 'token', ip: req.ip });
     log.info('Token refreshed', { userId: decoded.userId });

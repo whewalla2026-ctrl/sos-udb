@@ -12,8 +12,11 @@ const { metricsMiddleware, metricsEndpoint, trackRequestDrain } = require('./sha
 const { CircuitBreaker } = require('./shared/circuit-breaker');
 const eventBus = require('./shared/event-bus');
 const queueService = require('./shared/queue');
+const expressRateLimit = require('express-rate-limit');
+const crypto = require('crypto');
 
 const app = express();
+app.set('trust proxy', 1);
 const PORT = process.env.GATEWAY_PORT || 3000;
 const log = createLogger('api-gateway');
 
@@ -22,6 +25,7 @@ const SERVICES = {
   planner: { host: process.env.PLANNER_SERVICE_HOST || 'localhost', port: parseInt(process.env.PLANNER_SERVICE_PORT || '3002') },
   ai: { host: process.env.AI_SERVICE_HOST || 'localhost', port: parseInt(process.env.AI_SERVICE_PORT || '3003') },
   monitoring: { host: process.env.MONITORING_SERVICE_HOST || 'localhost', port: parseInt(process.env.MONITORING_SERVICE_PORT || '3004') },
+  api: { host: process.env.API_SERVICE_HOST || 'localhost', port: parseInt(process.env.API_SERVICE_PORT || '4000') },
 };
 
 const circuitBreakers = {};
@@ -44,7 +48,7 @@ app.use(correlationId);
 app.use(metricsMiddleware('api-gateway'));
 
 // Brute-force protection for auth routes (Redis-backed, shared across instances)
-const { checkBruteForce } = require('./shared/redis-state');
+const { checkBruteForce, blacklistToken, getRedis } = require('./shared/redis-state');
 async function bruteForceProtect(req, res, next) {
   let ip = req.connection?.remoteAddress || req.socket?.remoteAddress || req.ip || 'unknown';
   if (ip.startsWith('::ffff:')) ip = ip.substring(7);
@@ -59,6 +63,7 @@ async function bruteForceProtect(req, res, next) {
 }
 
 const globalRateLimit = rateLimit({ windowMs: 60000, max: 200 });
+const authLimiter = expressRateLimit({ windowMs: 15 * 60 * 1000, max: 10, message: { error: 'Too many auth requests, try again later' }, standardHeaders: true, legacyHeaders: false });
 
 const apiRateLimit = rateLimit({ windowMs: 60000, max: 100 });
 
@@ -83,8 +88,14 @@ function proxy(targetService) {
     delete forwardedHeaders['content-length'];
     delete forwardedHeaders['host'];
     delete forwardedHeaders['connection'];
-    const bodyStr = Object.keys(req.body || {}).length > 0 ? JSON.stringify(req.body) : null;
-    if (bodyStr) forwardedHeaders['content-length'] = Buffer.byteLength(bodyStr).toString();
+    delete forwardedHeaders['transfer-encoding'];
+    const bodyStr = (req.body !== undefined && req.body !== null)
+      ? JSON.stringify(req.body)
+      : null;
+    if (bodyStr && bodyStr !== '{}') {
+      forwardedHeaders['content-type'] = 'application/json';
+      forwardedHeaders['content-length'] = Buffer.byteLength(bodyStr).toString();
+    }
     const opts = {
       hostname: target.host,
       port: target.port,
@@ -148,8 +159,8 @@ async function requireAuth(req, res, next) {
 // --- Routes ---
 
 // Auth routes (unauthenticated)
-app.post('/auth/register', bruteForceProtect, globalRateLimit, proxy('auth'));
-app.post('/auth/login', bruteForceProtect, globalRateLimit, proxy('auth'));
+app.post('/auth/register', bruteForceProtect, globalRateLimit, authLimiter, proxy('auth'));
+app.post('/auth/login', bruteForceProtect, globalRateLimit, authLimiter, proxy('auth'));
 app.post('/auth/refresh', globalRateLimit, proxy('auth'));
 app.post('/auth/validate', globalRateLimit, proxy('auth'));
 app.post('/auth/forgot-password', globalRateLimit, proxy('auth'));
@@ -158,6 +169,26 @@ app.post('/auth/change-password', globalRateLimit, proxy('auth'));
 
 // Auth routes (authenticated)
 app.get('/auth/me', requireAuth, (req, res) => res.json(req.user));
+
+app.post('/auth/logout', requireAuth, async (req, res) => {
+  try {
+    const authHeader = req.headers['authorization'];
+    if (authHeader) {
+      const token = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : authHeader;
+      await blacklistToken(token);
+    }
+    const { refreshToken } = req.body;
+    if (refreshToken && typeof refreshToken === 'string') {
+      const hash = crypto.createHash('sha256').update(refreshToken).digest('hex');
+      const redis = await getRedis();
+      await redis.del(`refresh:${hash}`);
+    }
+    logAudit('AUTH_LOGOUT', { userId: req.user?.userId, action: 'logout', resource: 'session', ip: req.ip });
+    return res.json({ success: true });
+  } catch (err) {
+    return res.status(500).json({ error: 'Logout failed', detail: err.message });
+  }
+});
 
 // Planner routes
 app.post('/planning/generate', requireAuth, apiRateLimit, proxy('planner'));
@@ -212,6 +243,9 @@ app.post('/gateway/circuit-breakers/:name/reset', (req, res) => {
   cb.reset();
   return res.json({ message: `Circuit breaker '${req.params.name}' reset to CLOSED`, state: cb.getState() });
 });
+
+// GraphQL (proxied to NestJS API)
+app.all('/graphql', requireAuth, proxy('api'));
 
 // Service health endpoints
 app.get('/auth/health', proxy('auth'));

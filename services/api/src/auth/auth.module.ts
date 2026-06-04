@@ -3,6 +3,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { ConfigService } from '@nestjs/config';
 import { AuthService } from './auth.service';
+import { PasswordService } from './password.service';
 import { AuthResolver } from './auth.resolver';
 import { AdminAuthResolver } from './admin-auth.resolver';
 import { AuthController } from './auth.controller';
@@ -27,7 +28,7 @@ import { MetricsModule } from '../shared/metrics.module';
     MetricsModule,
   ],
   controllers: [AuthController],
-  providers: [AuthService, AuthResolver, AdminAuthResolver, FirebaseStrategy, JwtStrategy, GqlAuthGuard, RolesGuard],
+  providers: [AuthService, PasswordService, AuthResolver, AdminAuthResolver, FirebaseStrategy, JwtStrategy, GqlAuthGuard, RolesGuard],
   exports: [AuthService, GqlAuthGuard, RolesGuard, JwtModule],
 })
 export class AuthModule {}

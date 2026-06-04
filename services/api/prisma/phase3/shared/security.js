@@ -1,4 +1,5 @@
 const crypto = require('crypto');
+const argon2 = require('argon2');
 const redisState = require('./redis-state');
 
 const JWT_SECRET = process.env.JWT_SECRET || 'dev-secret-change-in-production-32chars';
@@ -84,7 +85,7 @@ function clearRateLimitBuckets() {
   inMemoryFallback.clear();
 }
 
-// --- Password hashing ---
+// --- Password hashing (scrypt - legacy phase3 format) ---
 function hashPassword(password) {
   const salt = crypto.randomBytes(16).toString('hex');
   const hash = crypto.scryptSync(password, salt, 64).toString('hex');
@@ -94,6 +95,61 @@ function hashPassword(password) {
 function verifyPassword(password, stored) {
   const [salt, hash] = stored.split(':');
   return crypto.scryptSync(password, salt, 64).toString('hex') === hash;
+}
+
+// --- SHA-256 (NestJS-compatible format, legacy) ---
+function sha256Hash(password) {
+  return crypto.createHash('sha256').update(password).digest('hex');
+}
+
+function verifySha256(password, storedHash) {
+  return sha256Hash(password) === storedHash;
+}
+
+// --- Argon2id (new standard) ---
+async function argon2Hash(password) {
+  return argon2.hash(password, {
+    memoryCost: 65536,
+    timeCost: 3,
+    parallelism: 1,
+    type: argon2.argon2id,
+  });
+}
+
+async function verifyArgon2(password, storedHash) {
+  try {
+    return await argon2.verify(storedHash, password);
+  } catch {
+    return false;
+  }
+}
+
+function isArgon2Hash(stored) {
+  return typeof stored === 'string' && stored.startsWith('$argon2');
+}
+
+// --- Universal credential verify: argon2id first, then SHA-256, then scrypt fallback ---
+async function verifyCredential(userId, password, redis) {
+  // Try argon2id first (current standard)
+  const stored = await redis.get(`cred:${userId}`);
+  if (stored !== null && stored !== undefined) {
+    if (isArgon2Hash(stored)) {
+      const matched = await verifyArgon2(password, stored);
+      return { matched, format: matched ? 'argon2id' : 'argon2id' };
+    }
+    // SHA-256 fallback for pre-migration credentials
+    if (verifySha256(password, stored)) {
+      return { matched: true, format: 'sha256' };
+    }
+    return { matched: false, format: 'sha256' };
+  }
+  // Fall back to phase3 format: user:<userId> hmset with scrypt hash
+  const creds = await redis.hgetall(`user:${userId}`);
+  if (creds && creds.passwordHash) {
+    if (verifyPassword(password, creds.passwordHash)) return { matched: true, format: 'scrypt' };
+    return { matched: false, format: 'scrypt' };
+  }
+  return { matched: false, format: 'none' };
 }
 
 // --- Audit logging (Redis-backed) ---
@@ -129,5 +185,7 @@ module.exports = {
   ROLES, hasRole, requireRole,
   rateLimit, clearRateLimitBuckets,
   hashPassword, verifyPassword,
+  sha256Hash, verifySha256, verifyCredential,
+  argon2Hash, verifyArgon2, isArgon2Hash,
   logAudit, getAuditLog,
 };
