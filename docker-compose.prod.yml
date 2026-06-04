@@ -46,13 +46,15 @@ services:
     image: redis:7-alpine
     container_name: udb-redis
     restart: unless-stopped
-    command: redis-server --appendonly yes --save 60 1 --save 300 10
+    command: redis-server --appendonly yes --save 60 1 --save 300 10 --requirepass ${REDIS_PASSWORD:-changeme}
+    environment:
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-changeme}
     ports:
       - '6379:6379'
     volumes:
       - redis_data:/data
     healthcheck:
-      test: ['CMD', 'redis-cli', 'ping']
+      test: ['CMD-SHELL', 'redis-cli -a $REDIS_PASSWORD ping | grep -q PONG']
       interval: 10s
       timeout: 5s
       retries: 5
@@ -79,13 +81,15 @@ services:
       AI_SERVICE_PORT: 3003
       MONITORING_SERVICE_HOST: monitoring-service
       MONITORING_SERVICE_PORT: 3004
-      REDIS_URL: redis://redis:6379
+      API_SERVICE_HOST: api
+      API_SERVICE_PORT: 4000
+      REDIS_URL: redis://:${REDIS_PASSWORD:-changeme}@redis:6379
       DATABASE_URL: postgresql://udb:${DB_PASSWORD:-udb}@pgbouncer:6432/udb?schema=public
       JWT_SECRET: ${JWT_SECRET}
       NODE_ENV: production
     depends_on:
       redis: { condition: service_healthy }
-      postgres: { condition: service_healthy }
+      pgbouncer: { condition: service_healthy }
     healthcheck:
       test: ['CMD', 'curl', '-f', 'http://localhost:3000/gateway/health']
       interval: 30s
@@ -105,13 +109,13 @@ services:
     restart: unless-stopped
     environment:
       AUTH_SERVICE_PORT: 3001
-      REDIS_URL: redis://redis:6379
+      REDIS_URL: redis://:${REDIS_PASSWORD:-changeme}@redis:6379
       DATABASE_URL: postgresql://udb:${DB_PASSWORD:-udb}@pgbouncer:6432/udb?schema=public&pgbouncer=true
       JWT_SECRET: ${JWT_SECRET}
       NODE_ENV: production
     depends_on:
       redis: { condition: service_healthy }
-      postgres: { condition: service_healthy }
+      pgbouncer: { condition: service_healthy }
     healthcheck:
       test: ['CMD', 'curl', '-f', 'http://localhost:3001/auth/health']
       interval: 30s
@@ -131,12 +135,12 @@ services:
     restart: unless-stopped
     environment:
       PLANNER_SERVICE_PORT: 3002
-      REDIS_URL: redis://redis:6379
+      REDIS_URL: redis://:${REDIS_PASSWORD:-changeme}@redis:6379
       DATABASE_URL: postgresql://udb:${DB_PASSWORD:-udb}@pgbouncer:6432/udb?schema=public&pgbouncer=true
       NODE_ENV: production
     depends_on:
       redis: { condition: service_healthy }
-      postgres: { condition: service_healthy }
+      pgbouncer: { condition: service_healthy }
     healthcheck:
       test: ['CMD', 'curl', '-f', 'http://localhost:3002/planner/health']
       interval: 30s
@@ -156,14 +160,14 @@ services:
     restart: unless-stopped
     environment:
       AI_SERVICE_PORT: 3003
-      REDIS_URL: redis://redis:6379
+      REDIS_URL: redis://:${REDIS_PASSWORD:-changeme}@redis:6379
       DATABASE_URL: postgresql://udb:${DB_PASSWORD:-udb}@pgbouncer:6432/udb?schema=public
       AI_COST_PER_HINT: '0.0004'
       AI_BUDGET_PER_USER_MONTHLY: '0.50'
       NODE_ENV: production
     depends_on:
       redis: { condition: service_healthy }
-      postgres: { condition: service_healthy }
+      pgbouncer: { condition: service_healthy }
     healthcheck:
       test: ['CMD', 'curl', '-f', 'http://localhost:3003/ai/health']
       interval: 30s
@@ -183,12 +187,12 @@ services:
     restart: unless-stopped
     environment:
       MONITORING_SERVICE_PORT: 3004
-      REDIS_URL: redis://redis:6379
+      REDIS_URL: redis://:${REDIS_PASSWORD:-changeme}@redis:6379
       DATABASE_URL: postgresql://udb:${DB_PASSWORD:-udb}@pgbouncer:6432/udb?schema=public
       NODE_ENV: production
     depends_on:
       redis: { condition: service_healthy }
-      postgres: { condition: service_healthy }
+      pgbouncer: { condition: service_healthy }
     healthcheck:
       test: ['CMD', 'curl', '-f', 'http://localhost:3004/monitoring/health']
       interval: 30s
@@ -212,12 +216,12 @@ services:
       API_PORT: 4000
       DATABASE_URL: postgresql://udb:${DB_PASSWORD:-udb}@pgbouncer:6432/udb?schema=public&pgbouncer=true
       DIRECT_URL: postgresql://udb:${DB_PASSWORD:-udb}@postgres:5432/udb?schema=public
-      REDIS_URL: redis://redis:6379
+      REDIS_URL: redis://:${REDIS_PASSWORD:-changeme}@redis:6379
       JWT_SECRET: ${JWT_SECRET}
       NODE_ENV: production
       NEXT_PUBLIC_APP_URL: ${NEXT_PUBLIC_APP_URL:-http://localhost:3030}
     depends_on:
-      postgres: { condition: service_healthy }
+      pgbouncer: { condition: service_healthy }
       redis: { condition: service_healthy }
     healthcheck:
       test: ['CMD', 'curl', '-f', 'http://localhost:4000/health']
@@ -244,10 +248,12 @@ services:
       PORT: 3030
       NEXT_PUBLIC_API_URL: /graphql
       NODE_ENV: production
+      GATEWAY_URL: http://gateway:3000
+      API_URL: http://api:4000
     depends_on:
       api: { condition: service_healthy }
     healthcheck:
-      test: ['CMD', 'curl', '-f', 'http://localhost:3030']
+      test: ['CMD', 'wget', '-qO-', 'http://127.0.0.1:3030']
       interval: 15s
       timeout: 5s
       start_period: 30s
@@ -393,7 +399,7 @@ services:
     restart: unless-stopped
     environment:
       GF_SECURITY_ADMIN_USER: admin
-      GF_SECURITY_ADMIN_PASSWORD: admin123
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:-admin123}
       GF_INSTALL_PLUGINS: ''
     volumes:
       - ./infra/grafana/datasources:/etc/grafana/provisioning/datasources

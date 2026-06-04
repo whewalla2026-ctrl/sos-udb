@@ -1,10 +1,9 @@
-version: '3.8'
 services:
   postgres:
-    image: postgres:15-alpine
+    image: postgres:16-alpine
     environment:
       POSTGRES_USER: udb
-      POSTGRES_PASSWORD: udb
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-udb}
       POSTGRES_DB: udb
     ports:
       - "5432:5432"
