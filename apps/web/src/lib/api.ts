@@ -3,9 +3,46 @@ var NESTJS_URL = process.env.NEXT_PUBLIC_API_URL ? process.env.NEXT_PUBLIC_API_U
 var accessToken: string | null = null;
 var refreshTokenValue: string | null = null;
 
+try {
+  if (typeof localStorage !== 'undefined') {
+    accessToken = localStorage.getItem('accessToken');
+    refreshTokenValue = localStorage.getItem('refreshToken');
+  }
+} catch {}
+
+function setCookie(name: string, value: string, maxAgeSeconds: number) {
+  if (typeof document === 'undefined') return;
+  var cookie = `${name}=${value}; path=/; max-age=${maxAgeSeconds}; SameSite=Strict`;
+  if (location.protocol === 'https:') cookie += '; Secure';
+  document.cookie = cookie;
+}
+
+function clearCookie(name: string) {
+  if (typeof document === 'undefined') return;
+  document.cookie = `${name}=; path=/; max-age=0`;
+}
+
 export function setTokens(access: string | null, refresh: string | null) {
   accessToken = access;
   refreshTokenValue = refresh;
+  try {
+    if (typeof localStorage !== 'undefined') {
+      if (access) localStorage.setItem('accessToken', access);
+      else localStorage.removeItem('accessToken');
+      if (refresh) localStorage.setItem('refreshToken', refresh);
+      else localStorage.removeItem('refreshToken');
+    }
+  } catch {}
+  if (access) {
+    setCookie('access_token', access, 900);
+  } else {
+    clearCookie('access_token');
+  }
+  if (refresh) {
+    setCookie('refresh_token', refresh, 604800);
+  } else {
+    clearCookie('refresh_token');
+  }
 }
 
 var FRIENDLY_ERRORS: Record<number, string> = {

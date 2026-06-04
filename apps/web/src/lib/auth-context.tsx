@@ -30,7 +30,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   var clearError = useCallback(() => setError(null), []);
 
   useEffect(() => {
-    api.validate()
+    api.refresh()
+      .then((data) => setTokens(data.token, data.refreshToken))
+      .catch(() => {})
+      .then(() => api.validate())
       .then(function(data) {
         setUser({ userId: data.userId, email: data.email, displayName: data.displayName, role: data.role });
       })
