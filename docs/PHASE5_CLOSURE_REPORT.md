@@ -1,14 +1,14 @@
-# Phase 5 Closure Report — UDB Hardening
+# Phase 5 Closure Report — UDB Hardening (Final)
 
 ## Summary
 
 - **Project:** SOS-UDB
 - **Phase:** 5 (Hardening & Final Closure)
 - **Tag:** `v21.0-hardened`
-- **Date:** 2026-06-04
-- **Commits:** 5 (plus 1 tag)
-- **Files changed:** 30 files, +2764 / -124 lines
-- **Phase 5 span:** `68a4470..HEAD` (5 commits over Phase 1-4 base)
+- **Date:** 2026-06-05
+- **Commits:** 7 (plus 1 tag)
+- **Files changed:** 32 files, +4667 / -124 lines
+- **Phase 5 span:** `68a4470..HEAD` (7 commits over Phase 1-4 base)
 
 ---
 
@@ -172,14 +172,84 @@ v21.0-hardened → 116353e
 
 ---
 
+## Phase 5 Failures Resolved (Final Closure Run)
+
+### Failure 1: Registration "Bad Request" (HTTP 400)
+- **Root cause:** PowerShell `curl.exe` argument escaping — `\"` inside `"..."` strings is mangled by PowerShell, sending only `Content-Length: 2` (literal `{}`) instead of the full JSON body. The auth service itself is correct.
+- **Fix:** Use `-d @file.json` to bypass PowerShell parsing. Node.js `http.request()` and the auth pipeline test suite work correctly because they construct the body programmatically.
+- **Verified:** `curl -d @file.json` → 201 Created with JSON; auth pipeline 17/17 pass; Node.js http test → 201.
+
+### Failure 2: Docker Image Sizes (3-5x expected)
+- **Root cause:** `.dockerignore` had only `node_modules/` (top-level) but not `**/node_modules/`. Host `services/api/prisma/phase3/node_modules/` (149MB) was copied into every image, overwriting `npm ci`-installed dependencies.
+- **Fix:** Added `**/node_modules/` to `.dockerignore`.
+- **Verified:**
+  - Gateway: **1.14GB → 734MB** (↓ 406MB)
+  - Auth: **919MB → 603MB** (↓ 316MB)
+  - Planner/AI/Monitoring: **864MB → 501MB** (↓ 363MB each)
+  - Gateway node_modules: 189MB → 68MB; Prisma removed from gateway; no build tools in runner stages.
+
+### Failure 3: argon2id Hash Storage Never Verified
+- **Root cause:** Was blocked by the registration "Bad Request" error in prior testing. Once registration was confirmed working, verification could proceed.
+- **Verified:**
+  - `cred:<userId>` in Redis: **`$argon2id$v=19$m=65536,t=3,p=1$...`** confirmed (not SHA-256 hex)
+  - Cross-registration: Phase3 register → NestJS login → 200 with token
+  - argon2 module: loaded successfully in auth container
+  - Credential TTL: **-1** (no expiry)
+  - Build tools (python3, g++): NOT present in runner stages
+  - Container user: **appuser** (non-root) in all microservices
+
+## Final Verification (TASK 5)
+
+| Check | Result |
+|-------|--------|
+| Auth pipeline integration tests | **17/17 pass** |
+| Non-root containers | **all appuser** |
+| Service health | **all healthy** |
+| Weak password validation | correctly rejected |
+| Password service unit tests | **14/14 pass** |
+| Git working tree | **clean** |
+| Tag | **v21.0-hardened** |
+
+## Docker Images (Final)
+
+| Image | Size |
+|-------|------|
+| sos-udb-api | 1.35 GB |
+| sos-udb-gateway | 734 MB |
+| sos-udb-auth-service | 603 MB |
+| sos-udb-planner-service | 501 MB |
+| sos-udb-ai-service | 501 MB |
+| sos-udb-monitoring-service | 501 MB |
+| sos-udb-db-backup | 258 MB |
+| sos-udb-frontend | 228 MB |
+| sos-udb-nginx | 94 MB |
+| sos-udb-pgbouncer | 21.5 MB |
+
+## Git History (Complete)
+
+```
+d6c0a89 fix: .dockerignore nested node_modules exclusion, add Status5.md
+3971bd6 docs: Phase 5 closure report — all 12 tasks completed, v21.0-hardened tag
+116353e docs: final closure documentation, delivery checklist, demo script, test reports, hardening status
+da4d26a feat: frontend Docker optimization, relative API URL build arg, middleware auth, public assets
+bfbfa88 feat: argon2id password hashing, trust proxy, password validation alignment across auth pipeline
+e90b63b infra: Dockerfile hardening — multi-stage builds, non-root, argon2 build deps, npm ci
+34a8045 infra: Docker hardening — multi-stage builds, non-root containers, PgBouncer deps, deterministic builds
+```
+
+## Known Limitations
+
+- **Windows Docker Desktop:** Host cannot directly reach exposed ports (0.0.0.0:PORT bound but unreachable). All testing via `docker exec` or internal container networking.
+- **PowerShell curl.exe:** Requires `-d @file.json` for JSON body data due to `\"` escaping being mangled by PowerShell. Use `curl.exe` from cmd or WSL for direct API calls from host.
+- **Rate limiter:** Auth rate limit (10 requests per 15 minutes) is in-memory and resets on container restart. In production, use Redis-backed rate limiting for persistence.
+- **npm package.json is shared** across all phase3 microservices, so the gateway installs argon2 and other unnecessary packages (~68MB vs an ideal ~20MB for gateway-only deps). Splitting into per-service package.json would further reduce image sizes.
+
 ## Conclusion
 
-All 12 Phase 5 tasks completed successfully:
+All Phase 5 tasks completed and verified. Three unresolved failures from the initial claim were diagnosed, fixed, and verified:
 
-- **Security:** Password hashing migrated from SHA-256 (unsalted) to argon2id (memory-hard, salted) in both NestJS and Phase3, with transparent auto-upgrade on login and no credential TTL.
-- **Infrastructure:** Dockerfiles hardened with multi-stage builds, non-root `appuser`, deterministic `npm ci`, and correct dependency ordering (PgBouncer before services).
-- **Frontend:** Docker-optimized with build-arg API URLs, middleware auth routing, and improved Apollo Client integration.
-- **Documentation:** Delivery checklist, demo script, test reports, and training guide all updated for the hardened stack.
-- **Git:** 5 structured commits + annotated tag `v21.0-hardened`, working tree clean.
+1. ✅ Registration works — the "Bad Request" was a PowerShell escaping issue, not a code bug
+2. ✅ Image sizes reduced 34-42% by fixing `.dockerignore` pattern for nested node_modules
+3. ✅ argon2id hash storage confirmed in Redis with cross-registration working bidirectionally
 
-The UDB stack is now production-hardened with industry-standard password hashing, properly configured containers, and comprehensive documentation.
+The UDB stack is production-hardened with argon2id password hashing, properly configured non-root containers, deterministic Docker builds, comprehensive test coverage (17/17 auth pipeline, 14/14 password service), and fully documented.
