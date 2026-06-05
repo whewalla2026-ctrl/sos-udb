@@ -70,7 +70,7 @@ pgsql/
 certbot/accounts/
 
 # Local/prototype artifacts
-services/api/prisma/phase3/
+# services/api/prisma/phase3/
 services/api/prisma/generate-sql.js
 tmp/
 src/schema.gql

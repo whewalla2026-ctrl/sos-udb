@@ -43,8 +43,8 @@ docker exec -i udb-postgres psql -U udb udb < backup_file.sql
 
 ### Redis Backup
 ```bash
-# Save Redis data
-docker exec udb-redis redis-cli SAVE
+# Save Redis data (authenticated — REDIS_PASSWORD required)
+docker exec udb-redis redis-cli -a "$REDIS_PASSWORD" SAVE
 
 # Backup RDB file
 docker cp udb-redis:/data/dump.rdb ./redis_backup.rdb
@@ -66,7 +66,7 @@ docker compose restart frontend
 ```bash
 # Check all services
 curl http://localhost:4000/health       # API
-redis-cli ping                          # Redis
+redis-cli -a "$REDIS_PASSWORD" ping     # Redis (authenticated)
 docker exec udb-postgres pg_isready    # PostgreSQL
 ```
 
@@ -84,6 +84,13 @@ docker exec udb-postgres pg_isready    # PostgreSQL
   1. Maintainers should have SSH key access to production hosts (or use a jump box)
   2. Docker Compose deploy: pull → `docker compose -f docker-compose.prod.yml up -d --build`
   3. Rollback: `git revert HEAD` → rebuild the affected service
-  4. Grafana dashboards at `http://localhost:3005` (admin/admin) — check loki logs + prometheus metrics first
+   4. Grafana dashboards at `http://localhost:3005` (admin / `GRAFANA_ADMIN_PASSWORD` env var) — check loki logs + prometheus metrics first
+
+## Password Hashing Note
+
+All user passwords are hashed with **Argon2id** (`$argon2id$v=19$...`) using memory-hard parameters. Redis stores the full hash string. On restore:
+- Hashes are portable across architectures (same `argon2` package version required)
+- No plaintext or reversible storage — password reset requires user action
+- Redis backup includes all hash data — ensure backup encryption is in place (see `BACKUP_ENCRYPTION_KEY`)
 
 ## Status: TESTED ✅

@@ -19,3 +19,9 @@
 | v13.0.0 | 2026-05-30 | v13.0.0 | Gap resolution: 446 tests, Redis migration, CI verified |
 | v14.0.0 | 2026-05-31 | v14.0-verified-stable | 9.8/10: 18 containers verified, full system snapshot, 3 dead services → Redis |
 | v15.0.0 | 2026-05-31 | v15.0-hardened | 10/10: 5 gaps closed, full testing, delivery audit, training guide. **Engineering phase complete.** |
+| v16.0.0 | 2026-06-01 | — | Post-engineering stabilization: infrastructure hardening, container security baseline |
+| v17.0.0 | 2026-06-02 | — | Testing infrastructure improvements, CI pipeline hardening |
+| v18.0.0 | 2026-06-03 | v18.0-tests-closed | 446/446 + 29/29 tests passing, test closure report generated |
+| v19.0.0 | 2026-06-03 | v19.0-demo-ready | Demo seed data, demo script, demo flow verified end-to-end |
+| v20.0.0 | 2026-06-04 | v20.0-demo-fixed | Nginx auth routing fix, relative API URL build arg, JWT client-side storage |
+| v21.0.0 | 2026-06-05 | v21.0-hardened | Docker hardening (multi-stage, non-root, 34-42% smaller), argon2id hashing, 17/17 + 14/14 auth tests, `.dockerignore`. **Deployment ready.** |

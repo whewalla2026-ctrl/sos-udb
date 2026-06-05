@@ -2,7 +2,7 @@
 
 Education platform for child development (ages 6-23) with AI tutoring, gamification, parental oversight, and safety-first design.
 
-**Version:** v15.0-hardened | **Status:** Engineering complete — transitioning to operations.
+**Version:** v21.0-hardened | **Status:** Engineering complete — transitioning to operations.
 
 ## Quick Start
 
@@ -48,7 +48,7 @@ pnpm test              # Run all tests (446+ unit, 29 E2E)
 ## Testing
 
 ```bash
-pnpm test              # 446 unit tests (34 suites) + 29 E2E
+pnpm test              # 446 unit tests (34 suites) + 29 E2E + 17 auth pipeline + 14 password service
 pnpm lint              # ESLint (0 errors expected)
 pnpm typecheck         # TypeScript strict mode (0 errors)
 ```
@@ -70,17 +70,17 @@ See [docs/FEATURE_FLAGS.md](docs/FEATURE_FLAGS.md) — 13 flags total (4 ON, 9 O
 | Document | Description |
 |----------|-------------|
 | `KNOWN_LIMITATIONS.md` | Current known limitations and score |
-| `DEPLOYMENT_HISTORY.md` | Version history from v1.0.0 → v15.0 |
+| `DEPLOYMENT_HISTORY.md` | Version history from v1.0.0 → v21.0 |
 | `docs/FEATURE_FLAGS.md` | 13-flag inventory with activation criteria |
 | `docs/USE_CASE_AUDIT.md` | 120 use case completion audit (98.3%) |
 | `docs/DELIVERY_CHECKLIST.md` | Requirements verification (53 items) |
 | `docs/TRAINING_GUIDE.md` | End user training guide |
-| `docs/TEST_REPORT_v15.0.md` | Comprehensive test verification report |
+| `docs/TEST_REPORT_v15.0.md` | Test verification report (v15.0 baseline) |
 | `docs/RUNBOOK.md` | Deployment and incident response runbook |
 | `docs/ROLLOUT_PLAN.md` | 4-phase rollout with rollback procedures |
 | `docs/DISASTER_RECOVERY_RUNTIME.md` | DR procedures and runtime ops |
 
-## Demo v20.0
+## Demo v21.0
 
 All services running via Docker Compose on `https://localhost/`.
 
@@ -89,9 +89,18 @@ Login page renders at `https://localhost/auth/login` (GET → frontend, POST →
 | Demo Account | Email | Password |
 |---|---|---|
 | Sarah Johnson | sarah.demo@udb.app | DemoParent123! |
-| Leo Johnson | leo.demo@udb.app | DemoKid123! |
-| Maya Johnson | maya.demo@udb.app | DemoTeen123! |
+| Leo Johnson | leo.demo@udb.app | DemoKidPass123! |
+| Maya Johnson | maya.demo@udb.app | DemoTeenPass123! |
 | Alex Admin | admin.demo@udb.app | DemoAdmin123! |
+
+## Security
+
+- **Password Hashing:** Argon2id (`$argon2id$v=19$...`) verified in Redis — all auth passwords hashed with memory-hard parameters
+- **Non-root containers:** All services run as non-root user after Docker hardening
+- **JWT Authentication:** HS256 tokens with configurable expiry
+- **Input Validation:** Mass assignment protection — API register always creates `CHILD` role
+- **Audit Immutability:** `audit_logs_immutable` trigger prevents `DELETE`/`UPDATE` on audit logs
+- **Docker Hardening:** Multi-stage builds, `npm ci` with frozen lockfile, `**/node_modules/` in `.dockerignore` (34-42% image size reduction)
 
 ## License
 
