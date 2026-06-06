@@ -46,19 +46,38 @@ Generated 6 strong random secrets via `setup-secrets.ps1`.
 - [ ] Require branches up to date
 - [ ] Do not allow bypassing
 
-## Task 5: CI Trigger
+## Task 5: CI Trigger + Fixes
 
-Two pushes sent to `release/v1-production`:
-1. `0d5ecbb` — CI workflow rewrite
-2. `06a0e7d` — Secrets setup script
+**First run (27044178333):** 2 of 4 jobs failed
+- `typecheck` ❌ — `PrismaClient` not exported; Prisma client types not generated
+- `test` ❌ — Same root cause; blockchain test failed to compile
+- Root cause: `prisma generate` never ran in CI, so `@prisma/client` had no model types
 
-**Action required:** Check GitHub → Actions tab for pipeline run status.
+**Fix applied:** Added `pnpm --filter @udb/api prisma:generate` step before typecheck and test.
+
+**Second run (27060477063):** ✅ **All 4 jobs green**
+| Job | Time | Status |
+|-----|------|--------|
+| typecheck | 1m 5s | ✅ |
+| lint | 50s | ✅ |
+| test | 1m 32s | ✅ |
+| docker-build | 4m 38s | ✅ |
+
+## Task 6: Branch Protection
+
+⚠️ **GitHub Pro required** — the REST API returned:
+> "Upgrade to GitHub Pro or make this repository public to enable this feature."
+
+Branch protection (required PRs, status checks, up-to-date) cannot be set on private repos with GitHub Free. Options:
+1. Upgrade to **GitHub Pro** ($4/month) — enables branch protection rules
+2. **Make repo public** — branch protection is free on public repos
+3. Manual enforcement via **repo conventions** for now
 
 ## Files Changed
 
 | File | Action |
 |------|--------|
-| `.github/workflows/ci.yml` | Rewritten — 4 parallel jobs with service containers |
+| `.github/workflows/ci.yml` | Rewritten — 4 parallel jobs, service containers, prisma generate |
 | `.github/workflows/setup-secrets.ps1` | Created — secret generation helper |
 
 ---
@@ -66,9 +85,14 @@ Two pushes sent to `release/v1-production`:
 ## CI Workflow Summary
 
 ```yaml
-# 4 jobs, running in parallel:
-#   typecheck   → pnpm typecheck
+# 4 parallel jobs:
+#   typecheck   → prisma:generate + pnpm typecheck
 #   lint        → pnpm lint
-#   test        → pnpm test:api (with postgres + redis service containers)
+#   test        → prisma:generate + pnpm test:api (postgres + redis service containers)
 #   docker-build → docker compose -f docker-compose.prod.yml build --parallel
 ```
+
+## GitHub Secrets Configured
+
+6 secrets added via `gh secret set`:
+`JWT_SECRET`, `DB_PASSWORD`, `REDIS_PASSWORD`, `GRAFANA_ADMIN_PASSWORD`, `BACKUP_ENCRYPTION_KEY`, `CI_JWT_SECRET`
