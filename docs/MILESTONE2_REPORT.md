@@ -28,23 +28,15 @@
 
 ## Task 3: GitHub Secrets
 
-Generated 6 strong random secrets via `setup-secrets.ps1`.
-
-**Action required:** Navigate to GitHub → Settings → Secrets and variables → Actions and add:
-- `JWT_SECRET`
-- `DB_PASSWORD`
-- `REDIS_PASSWORD`
-- `GRAFANA_ADMIN_PASSWORD`
-- `BACKUP_ENCRYPTION_KEY`
-- `CI_JWT_SECRET`
+Generated 6 strong random secrets via `setup-secrets.ps1` and configured via `gh secret set`:
+- `JWT_SECRET`, `DB_PASSWORD`, `REDIS_PASSWORD`, `GRAFANA_ADMIN_PASSWORD`, `BACKUP_ENCRYPTION_KEY`, `CI_JWT_SECRET`
 
 ## Task 4: Branch Protection
 
-**Action required:** GitHub → Settings → Branches → Add rule for `release/v1-production`:
-- [ ] Require pull request before merging
-- [ ] Require status checks: `typecheck`, `lint`, `test`, `docker-build`
-- [ ] Require branches up to date
-- [ ] Do not allow bypassing
+**✅ Completed — repo made public, rules enforced via REST API.**
+
+- Repo visibility changed from private → public to unlock branch protection on Free plan
+- Applied via `gh api` with `required_status_checks` (strict, 4 checks), `required_pull_request_reviews` (1 approval), `enforce_admins: true`
 
 ## Task 5: CI Trigger + Fixes
 
@@ -63,15 +55,14 @@ Generated 6 strong random secrets via `setup-secrets.ps1`.
 | test | 1m 32s | ✅ |
 | docker-build | 4m 38s | ✅ |
 
-## Task 6: Branch Protection
+## Task 6: Branch Protection (Resolved)
 
-⚠️ **GitHub Pro required** — the REST API returned:
-> "Upgrade to GitHub Pro or make this repository public to enable this feature."
+⚠️ Initial attempt blocked — API returned "Upgrade to GitHub Pro or make this repository public."
 
-Branch protection (required PRs, status checks, up-to-date) cannot be set on private repos with GitHub Free. Options:
-1. Upgrade to **GitHub Pro** ($4/month) — enables branch protection rules
-2. **Make repo public** — branch protection is free on public repos
-3. Manual enforcement via **repo conventions** for now
+**Resolution:** Made the repo public (user choice), then applied branch protection via REST API:
+- `required_status_checks` with `strict: true` and 4 required contexts
+- `required_pull_request_reviews` with 1 approving review
+- `enforce_admins: true`
 
 ## Files Changed
 
