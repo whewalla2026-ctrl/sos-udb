@@ -1,6 +1,6 @@
 # Milestone 2: CI/CD Activation Report
 
-**Date:** 2026-06-05
+**Date:** 2026-06-06
 **Branch:** release/v1-production
 **Repo:** github.com/whewalla2026-ctrl/sos-udb
 
@@ -35,8 +35,10 @@ Generated 6 strong random secrets via `setup-secrets.ps1` and configured via `gh
 
 **✅ Completed — repo made public, rules enforced via REST API.**
 
-- Repo visibility changed from private → public to unlock branch protection on Free plan
-- Applied via `gh api` with `required_status_checks` (strict, 4 checks), `required_pull_request_reviews` (1 approval), `enforce_admins: true`
+- Repo visibility changed from private → public via `gh repo edit --visibility public`
+- Applied via `gh api` with `required_status_checks` (strict, 4 checks: typecheck, lint, test, docker-build) and `enforce_admins: true`
+- PR reviews removed from rule (impractical for solo project — no second account to approve)
+- Effective workflow: push feature branch → create PR → CI runs 4 jobs → merge via UI (or direct push only if commit already has passing CI)
 
 ## Task 5: CI Trigger + Fixes
 
@@ -60,9 +62,10 @@ Generated 6 strong random secrets via `setup-secrets.ps1` and configured via `gh
 ⚠️ Initial attempt blocked — API returned "Upgrade to GitHub Pro or make this repository public."
 
 **Resolution:** Made the repo public (user choice), then applied branch protection via REST API:
-- `required_status_checks` with `strict: true` and 4 required contexts
-- `required_pull_request_reviews` with 1 approving review
-- `enforce_admins: true`
+- `required_status_checks` with `strict: true` and 4 required contexts (typecheck, lint, test, docker-build)
+- `enforce_admins: true` — no bypassing rules
+- PR reviews removed (solo project constraint — cannot self-approve)
+- PR #1 created and merged to `release/v1-production` to validate the flow
 
 ## Files Changed
 
@@ -87,3 +90,16 @@ Generated 6 strong random secrets via `setup-secrets.ps1` and configured via `gh
 
 6 secrets added via `gh secret set`:
 `JWT_SECRET`, `DB_PASSWORD`, `REDIS_PASSWORD`, `GRAFANA_ADMIN_PASSWORD`, `BACKUP_ENCRYPTION_KEY`, `CI_JWT_SECRET`
+
+## Pre-existing Workflows (Not Modified)
+
+The repo also contains these workflow files that were NOT part of this milestone:
+- `validate.yml` — typecheck, lint, test, build (overlaps with ci.yml; uses `pnpm run` commands)
+- `security.yml` — npm-audit, truffleHog secret-scan (failing on historical secrets), Snyk dependency-scan
+- `docker.yml` — API-only Docker build (redundant with ci.yml docker-build)
+- `staging-deploy.yml` — Full staging pipeline (test→deploy→smoke→readiness) on push to release/v1-production
+- `release.yml` — DB validation + audit on PR to main
+- `load.yml` — k6 load test (PR to main or manual dispatch)
+- `pentest.yml` — OWASP ZAP + security checks (scheduled 2x/month or manual)
+
+**Note:** `validate.yml`, `security.yml`, and `docker.yml` have overlapping triggers with `ci.yml` and will run on every push/PR, causing redundant CI minutes. Consider consolidating or disabling redundant workflows.
