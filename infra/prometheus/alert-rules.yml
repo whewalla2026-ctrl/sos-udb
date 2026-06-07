@@ -47,6 +47,24 @@ groups:
           summary: 'High auth failure rate'
           description: '> 10 auth failures/minute for 2 minutes.'
 
+      - alert: DatabaseConnectionPoolExhausted
+        expr: udb_db_connection_status == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: 'Database connection pool exhausted'
+          description: 'Database connection pool is exhausted on {{ $labels.service }}.'
+
+      - alert: BackupFailed
+        expr: time() - udb_backup_last_success_timestamp > 43200
+        for: 10m
+        labels:
+          severity: critical
+        annotations:
+          summary: 'Database backup failed'
+          description: 'Last successful backup was more than 12 hours ago.'
+
       - alert: SignupDrop
         expr: rate(udb_signups_total[1h]) < rate(udb_signups_total[24h] offset 24h) * 0.5
         for: 1h
