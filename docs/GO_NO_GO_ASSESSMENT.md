@@ -16,17 +16,15 @@
 
 ### 2. No P0 (critical) bugs unresolved
 
-- **Status:** ⬜ Pending
-- **Current:** 2 active issues
-  - P2: No documented login passwords for any seeded users (`cred:*` hashes exist in Redis but passwords are unknown). **Workaround:** "Forgot Password" flow or re-register users with known passwords via `seed-redis.cjs`.
-  - P2: Credential hashes lost on Redis container restart — documented in BURN_IN_TRACKING.md. **Fix:** Create `seed-redis.cjs` to re-populate hashes on restart.
+- **Status:** ✅ Pass (resolved 2026-06-07)
+- **Resolution:** `seed-redis.cjs` created (argon2id hashing), all 17 passwords reset to known values. Verified: 17/17 login OK, all creds survive Redis restart.
 - **Requirement:** Zero P0/P1 bugs before Go decision
 
 ### 3. 10+ families active
 
 - **Status:** ✅ Pass (10 families registered)
 - **Proof:** All 10 `@udb.alpha` parent accounts exist in PostgreSQL
-- **Note:** Login not verified — passwords unknown (see above)
+- **Note:** All 17 accounts login verified (17/17 OK from gateway internal test)
 
 ### 4. All 4 required features verified
 
@@ -66,8 +64,8 @@
 
 ### 3. At least 1 co-op quest completed between families
 
-- **Status:** ⬜ Pending (requires verified login + active families)
-- **Blocked by:** Unknown passwords for alpha families
+- **Status:** ⬜ Pending (requires active families using the app)
+- **Note:** Login credentials now available — Alpha<Family>2026! pattern
 
 ---
 
@@ -91,17 +89,15 @@
 
 | Date | Assessment |
 |------|-----------|
-| 2026-06-07 (Day 5) | **Conditional Go** with blockers: resolve credential issue, install k6 for load tests, install AWS CLI for terraform. All infrastructure healthy. |
+| 2026-06-07 (Day 5) | **Conditional Go** with blockers: install k6 for load tests, install AWS CLI for terraform. Credential issue resolved (seed-redis.cjs created, all 17 logins verified). All infrastructure healthy. |
 | 2026-06-17 (target) | ⬜ Final assessment pending burn-in completion |
 
 ## Required Actions Before Go
 
 | # | Action | Owner | Deadline |
 |---|--------|-------|----------|
-| 1 | Create `seed-redis.cjs` with known test passwords | DevOps | 06-10 |
-| 2 | Install k6 + run load test (50 VUs, 60s) | DevOps | 06-12 |
-| 3 | Install AWS CLI + verify Terraform plan | DevOps | 06-14 |
-| 4 | Collect 5+ family feedback responses | Product | 06-16 |
-| 5 | Create seed-redis.cjs for credential persistence | DevOps | 06-10 |
-| 6 | Run daily burn-in check for all 14 days | DevOps | Per tracking sheet |
-| 7 | Close all P0/P1 bugs | Engineering | 06-16 |
+| 1 | Install k6 + run load test (50 VUs, 60s) | DevOps | 06-12 |
+| 2 | Install AWS CLI + verify Terraform plan | DevOps | 06-14 |
+| 3 | Collect 5+ family feedback responses | Product | 06-16 |
+| 4 | Run daily burn-in check for all 14 days | DevOps | Per tracking sheet |
+| 5 | Distribute credentials to alpha families | Product | 06-10 |
