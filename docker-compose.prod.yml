@@ -16,6 +16,9 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    networks:
+      default:
+        ipv4_address: 172.20.0.2
     deploy:
       resources:
         limits: { memory: 512M }
@@ -29,6 +32,11 @@ services:
     restart: unless-stopped
     ports:
       - '6432:6432'
+    extra_hosts:
+      - 'postgres:172.20.0.2'
+    environment:
+      DB_USER: udb
+      DB_PASSWORD: ${DB_PASSWORD:-udb}
     depends_on:
       postgres: { condition: service_healthy }
     healthcheck:
@@ -420,19 +428,30 @@ services:
       dockerfile: Dockerfile.backup
     container_name: udb-db-backup
     restart: unless-stopped
+    ports:
+      - '9122:9122'
     environment:
       DB_URL: postgresql://udb:${DB_PASSWORD:-udb}@pgbouncer:6432/udb
       BACKUP_ENCRYPTION_KEY: ${BACKUP_ENCRYPTION_KEY:-}
+      METRICS_PORT: '9122'
     volumes:
       - db_backups:/backups
     depends_on:
       pgbouncer: { condition: service_healthy }
     command: >
-      sh -c '/usr/local/bin/backup.sh; while true; do sleep 21600 && /usr/local/bin/backup.sh; done'
+      sh -c 'python3 /usr/local/bin/metrics-server.py &
+             while true; do /usr/local/bin/backup.sh; sleep 21600; done'
     deploy:
       resources:
         limits: { memory: 128M }
         reservations: { memory: 64M }
+
+networks:
+  default:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
 
 volumes:
   postgres_data:
