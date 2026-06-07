@@ -6,9 +6,51 @@ rule_files:
   - 'alert-rules.yml'
 
 scrape_configs:
+  - job_name: 'udb-gateway'
+    metrics_path: '/metrics'
+    static_configs:
+      - targets: ['gateway:3000']
+        labels:
+          service: 'udb-gateway'
+
+  - job_name: 'udb-auth'
+    metrics_path: '/metrics'
+    static_configs:
+      - targets: ['auth-service:3001']
+        labels:
+          service: 'udb-auth'
+
+  - job_name: 'udb-planner'
+    metrics_path: '/metrics'
+    static_configs:
+      - targets: ['planner-service:3002']
+        labels:
+          service: 'udb-planner'
+
+  - job_name: 'udb-ai'
+    metrics_path: '/metrics'
+    static_configs:
+      - targets: ['ai-service:3003']
+        labels:
+          service: 'udb-ai'
+
+  - job_name: 'udb-monitoring'
+    metrics_path: '/metrics'
+    static_configs:
+      - targets: ['monitoring-service:3004']
+        labels:
+          service: 'udb-monitoring'
+
   - job_name: 'udb-api'
     metrics_path: '/metrics'
     static_configs:
       - targets: ['api:4000']
         labels:
           service: 'udb-api'
+
+  - job_name: 'udb-backup'
+    metrics_path: '/metrics'
+    static_configs:
+      - targets: ['db-backup:9122']
+        labels:
+          service: 'udb-backup'

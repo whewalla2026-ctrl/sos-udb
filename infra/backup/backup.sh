@@ -73,4 +73,12 @@ fi
 find "${OUTPUT_DIR}" -name "udb-db-*.sql.gz" -o -name "udb-db-*.sql.gz.gpg" -mtime +7 -delete 2>/dev/null || true
 
 log "Backup completed successfully"
+
+# Write Prometheus metric for BackupFailed alert
+cat > /tmp/backup-metrics.prom <<EOPROM
+# HELP udb_backup_last_success_timestamp Last successful backup timestamp
+# TYPE udb_backup_last_success_timestamp gauge
+udb_backup_last_success_timestamp $(date +%s)
+EOPROM
+
 exit 0

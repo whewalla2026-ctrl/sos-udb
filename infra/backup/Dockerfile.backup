@@ -1,5 +1,7 @@
 FROM alpine:3.19
-RUN apk add --no-cache postgresql-client gpg gpg-agent aws-cli bash
+RUN apk add --no-cache postgresql-client gpg gpg-agent aws-cli bash python3
 COPY backup.sh /usr/local/bin/backup.sh
-RUN chmod +x /usr/local/bin/backup.sh
-CMD ["/usr/local/bin/backup.sh"]
+COPY metrics-server.py /usr/local/bin/metrics-server.py
+RUN chmod +x /usr/local/bin/backup.sh /usr/local/bin/metrics-server.py
+EXPOSE 9122
+CMD ["/bin/sh", "-c", "python3 /usr/local/bin/metrics-server.py & /usr/local/bin/backup.sh"]
