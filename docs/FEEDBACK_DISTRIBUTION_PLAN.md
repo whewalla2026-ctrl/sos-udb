@@ -62,7 +62,6 @@ If response rate is below 50% by 06-14, send a reminder or follow up individuall
 
 ## Credential Note
 
-Due to the known credential issue (P2 — Redis cred:* hashes with unknown passwords), families who need to log in should:
-1. Visit http://localhost:3030
-2. Use "Forgot Password" to reset
-3. Contact alpha-support@sos-udb.com for help
+Credentials have been reset to known passwords (see ALPHA_WELCOME_EMAIL.md).
+`seed-redis.cjs` at `services/api/prisma/phase3/` repopulates hashes on Redis restart.
+All 17 accounts verified working (17/17 login OK, Redis restart persistence confirmed).

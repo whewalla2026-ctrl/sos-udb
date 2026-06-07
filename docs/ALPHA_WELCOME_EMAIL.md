@@ -9,9 +9,12 @@ Your Login Credentials
 -----------------------
 URL:      http://localhost:3030
 Email:    {{email}}
-Password: {{temporaryPassword}}
+Password: {{password}}
 
-Please log in and change your password immediately.
+Family passwords follow the pattern: Alpha<FamilyName>2026!
+(e.g., AlphaRiver2026! for the River family)
+
+Please log in and change your password after first login.
 
 Quick Start Checklist
 ---------------------
