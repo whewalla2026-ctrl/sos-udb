@@ -13,8 +13,8 @@
 |  3 | 06-05 | 100% | 0% | 0 | 0 | Monaco editor issue (pre-existing) |
 |  4 | 06-06 | 100% | 0% | 0 | 0 | Stable |
 |  5 | 06-07 | 100% | 0% | 7 | 0 | Phase 5C onboarded + PR #6 deployed. Burn-in check 12/12 pass. Backup ts: 1780816065. Known: no known login password for seeded users |
-|  6 |      |      |            |           |               | |
-|  7 |      |      |            |           |               | |
+|  6 | 06-08 | 100% | 0% | 0 | 0 | Stable |
+|  7 | 06-09 | 100% | ~0.03% | 0 | 0 | All 7/7 Prometheus targets UP, 19 cred keys, 18 users, 566 errors (24h), auth pipeline 16/17 pass |
 |  8 |      |      |            |           |               | |
 |  9 |      |      |            |           |               | |
 | 10 |      |      |            |           |               | |
