@@ -63,7 +63,7 @@ async function bruteForceProtect(req, res, next) {
 }
 
 const globalRateLimit = rateLimit({ windowMs: 60000, max: 200 });
-const authLimiter = expressRateLimit({ windowMs: 15 * 60 * 1000, max: 10, message: { error: 'Too many auth requests, try again later' }, standardHeaders: true, legacyHeaders: false });
+const authLimiter = expressRateLimit({ windowMs: 15 * 60 * 1000, max: 30, message: { error: 'Too many auth requests, try again later' }, standardHeaders: true, legacyHeaders: false });
 
 const apiRateLimit = rateLimit({ windowMs: 60000, max: 100 });
 

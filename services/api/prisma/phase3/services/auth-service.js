@@ -24,6 +24,12 @@ const redis = new Redis(process.env.REDIS_URL || 'redis://localhost:6379', {
 app.use(helmet({ contentSecurityPolicy: false }));
 app.use(cors({ origin: process.env.CORS_ORIGIN || 'http://localhost:3000', credentials: true }));
 app.use(express.json({ limit: '50kb' }));
+app.use((err, req, res, next) => {
+  if (err instanceof SyntaxError && err.status === 400 && 'body' in err) {
+    return res.status(400).json({ error: 'Invalid JSON in request body', detail: err.message });
+  }
+  next();
+});
 app.use(correlationId);
 app.use(metricsMiddleware('auth-service'));
 
