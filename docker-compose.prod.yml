@@ -33,7 +33,7 @@ services:
     ports:
       - '6432:6432'
     extra_hosts:
-      - 'postgres:172.20.0.2'
+      - 'postgres:172.20.0.13'
     environment:
       DB_USER: udb
       DB_PASSWORD: ${DB_PASSWORD:-udb}

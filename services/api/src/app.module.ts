@@ -43,6 +43,9 @@ import { HealthModule } from './health/health.module';
 import { TutorModule } from './tutor/tutor.module';
 import { MailModule } from './mail/mail.module';
 import { BillingModule } from './billing/billing.module';
+import { InstitutionalModule } from './institutional/institutional.module';
+import { QuestStoreModule } from './quest-store/quest-store.module';
+import { SharedModule } from './shared/shared.module';
 import { createGraphQLMetricsPlugin } from './shared/graphql-metrics.plugin';
 
 @Module({
@@ -107,6 +110,9 @@ import { createGraphQLMetricsPlugin } from './shared/graphql-metrics.plugin';
     TutorModule,
     BillingModule,
     MailModule,
+    InstitutionalModule,
+    QuestStoreModule,
+    SharedModule,
   ],
   providers: [
     {

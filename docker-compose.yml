@@ -8,7 +8,7 @@ services:
       POSTGRES_PASSWORD: ${DB_PASSWORD:-udb}
       POSTGRES_DB: udb
     ports:
-      - '5432:5432'
+      - '127.0.0.1:5435:5432'
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:

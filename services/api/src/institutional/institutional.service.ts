@@ -70,6 +70,13 @@ export class InstitutionalService {
     return [];
   }
 
+  async getCohortSize(schoolId: string): Promise<number> {
+    const result = await this.prisma.$queryRaw<any[]>`
+      SELECT COUNT(*) as count FROM users WHERE school_id = ${schoolId}
+    `;
+    return Number(result[0]?.count || 0);
+  }
+
   async assignQuestToClass(questId: string, classId: string, teacherId: string): Promise<void> {
     const classStudents = await this.prisma.$queryRaw<any[]>`
       SELECT id FROM users WHERE class_id = ${classId} AND role = 'CHILD'
