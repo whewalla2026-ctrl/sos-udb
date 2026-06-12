@@ -41,7 +41,7 @@ export class FeatureFlagService implements OnModuleInit {
       { name: 'safety-score', enabled: true, createdAt: new Date(), updatedAt: new Date() },
       { name: 'data-export', enabled: true, createdAt: new Date(), updatedAt: new Date() },
       { name: 'joon-world', enabled: true, createdAt: new Date(), updatedAt: new Date() },
-      { name: 'co-op-quests', enabled: false, createdAt: new Date(), updatedAt: new Date() },
+      { name: 'co-op-quests', enabled: true, createdAt: new Date(), updatedAt: new Date() },
       { name: 'messaging', enabled: true, createdAt: new Date(), updatedAt: new Date() },
       { name: 'institutional', enabled: true, createdAt: new Date(), updatedAt: new Date() },
       { name: 'quest-store', enabled: true, createdAt: new Date(), updatedAt: new Date() },

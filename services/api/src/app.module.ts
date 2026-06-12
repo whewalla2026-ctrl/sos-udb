@@ -46,6 +46,15 @@ import { BillingModule } from './billing/billing.module';
 import { InstitutionalModule } from './institutional/institutional.module';
 import { QuestStoreModule } from './quest-store/quest-store.module';
 import { SharedModule } from './shared/shared.module';
+import { GamificationModule } from './gamification/gamification.module';
+import { VisionModule } from './vision/vision.module';
+import { PlannerModule } from './planner/planner.module';
+import { AgentModule } from './agent/agent.module';
+import { FutureSelfModule } from './future-self/future-self.module';
+import { FeedbackModule } from './feedback/feedback.module';
+import { ExportModule } from './export/export.module';
+import { SocialModule } from './social/social.module';
+import { CoopQuestModule } from './quests/coop-quest.module';
 import { createGraphQLMetricsPlugin } from './shared/graphql-metrics.plugin';
 
 @Module({
@@ -113,6 +122,15 @@ import { createGraphQLMetricsPlugin } from './shared/graphql-metrics.plugin';
     InstitutionalModule,
     QuestStoreModule,
     SharedModule,
+    GamificationModule,
+    VisionModule,
+    PlannerModule,
+    AgentModule,
+    FutureSelfModule,
+    FeedbackModule,
+    ExportModule,
+    SocialModule,
+    CoopQuestModule,
   ],
   providers: [
     {

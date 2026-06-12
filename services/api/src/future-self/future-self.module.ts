@@ -1,13 +1,12 @@
 import { Module } from '@nestjs/common';
-import { GamificationService } from './gamification.service';
-import { GamificationResolver } from './gamification.resolver';
+import { FutureSelfService } from './future-self.service';
 import { PrismaModule } from '../prisma/prisma.module';
 import { UUPSyncModule } from '../uup-sync/uup-sync.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 
 @Module({
   imports: [PrismaModule, UUPSyncModule, EventEmitterModule.forRoot()],
-  providers: [GamificationService, GamificationResolver],
-  exports: [GamificationService],
+  providers: [FutureSelfService],
+  exports: [FutureSelfService],
 })
-export class GamificationModule {}
+export class FutureSelfModule {}

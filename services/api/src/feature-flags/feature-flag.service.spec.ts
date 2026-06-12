@@ -46,7 +46,7 @@ describe('FeatureFlagService', () => {
   it('should return false for disabled flags', async () => {
     expect(await service.isEnabled('offline-tutor')).toBe(false);
     expect(await service.isEnabled('desktop-agent')).toBe(false);
-    expect(await service.isEnabled('co-op-quests')).toBe(false);
+    expect(await service.isEnabled('biometric-feed')).toBe(false);
   });
 
   it('should return false for unknown flags', async () => {
