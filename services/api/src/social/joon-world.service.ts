@@ -41,15 +41,21 @@ export class JoonWorldService {
     private eventEmitter: EventEmitter2,
     @Inject(REDIS_CLIENT) private redis: Redis,
   ) {
-    this.initializeDefaultPods();
+    this.initializeDefaultPods().catch(err =>
+      this.logger.warn(`Failed to initialize default pods: ${err.message}`)
+    );
   }
 
   private async initializeDefaultPods() {
     for (const pod of this.DEFAULT_PODS) {
       const key = `${this.POD_KEY_PREFIX}${pod.id}`;
-      const exists = await this.redis.exists(key);
-      if (!exists) {
-        await this.redis.set(key, JSON.stringify(pod));
+      try {
+        const exists = await this.redis.exists(key);
+        if (!exists) {
+          await this.redis.set(key, JSON.stringify(pod));
+        }
+      } catch (err: any) {
+        this.logger.warn(`Redis unavailable for pod ${pod.id}: ${err.message}`);
       }
     }
   }
